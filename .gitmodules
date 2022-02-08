@@ -1,0 +1,12 @@
+[submodule "arb"]
+	path = arb
+	url = https://github.com/fredrik-johansson/arb.git
+[submodule "flint2"]
+	path = flint2
+	url = https://github.com/wbhart/flint2.git
+[submodule "antic"]
+	path = antic
+	url = https://github.com/wbhart/antic.git
+[submodule "calcium"]
+	path = calcium
+	url = https://github.com/fredrik-johansson/calcium.git
