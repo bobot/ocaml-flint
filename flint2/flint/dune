@@ -1,0 +1,400 @@
+(data_only_dirs flint2)
+
+;make sure the library .a is compiled with pic, and is used for .cmxs
+
+(rule
+ (alias flint2_build)
+ (targets
+  aprcl.h
+  arith.h
+  arithxx.h
+  d_mat.h
+  double_extras.h
+  d_vec.h
+  exception.h
+  fft.h
+  fft_tuning.h
+  flint-config.h
+  flint.h
+  fmpq.h
+  fmpq_mat.h
+  fmpq_matxx.h
+  fmpq_mpoly_factor.h
+  fmpq_mpoly.h
+  fmpq_poly.h
+  fmpq_polyxx.h
+  fmpq_vec.h
+  fmpqxx.h
+  fmpz-conversions.h
+  fmpz_factor.h
+  fmpz_factorxx.h
+  fmpz.h
+  fmpz_lll.h
+  fmpz_mat.h
+  fmpz_matxx.h
+  fmpz_mod.h
+  fmpz_mod_mat.h
+  fmpz_mod_mpoly_factor.h
+  fmpz_mod_mpoly.h
+  fmpz_mod_poly_factor.h
+  fmpz_mod_poly_factorxx.h
+  fmpz_mod_poly.h
+  fmpz_mod_polyxx.h
+  fmpz_mod_vec.h
+  fmpz_mpoly_factor.h
+  fmpz_mpoly.h
+  fmpz_poly_factor.h
+  fmpz_poly_factorxx.h
+  fmpz_poly.h
+  fmpz_poly_mat.h
+  fmpz_poly_matxx.h
+  fmpz_poly_q.h
+  fmpz_poly_qxx.h
+  fmpz_polyxx.h
+  fmpz_vec.h
+  fmpz_vecxx.h
+  fmpzxx.h
+  fq_default.h
+  fq_default_mat.h
+  fq_default_poly_factor.h
+  fq_default_poly.h
+  fq_embed.h
+  fq_embed_templates.h
+  fq.h
+  fq_mat.h
+  fq_mat_templates.h
+  fq_nmod_embed.h
+  fq_nmod.h
+  fq_nmod_mat.h
+  fq_nmod_mpoly_factor.h
+  fq_nmod_mpoly.h
+  fq_nmod_poly_factor.h
+  fq_nmod_poly.h
+  fq_nmod_vec.h
+  fq_poly_factor.h
+  fq_poly_factor_templates.h
+  fq_poly.h
+  fq_poly_templates.h
+  fq_templates.h
+  fq_vec.h
+  fq_vec_templates.h
+  fq_zech_embed.h
+  fq_zech.h
+  fq_zech_mat.h
+  fq_zech_mpoly_factor.h
+  fq_zech_mpoly.h
+  fq_zech_poly_factor.h
+  fq_zech_poly.h
+  fq_zech_vec.h
+  gmpcompat.h
+  hashmap.h
+  long_extras.h
+  longlong.h
+  mpf_mat.h
+  mpfr_mat.h
+  mpfr_vec.h
+  mpf_vec.h
+  mpn_extras.h
+  mpoly.h
+  nmod.h
+  nmod_mat.h
+  nmod_matxx.h
+  nmod_mpoly_factor.h
+  nmod_mpoly.h
+  nmod_poly_factor.h
+  nmod_poly.h
+  nmod_poly_mat.h
+  nmod_poly_matxx.h
+  nmod_polyxx.h
+  nmod_vec.h
+  nmod_vecxx.h
+  n_poly.h
+  NTL-interface.h
+  padic.h
+  padic_mat.h
+  padic_matxx.h
+  padic_poly.h
+  padic_polyxx.h
+  padicxx.h
+  perm.h
+  permxx.h
+  profiler.h
+  qadic.h
+  qadicxx.h
+  qsieve.h
+  templates.h
+  thread_pool.h
+  thread_support.h
+  ulong_extras.h
+  libflint.a
+  dllflint.so)
+ (deps
+  (source_tree flint2)
+  (sandbox always))
+ (action
+  (no-infer
+   (progn
+    (chdir
+     flint2
+     (progn
+      (run ./configure --prefix=../prefix CFLAGS=-fPIC)
+      (run make library -j)
+      (run make install)))
+    (copy prefix/lib/libflint.a libflint.a)
+    (copy prefix/lib/libflint.so dllflint.so)
+    (copy prefix/include/flint/aprcl.h aprcl.h)
+    (copy prefix/include/flint/arith.h arith.h)
+    (copy prefix/include/flint/arithxx.h arithxx.h)
+    (copy prefix/include/flint/d_mat.h d_mat.h)
+    (copy prefix/include/flint/double_extras.h double_extras.h)
+    (copy prefix/include/flint/d_vec.h d_vec.h)
+    (copy prefix/include/flint/exception.h exception.h)
+    (copy prefix/include/flint/fft.h fft.h)
+    (copy prefix/include/flint/fft_tuning.h fft_tuning.h)
+    (copy prefix/include/flint/flint-config.h flint-config.h)
+    (copy prefix/include/flint/flint.h flint.h)
+    (copy prefix/include/flint/fmpq.h fmpq.h)
+    (copy prefix/include/flint/fmpq_mat.h fmpq_mat.h)
+    (copy prefix/include/flint/fmpq_matxx.h fmpq_matxx.h)
+    (copy prefix/include/flint/fmpq_mpoly_factor.h fmpq_mpoly_factor.h)
+    (copy prefix/include/flint/fmpq_mpoly.h fmpq_mpoly.h)
+    (copy prefix/include/flint/fmpq_poly.h fmpq_poly.h)
+    (copy prefix/include/flint/fmpq_polyxx.h fmpq_polyxx.h)
+    (copy prefix/include/flint/fmpq_vec.h fmpq_vec.h)
+    (copy prefix/include/flint/fmpqxx.h fmpqxx.h)
+    (copy prefix/include/flint/fmpz-conversions.h fmpz-conversions.h)
+    (copy prefix/include/flint/fmpz_factor.h fmpz_factor.h)
+    (copy prefix/include/flint/fmpz_factorxx.h fmpz_factorxx.h)
+    (copy prefix/include/flint/fmpz.h fmpz.h)
+    (copy prefix/include/flint/fmpz_lll.h fmpz_lll.h)
+    (copy prefix/include/flint/fmpz_mat.h fmpz_mat.h)
+    (copy prefix/include/flint/fmpz_matxx.h fmpz_matxx.h)
+    (copy prefix/include/flint/fmpz_mod.h fmpz_mod.h)
+    (copy prefix/include/flint/fmpz_mod_mat.h fmpz_mod_mat.h)
+    (copy
+     prefix/include/flint/fmpz_mod_mpoly_factor.h
+     fmpz_mod_mpoly_factor.h)
+    (copy prefix/include/flint/fmpz_mod_mpoly.h fmpz_mod_mpoly.h)
+    (copy prefix/include/flint/fmpz_mod_poly_factor.h fmpz_mod_poly_factor.h)
+    (copy
+     prefix/include/flint/fmpz_mod_poly_factorxx.h
+     fmpz_mod_poly_factorxx.h)
+    (copy prefix/include/flint/fmpz_mod_poly.h fmpz_mod_poly.h)
+    (copy prefix/include/flint/fmpz_mod_polyxx.h fmpz_mod_polyxx.h)
+    (copy prefix/include/flint/fmpz_mod_vec.h fmpz_mod_vec.h)
+    (copy prefix/include/flint/fmpz_mpoly_factor.h fmpz_mpoly_factor.h)
+    (copy prefix/include/flint/fmpz_mpoly.h fmpz_mpoly.h)
+    (copy prefix/include/flint/fmpz_poly_factor.h fmpz_poly_factor.h)
+    (copy prefix/include/flint/fmpz_poly_factorxx.h fmpz_poly_factorxx.h)
+    (copy prefix/include/flint/fmpz_poly.h fmpz_poly.h)
+    (copy prefix/include/flint/fmpz_poly_mat.h fmpz_poly_mat.h)
+    (copy prefix/include/flint/fmpz_poly_matxx.h fmpz_poly_matxx.h)
+    (copy prefix/include/flint/fmpz_poly_q.h fmpz_poly_q.h)
+    (copy prefix/include/flint/fmpz_poly_qxx.h fmpz_poly_qxx.h)
+    (copy prefix/include/flint/fmpz_polyxx.h fmpz_polyxx.h)
+    (copy prefix/include/flint/fmpz_vec.h fmpz_vec.h)
+    (copy prefix/include/flint/fmpz_vecxx.h fmpz_vecxx.h)
+    (copy prefix/include/flint/fmpzxx.h fmpzxx.h)
+    (copy prefix/include/flint/fq_default.h fq_default.h)
+    (copy prefix/include/flint/fq_default_mat.h fq_default_mat.h)
+    (copy
+     prefix/include/flint/fq_default_poly_factor.h
+     fq_default_poly_factor.h)
+    (copy prefix/include/flint/fq_default_poly.h fq_default_poly.h)
+    (copy prefix/include/flint/fq_embed.h fq_embed.h)
+    (copy prefix/include/flint/fq_embed_templates.h fq_embed_templates.h)
+    (copy prefix/include/flint/fq.h fq.h)
+    (copy prefix/include/flint/fq_mat.h fq_mat.h)
+    (copy prefix/include/flint/fq_mat_templates.h fq_mat_templates.h)
+    (copy prefix/include/flint/fq_nmod_embed.h fq_nmod_embed.h)
+    (copy prefix/include/flint/fq_nmod.h fq_nmod.h)
+    (copy prefix/include/flint/fq_nmod_mat.h fq_nmod_mat.h)
+    (copy prefix/include/flint/fq_nmod_mpoly_factor.h fq_nmod_mpoly_factor.h)
+    (copy prefix/include/flint/fq_nmod_mpoly.h fq_nmod_mpoly.h)
+    (copy prefix/include/flint/fq_nmod_poly_factor.h fq_nmod_poly_factor.h)
+    (copy prefix/include/flint/fq_nmod_poly.h fq_nmod_poly.h)
+    (copy prefix/include/flint/fq_nmod_vec.h fq_nmod_vec.h)
+    (copy prefix/include/flint/fq_poly_factor.h fq_poly_factor.h)
+    (copy
+     prefix/include/flint/fq_poly_factor_templates.h
+     fq_poly_factor_templates.h)
+    (copy prefix/include/flint/fq_poly.h fq_poly.h)
+    (copy prefix/include/flint/fq_poly_templates.h fq_poly_templates.h)
+    (copy prefix/include/flint/fq_templates.h fq_templates.h)
+    (copy prefix/include/flint/fq_vec.h fq_vec.h)
+    (copy prefix/include/flint/fq_vec_templates.h fq_vec_templates.h)
+    (copy prefix/include/flint/fq_zech_embed.h fq_zech_embed.h)
+    (copy prefix/include/flint/fq_zech.h fq_zech.h)
+    (copy prefix/include/flint/fq_zech_mat.h fq_zech_mat.h)
+    (copy prefix/include/flint/fq_zech_mpoly_factor.h fq_zech_mpoly_factor.h)
+    (copy prefix/include/flint/fq_zech_mpoly.h fq_zech_mpoly.h)
+    (copy prefix/include/flint/fq_zech_poly_factor.h fq_zech_poly_factor.h)
+    (copy prefix/include/flint/fq_zech_poly.h fq_zech_poly.h)
+    (copy prefix/include/flint/fq_zech_vec.h fq_zech_vec.h)
+    (copy prefix/include/flint/gmpcompat.h gmpcompat.h)
+    (copy prefix/include/flint/hashmap.h hashmap.h)
+    (copy prefix/include/flint/long_extras.h long_extras.h)
+    (copy prefix/include/flint/longlong.h longlong.h)
+    (copy prefix/include/flint/mpf_mat.h mpf_mat.h)
+    (copy prefix/include/flint/mpfr_mat.h mpfr_mat.h)
+    (copy prefix/include/flint/mpfr_vec.h mpfr_vec.h)
+    (copy prefix/include/flint/mpf_vec.h mpf_vec.h)
+    (copy prefix/include/flint/mpn_extras.h mpn_extras.h)
+    (copy prefix/include/flint/mpoly.h mpoly.h)
+    (copy prefix/include/flint/nmod.h nmod.h)
+    (copy prefix/include/flint/nmod_mat.h nmod_mat.h)
+    (copy prefix/include/flint/nmod_matxx.h nmod_matxx.h)
+    (copy prefix/include/flint/nmod_mpoly_factor.h nmod_mpoly_factor.h)
+    (copy prefix/include/flint/nmod_mpoly.h nmod_mpoly.h)
+    (copy prefix/include/flint/nmod_poly_factor.h nmod_poly_factor.h)
+    (copy prefix/include/flint/nmod_poly.h nmod_poly.h)
+    (copy prefix/include/flint/nmod_poly_mat.h nmod_poly_mat.h)
+    (copy prefix/include/flint/nmod_poly_matxx.h nmod_poly_matxx.h)
+    (copy prefix/include/flint/nmod_polyxx.h nmod_polyxx.h)
+    (copy prefix/include/flint/nmod_vec.h nmod_vec.h)
+    (copy prefix/include/flint/nmod_vecxx.h nmod_vecxx.h)
+    (copy prefix/include/flint/n_poly.h n_poly.h)
+    (copy prefix/include/flint/NTL-interface.h NTL-interface.h)
+    (copy prefix/include/flint/padic.h padic.h)
+    (copy prefix/include/flint/padic_mat.h padic_mat.h)
+    (copy prefix/include/flint/padic_matxx.h padic_matxx.h)
+    (copy prefix/include/flint/padic_poly.h padic_poly.h)
+    (copy prefix/include/flint/padic_polyxx.h padic_polyxx.h)
+    (copy prefix/include/flint/padicxx.h padicxx.h)
+    (copy prefix/include/flint/perm.h perm.h)
+    (copy prefix/include/flint/permxx.h permxx.h)
+    (copy prefix/include/flint/profiler.h profiler.h)
+    (copy prefix/include/flint/qadic.h qadic.h)
+    (copy prefix/include/flint/qadicxx.h qadicxx.h)
+    (copy prefix/include/flint/qsieve.h qsieve.h)
+    (copy prefix/include/flint/templates.h templates.h)
+    (copy prefix/include/flint/thread_pool.h thread_pool.h)
+    (copy prefix/include/flint/thread_support.h thread_support.h)
+    (copy prefix/include/flint/ulong_extras.h ulong_extras.h)))))
+
+(install
+ (section lib)
+ (package flint2)
+ (files
+  (aprcl.h as include/fline/aprcl.h)
+  (arith.h as include/fline/arith.h)
+  (arithxx.h as include/fline/arithxx.h)
+  (d_mat.h as include/fline/d_mat.h)
+  (double_extras.h as include/fline/double_extras.h)
+  (d_vec.h as include/fline/d_vec.h)
+  (exception.h as include/fline/exception.h)
+  (fft.h as include/fline/fft.h)
+  (fft_tuning.h as include/fline/fft_tuning.h)
+  (flint-config.h as include/fline/flint-config.h)
+  (flint.h as include/fline/flint.h)
+  (fmpq.h as include/fline/fmpq.h)
+  (fmpq_mat.h as include/fline/fmpq_mat.h)
+  (fmpq_matxx.h as include/fline/fmpq_matxx.h)
+  (fmpq_mpoly_factor.h as include/fline/fmpq_mpoly_factor.h)
+  (fmpq_mpoly.h as include/fline/fmpq_mpoly.h)
+  (fmpq_poly.h as include/fline/fmpq_poly.h)
+  (fmpq_polyxx.h as include/fline/fmpq_polyxx.h)
+  (fmpq_vec.h as include/fline/fmpq_vec.h)
+  (fmpqxx.h as include/fline/fmpqxx.h)
+  (fmpz-conversions.h as include/fline/fmpz-conversions.h)
+  (fmpz_factor.h as include/fline/fmpz_factor.h)
+  (fmpz_factorxx.h as include/fline/fmpz_factorxx.h)
+  (fmpz.h as include/fline/fmpz.h)
+  (fmpz_lll.h as include/fline/fmpz_lll.h)
+  (fmpz_mat.h as include/fline/fmpz_mat.h)
+  (fmpz_matxx.h as include/fline/fmpz_matxx.h)
+  (fmpz_mod.h as include/fline/fmpz_mod.h)
+  (fmpz_mod_mat.h as include/fline/fmpz_mod_mat.h)
+  (fmpz_mod_mpoly_factor.h as include/fline/fmpz_mod_mpoly_factor.h)
+  (fmpz_mod_mpoly.h as include/fline/fmpz_mod_mpoly.h)
+  (fmpz_mod_poly_factor.h as include/fline/fmpz_mod_poly_factor.h)
+  (fmpz_mod_poly_factorxx.h as include/fline/fmpz_mod_poly_factorxx.h)
+  (fmpz_mod_poly.h as include/fline/fmpz_mod_poly.h)
+  (fmpz_mod_polyxx.h as include/fline/fmpz_mod_polyxx.h)
+  (fmpz_mod_vec.h as include/fline/fmpz_mod_vec.h)
+  (fmpz_mpoly_factor.h as include/fline/fmpz_mpoly_factor.h)
+  (fmpz_mpoly.h as include/fline/fmpz_mpoly.h)
+  (fmpz_poly_factor.h as include/fline/fmpz_poly_factor.h)
+  (fmpz_poly_factorxx.h as include/fline/fmpz_poly_factorxx.h)
+  (fmpz_poly.h as include/fline/fmpz_poly.h)
+  (fmpz_poly_mat.h as include/fline/fmpz_poly_mat.h)
+  (fmpz_poly_matxx.h as include/fline/fmpz_poly_matxx.h)
+  (fmpz_poly_q.h as include/fline/fmpz_poly_q.h)
+  (fmpz_poly_qxx.h as include/fline/fmpz_poly_qxx.h)
+  (fmpz_polyxx.h as include/fline/fmpz_polyxx.h)
+  (fmpz_vec.h as include/fline/fmpz_vec.h)
+  (fmpz_vecxx.h as include/fline/fmpz_vecxx.h)
+  (fmpzxx.h as include/fline/fmpzxx.h)
+  (fq_default.h as include/fline/fq_default.h)
+  (fq_default_mat.h as include/fline/fq_default_mat.h)
+  (fq_default_poly_factor.h as include/fline/fq_default_poly_factor.h)
+  (fq_default_poly.h as include/fline/fq_default_poly.h)
+  (fq_embed.h as include/fline/fq_embed.h)
+  (fq_embed_templates.h as include/fline/fq_embed_templates.h)
+  (fq.h as include/fline/fq.h)
+  (fq_mat.h as include/fline/fq_mat.h)
+  (fq_mat_templates.h as include/fline/fq_mat_templates.h)
+  (fq_nmod_embed.h as include/fline/fq_nmod_embed.h)
+  (fq_nmod.h as include/fline/fq_nmod.h)
+  (fq_nmod_mat.h as include/fline/fq_nmod_mat.h)
+  (fq_nmod_mpoly_factor.h as include/fline/fq_nmod_mpoly_factor.h)
+  (fq_nmod_mpoly.h as include/fline/fq_nmod_mpoly.h)
+  (fq_nmod_poly_factor.h as include/fline/fq_nmod_poly_factor.h)
+  (fq_nmod_poly.h as include/fline/fq_nmod_poly.h)
+  (fq_nmod_vec.h as include/fline/fq_nmod_vec.h)
+  (fq_poly_factor.h as include/fline/fq_poly_factor.h)
+  (fq_poly_factor_templates.h as include/fline/fq_poly_factor_templates.h)
+  (fq_poly.h as include/fline/fq_poly.h)
+  (fq_poly_templates.h as include/fline/fq_poly_templates.h)
+  (fq_templates.h as include/fline/fq_templates.h)
+  (fq_vec.h as include/fline/fq_vec.h)
+  (fq_vec_templates.h as include/fline/fq_vec_templates.h)
+  (fq_zech_embed.h as include/fline/fq_zech_embed.h)
+  (fq_zech.h as include/fline/fq_zech.h)
+  (fq_zech_mat.h as include/fline/fq_zech_mat.h)
+  (fq_zech_mpoly_factor.h as include/fline/fq_zech_mpoly_factor.h)
+  (fq_zech_mpoly.h as include/fline/fq_zech_mpoly.h)
+  (fq_zech_poly_factor.h as include/fline/fq_zech_poly_factor.h)
+  (fq_zech_poly.h as include/fline/fq_zech_poly.h)
+  (fq_zech_vec.h as include/fline/fq_zech_vec.h)
+  (gmpcompat.h as include/fline/gmpcompat.h)
+  (hashmap.h as include/fline/hashmap.h)
+  (long_extras.h as include/fline/long_extras.h)
+  (longlong.h as include/fline/longlong.h)
+  (mpf_mat.h as include/fline/mpf_mat.h)
+  (mpfr_mat.h as include/fline/mpfr_mat.h)
+  (mpfr_vec.h as include/fline/mpfr_vec.h)
+  (mpf_vec.h as include/fline/mpf_vec.h)
+  (mpn_extras.h as include/fline/mpn_extras.h)
+  (mpoly.h as include/fline/mpoly.h)
+  (nmod.h as include/fline/nmod.h)
+  (nmod_mat.h as include/fline/nmod_mat.h)
+  (nmod_matxx.h as include/fline/nmod_matxx.h)
+  (nmod_mpoly_factor.h as include/fline/nmod_mpoly_factor.h)
+  (nmod_mpoly.h as include/fline/nmod_mpoly.h)
+  (nmod_poly_factor.h as include/fline/nmod_poly_factor.h)
+  (nmod_poly.h as include/fline/nmod_poly.h)
+  (nmod_poly_mat.h as include/fline/nmod_poly_mat.h)
+  (nmod_poly_matxx.h as include/fline/nmod_poly_matxx.h)
+  (nmod_polyxx.h as include/fline/nmod_polyxx.h)
+  (nmod_vec.h as include/fline/nmod_vec.h)
+  (nmod_vecxx.h as include/fline/nmod_vecxx.h)
+  (n_poly.h as include/fline/n_poly.h)
+  (NTL-interface.h as include/fline/NTL-interface.h)
+  (padic.h as include/fline/padic.h)
+  (padic_mat.h as include/fline/padic_mat.h)
+  (padic_matxx.h as include/fline/padic_matxx.h)
+  (padic_poly.h as include/fline/padic_poly.h)
+  (padic_polyxx.h as include/fline/padic_polyxx.h)
+  (padicxx.h as include/fline/padicxx.h)
+  (perm.h as include/fline/perm.h)
+  (permxx.h as include/fline/permxx.h)
+  (profiler.h as include/fline/profiler.h)
+  (qadic.h as include/fline/qadic.h)
+  (qadicxx.h as include/fline/qadicxx.h)
+  (qsieve.h as include/fline/qsieve.h)
+  (templates.h as include/fline/templates.h)
+  (thread_pool.h as include/fline/thread_pool.h)
+  (thread_support.h as include/fline/thread_support.h)
+  (ulong_extras.h as include/fline/ulong_extras.h)
+))

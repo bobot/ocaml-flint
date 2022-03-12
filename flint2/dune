@@ -1,0 +1,35 @@
+(library
+ (name flint2)
+ (public_name flint2)
+ (foreign_archives flint/flint)
+ (foreign_stubs
+  (language c)
+  (names ocaml_flint_utils)
+  (include_dirs
+   (lib zarith)))
+ (libraries zarith)
+ (flags -w -9-27)
+ (ctypes
+  (external_library_name flint)
+  (build_flags_resolver
+   (vendored
+    (c_flags
+     "-Iflint2"
+     "-I."
+     "-Werror=implicit-function-declaration"
+     :standard)
+    (c_library_flags "-lflint -lgmp -lmpfr")))
+  (deps flint/flint.h)
+  (headers
+   (include "flint/fmpz.h" "string.h"))
+  (type_description
+   (instance Type)
+   (functor Type_description))
+  (function_description
+   (concurrency sequential)
+   (instance Function)
+   (functor Function_description))
+  (generated_types Types_generated)
+  (generated_entry_point C)))
+
+;(rule (action (copy %{lib:zarith:zarith.h} zarith.h)))
