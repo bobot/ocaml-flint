@@ -8,5 +8,5 @@
 	path = antic/lib/antic
 	url = https://github.com/wbhart/antic.git
 [submodule "calcium"]
-	path = calcium/calcium
+	path = calcium/lib/calcium
 	url = https://github.com/fredrik-johansson/calcium.git

@@ -19,3 +19,8 @@
  (name antic)
  (depends flint2)
 )
+
+(package
+ (name calcium)
+ (depends flint2 arb antic)
+)

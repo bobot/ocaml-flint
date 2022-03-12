@@ -114,57 +114,57 @@
  (package arb)
  (files
    (dirichlet.h
- as include/fline/dirichlet.h
+ as include/arb/dirichlet.h
 )   (mag.h
- as include/fline/mag.h
+ as include/arb/mag.h
 )   (acb_poly.h
- as include/fline/acb_poly.h
+ as include/arb/acb_poly.h
 )   (arb.h
- as include/fline/arb.h
+ as include/arb/arb.h
 )   (arb_calc.h
- as include/fline/arb_calc.h
+ as include/arb/arb_calc.h
 )   (arb_poly.h
- as include/fline/arb_poly.h
+ as include/arb/arb_poly.h
 )   (double_interval.h
- as include/fline/double_interval.h
+ as include/arb/double_interval.h
 )   (acb_hypgeom.h
- as include/fline/acb_hypgeom.h
+ as include/arb/acb_hypgeom.h
 )   (acb_calc.h
- as include/fline/acb_calc.h
+ as include/arb/acb_calc.h
 )   (arb_fmpz_poly.h
- as include/fline/arb_fmpz_poly.h
+ as include/arb/arb_fmpz_poly.h
 )   (acb_dft.h
- as include/fline/acb_dft.h
+ as include/arb/acb_dft.h
 )   (bernoulli.h
- as include/fline/bernoulli.h
+ as include/arb/bernoulli.h
 )   (acb_mat.h
- as include/fline/acb_mat.h
+ as include/arb/acb_mat.h
 )   (bool_mat.h
- as include/fline/bool_mat.h
+ as include/arb/bool_mat.h
 )   (acb_elliptic.h
- as include/fline/acb_elliptic.h
+ as include/arb/acb_elliptic.h
 )   (arb_fpwrap.h
- as include/fline/arb_fpwrap.h
+ as include/arb/arb_fpwrap.h
 )   (partitions.h
- as include/fline/partitions.h
+ as include/arb/partitions.h
 )   (acb_modular.h
- as include/fline/acb_modular.h
+ as include/arb/acb_modular.h
 )   (acb_dirichlet.h
- as include/fline/acb_dirichlet.h
+ as include/arb/acb_dirichlet.h
 )   (dlog.h
- as include/fline/dlog.h
+ as include/arb/dlog.h
 )   (arb_hypgeom.h
- as include/fline/arb_hypgeom.h
+ as include/arb/arb_hypgeom.h
 )   (arf.h
- as include/fline/arf.h
+ as include/arb/arf.h
 )   (hypgeom.h
- as include/fline/hypgeom.h
+ as include/arb/hypgeom.h
 )   (acb.h
- as include/fline/acb.h
+ as include/arb/acb.h
 )   (fmpz_extras.h
- as include/fline/fmpz_extras.h
+ as include/arb/fmpz_extras.h
 )   (arb_mat.h
- as include/fline/arb_mat.h
+ as include/arb/arb_mat.h
 )   (fmpr.h
- as include/fline/fmpr.h
+ as include/arb/fmpr.h
 )))

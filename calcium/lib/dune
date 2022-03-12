@@ -1,0 +1,42 @@
+(data_only_dirs calcium)
+
+;make sure the library .a is compiled with pic, and is used for .cmxs
+
+(rule
+  (action (with-stdout-to flint_dir (run %{ocaml} %{dep:../../utils/get_include_root.ml} %{lib:flint2:include/flint/flint.h}))))
+
+(rule
+  (action (with-stdout-to arb_dir (run %{ocaml} %{dep:../../utils/get_include_root.ml} %{lib:arb:include/arb/arb.h}))))
+
+(rule
+  (action (with-stdout-to antic_dir (run %{ocaml} %{dep:../../utils/get_include_root.ml} %{lib:antic:include/antic/nf.h}))))
+
+(rule
+ (targets
+   dllcalcium.so
+   libcalcium.a
+)
+ (deps
+  (source_tree calcium)
+  (sandbox always)
+  (package flint2)
+ )
+ (action
+  (no-infer
+   (progn
+    (chdir
+     calcium
+     (progn
+      (run ./configure --with-flint=%{read:flint_dir} --with-arb=%{read:arb_dir} --with-antic=%{read:antic_dir} --prefix=../prefix CFLAGS=-fPIC)
+      (run make library -j)
+      (run make install)))
+   (copy prefix/lib/libcalcium.so dllcalcium.so)
+   (copy prefix/lib/libcalcium.a libcalcium.a)
+ ))))
+
+; (install
+;  (section lib)
+;  (package calcium)
+;  (files
+
+; )))

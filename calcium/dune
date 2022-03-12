@@ -1,0 +1,9 @@
+(library
+ (name calcium)
+ (public_name calcium)
+ (foreign_archives lib/calcium)
+ (libraries zarith flint2)
+ (flags -w -9-27)
+)
+
+;(rule (action (copy %{lib:zarith:zarith.h} zarith.h)))
