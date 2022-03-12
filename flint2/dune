@@ -1,7 +1,7 @@
 (library
  (name flint2)
  (public_name flint2)
- (foreign_archives flint/flint)
+ (foreign_archives lib/flint)
  (foreign_stubs
   (language c)
   (names ocaml_flint_utils)
@@ -19,9 +19,9 @@
      "-Werror=implicit-function-declaration"
      :standard)
     (c_library_flags "-lflint -lgmp -lmpfr")))
-  (deps flint/flint.h)
+  (deps lib/flint.h lib/fmpz.h)
   (headers
-   (include "flint/fmpz.h" "string.h"))
+   (include "lib/fmpz.h" "string.h"))
   (type_description
    (instance Type)
    (functor Type_description))

@@ -1,0 +1,170 @@
+(data_only_dirs arb)
+
+;make sure the library .a is compiled with pic, and is used for .cmxs
+
+(rule
+  (action (with-stdout-to flint_dir (run %{ocaml} %{dep:../../utils/get_include_root.ml} %{lib:flint2:include/flint/flint.h}))))
+
+(rule
+ (targets
+   dllarb.so
+   libarb.a
+   dirichlet.h
+   mag.h
+   acb_poly.h
+   arb.h
+   arb_calc.h
+   arb_poly.h
+   double_interval.h
+   acb_hypgeom.h
+   acb_calc.h
+   arb_fmpz_poly.h
+   acb_dft.h
+   bernoulli.h
+   acb_mat.h
+   bool_mat.h
+   acb_elliptic.h
+   arb_fpwrap.h
+   partitions.h
+   acb_modular.h
+   acb_dirichlet.h
+   dlog.h
+   arb_hypgeom.h
+   arf.h
+   hypgeom.h
+   acb.h
+   fmpz_extras.h
+   arb_mat.h
+   fmpr.h
+)
+ (deps
+  (source_tree arb)
+  (sandbox always)
+  (package flint2)
+ )
+ (action
+  (no-infer
+   (progn
+    (chdir
+     arb
+     (progn
+      (run ./configure --with-flint=%{read:flint_dir} --prefix=../prefix CFLAGS=-fPIC)
+      (run make library -j)
+      (run make install)))
+   (copy prefix/lib/libarb.so dllarb.so)
+   (copy prefix/lib/libarb.a libarb.a)
+   (copy prefix/include/dirichlet.h
+ dirichlet.h
+)   (copy prefix/include/mag.h
+ mag.h
+)   (copy prefix/include/acb_poly.h
+ acb_poly.h
+)   (copy prefix/include/arb.h
+ arb.h
+)   (copy prefix/include/arb_calc.h
+ arb_calc.h
+)   (copy prefix/include/arb_poly.h
+ arb_poly.h
+)   (copy prefix/include/double_interval.h
+ double_interval.h
+)   (copy prefix/include/acb_hypgeom.h
+ acb_hypgeom.h
+)   (copy prefix/include/acb_calc.h
+ acb_calc.h
+)   (copy prefix/include/arb_fmpz_poly.h
+ arb_fmpz_poly.h
+)   (copy prefix/include/acb_dft.h
+ acb_dft.h
+)   (copy prefix/include/bernoulli.h
+ bernoulli.h
+)   (copy prefix/include/acb_mat.h
+ acb_mat.h
+)   (copy prefix/include/bool_mat.h
+ bool_mat.h
+)   (copy prefix/include/acb_elliptic.h
+ acb_elliptic.h
+)   (copy prefix/include/arb_fpwrap.h
+ arb_fpwrap.h
+)   (copy prefix/include/partitions.h
+ partitions.h
+)   (copy prefix/include/acb_modular.h
+ acb_modular.h
+)   (copy prefix/include/acb_dirichlet.h
+ acb_dirichlet.h
+)   (copy prefix/include/dlog.h
+ dlog.h
+)   (copy prefix/include/arb_hypgeom.h
+ arb_hypgeom.h
+)   (copy prefix/include/arf.h
+ arf.h
+)   (copy prefix/include/hypgeom.h
+ hypgeom.h
+)   (copy prefix/include/acb.h
+ acb.h
+)   (copy prefix/include/fmpz_extras.h
+ fmpz_extras.h
+)   (copy prefix/include/arb_mat.h
+ arb_mat.h
+)   (copy prefix/include/fmpr.h
+ fmpr.h
+) ))))
+
+(install
+ (section lib)
+ (package arb)
+ (files
+   (dirichlet.h
+ as include/fline/dirichlet.h
+)   (mag.h
+ as include/fline/mag.h
+)   (acb_poly.h
+ as include/fline/acb_poly.h
+)   (arb.h
+ as include/fline/arb.h
+)   (arb_calc.h
+ as include/fline/arb_calc.h
+)   (arb_poly.h
+ as include/fline/arb_poly.h
+)   (double_interval.h
+ as include/fline/double_interval.h
+)   (acb_hypgeom.h
+ as include/fline/acb_hypgeom.h
+)   (acb_calc.h
+ as include/fline/acb_calc.h
+)   (arb_fmpz_poly.h
+ as include/fline/arb_fmpz_poly.h
+)   (acb_dft.h
+ as include/fline/acb_dft.h
+)   (bernoulli.h
+ as include/fline/bernoulli.h
+)   (acb_mat.h
+ as include/fline/acb_mat.h
+)   (bool_mat.h
+ as include/fline/bool_mat.h
+)   (acb_elliptic.h
+ as include/fline/acb_elliptic.h
+)   (arb_fpwrap.h
+ as include/fline/arb_fpwrap.h
+)   (partitions.h
+ as include/fline/partitions.h
+)   (acb_modular.h
+ as include/fline/acb_modular.h
+)   (acb_dirichlet.h
+ as include/fline/acb_dirichlet.h
+)   (dlog.h
+ as include/fline/dlog.h
+)   (arb_hypgeom.h
+ as include/fline/arb_hypgeom.h
+)   (arf.h
+ as include/fline/arf.h
+)   (hypgeom.h
+ as include/fline/hypgeom.h
+)   (acb.h
+ as include/fline/acb.h
+)   (fmpz_extras.h
+ as include/fline/fmpz_extras.h
+)   (arb_mat.h
+ as include/fline/arb_mat.h
+)   (fmpr.h
+ as include/fline/fmpr.h
+)))

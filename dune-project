@@ -8,3 +8,8 @@
  (name flint2)
  (depends zarith)
 )
+
+(package
+ (name arb)
+ (depends flint2)
+)
