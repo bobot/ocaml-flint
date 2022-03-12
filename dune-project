@@ -13,3 +13,9 @@
  (name arb)
  (depends flint2)
 )
+
+
+(package
+ (name antic)
+ (depends flint2)
+)

@@ -1,0 +1,9 @@
+(library
+ (name antic)
+ (public_name antic)
+ (foreign_archives lib/antic)
+ (libraries zarith flint2)
+ (flags -w -9-27)
+)
+
+;(rule (action (copy %{lib:zarith:zarith.h} zarith.h)))

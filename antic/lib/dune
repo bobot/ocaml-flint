@@ -1,0 +1,44 @@
+(data_only_dirs antic)
+
+;make sure the library .a is compiled with pic, and is used for .cmxs
+
+(rule
+  (action (with-stdout-to flint_dir (run %{ocaml} %{dep:../../utils/get_include_root.ml} %{lib:flint2:include/flint/flint.h}))))
+
+(rule
+ (targets
+   dllantic.so
+   libantic.a
+   nf_elem.h
+   qfb.h
+   nf.h
+)
+ (deps
+  (source_tree antic)
+  (sandbox always)
+  (package flint2)
+ )
+ (action
+  (no-infer
+   (progn
+    (chdir
+     antic
+     (progn
+      (run ./configure --with-flint=%{read:flint_dir} --prefix=../prefix CFLAGS=-fPIC)
+      (run make library -j)
+      (run make install)))
+   (copy prefix/lib/libantic.so dllantic.so)
+    (copy prefix/lib/libantic.a libantic.a)
+     (copy prefix/include/antic/nf_elem.h nf_elem.h)
+     (copy prefix/include/antic/qfb.h qfb.h)
+     (copy prefix/include/antic/nf.h nf.h)
+) )))
+
+(install
+ (section lib)
+ (package antic)
+ (files
+   (nf_elem.h as include/antic/nf_elem.h)
+   (qfb.h as include/antic/qfb.h)
+   (nf.h as include/antic/nf.h)
+))

@@ -5,7 +5,7 @@
 	path = flint2/lib/flint2
 	url = https://github.com/wbhart/flint2.git
 [submodule "antic"]
-	path = antic/antic
+	path = antic/lib/antic
 	url = https://github.com/wbhart/antic.git
 [submodule "calcium"]
 	path = calcium/calcium
