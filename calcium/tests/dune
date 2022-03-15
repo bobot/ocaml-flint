@@ -1,0 +1,12 @@
+(tests
+ (names units)
+ (modules units)
+ (libraries calcium)
+)
+
+(tests
+ (names dynamic)
+ (modules dynamic)
+ (libraries dune-site.plugins zarith)
+ (deps (package flint2)(package arb)(package antic)(package calcium))
+)

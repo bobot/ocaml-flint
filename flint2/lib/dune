@@ -396,5 +396,4 @@
   (templates.h as include/flint/templates.h)
   (thread_pool.h as include/flint/thread_pool.h)
   (thread_support.h as include/flint/thread_support.h)
-  (ulong_extras.h as include/flint/ulong_extras.h)
-))
+  (ulong_extras.h as include/flint/ulong_extras.h)))

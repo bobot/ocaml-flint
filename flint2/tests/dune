@@ -1,3 +1,12 @@
 (tests
  (names units)
- (libraries flint2))
+ (modules units)
+ (libraries flint2)
+ (modes byte)
+ (package flint2)
+)
+
+(tests
+ (names dynamic)
+ (modules dynamic)
+ (libraries dune-site.plugins zarith))

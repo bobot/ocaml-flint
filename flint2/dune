@@ -1,13 +1,13 @@
 (library
  (name flint2)
  (public_name flint2)
- (foreign_archives lib/flint)
+ (foreign_archives ((path lib/flint)(mode whole)))
  (foreign_stubs
   (language c)
   (names ocaml_flint_utils)
   (include_dirs
    (lib zarith)))
- (libraries zarith)
+ (libraries zarith ctypes)
  (flags -w -9-27)
  (ctypes
   (external_library_name flint)
@@ -18,7 +18,10 @@
      "-I."
      "-Werror=implicit-function-declaration"
      :standard)
-    (c_library_flags "-lflint -lgmp -lmpfr")))
+    (c_library_flags
+    "-lgmp -lmpfr"
+
+  )))
   (deps lib/flint.h lib/fmpz.h)
   (headers
    (include "lib/fmpz.h" "string.h"))

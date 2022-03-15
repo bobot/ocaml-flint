@@ -1,9 +1,33 @@
 (library
  (name calcium)
  (public_name calcium)
- (foreign_archives lib/calcium)
- (libraries zarith flint2)
+ (foreign_archives ((path lib/calcium)(mode whole)))
+ (foreign_stubs
+  (language c)
+  (names ocaml_calcium_utils))
+ (libraries zarith flint2 arb antic)
  (flags -w -9-27)
-)
+ (ctypes
+  (external_library_name calcium)
+  (build_flags_resolver
+   (vendored
+    (c_flags
+     "-Icalcium"
+     "-I."
+     "-Werror=implicit-function-declaration"
+     :standard)
+    (c_library_flags "-lgmp -lmpfr")))
+  (deps lib/ca.h)
+  (headers
+   (include "lib/ca.h" "string.h"))
+  (type_description
+   (instance Type)
+   (functor Type_description))
+  (function_description
+   (concurrency sequential)
+   (instance Function)
+   (functor Function_description))
+  (generated_types Types_generated)
+  (generated_entry_point C)))
 
 ;(rule (action (copy %{lib:zarith:zarith.h} zarith.h)))

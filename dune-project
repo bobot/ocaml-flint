@@ -1,7 +1,6 @@
-(lang dune 3.0)
+(lang dune 3.1)
 
 (generate_opam_files true)
-;(using directory-targets 0.1)
 (using ctypes 0.1)
 
 (package
