@@ -8,8 +8,9 @@
    flint_dir
    (run
     %{ocaml}
-    %{dep:../../utils/get_include_root.ml}
-    %{lib:flint:include/flint/flint.h}))))
+     %{dep:../../utils/get_include_root.ml}
+     2
+     %{lib:flint:flint/flint.h}))))
 
 (rule
  (action
@@ -17,8 +18,9 @@
    arb_dir
    (run
     %{ocaml}
-    %{dep:../../utils/get_include_root.ml}
-    %{lib:arb:include/arb/arb.h}))))
+     %{dep:../../utils/get_include_root.ml}
+     1
+     %{lib:arb:arb.h}))))
 
 (rule
  (action
@@ -26,8 +28,9 @@
    antic_dir
    (run
     %{ocaml}
-    %{dep:../../utils/get_include_root.ml}
-    %{lib:antic:include/antic/nf.h}))))
+     %{dep:../../utils/get_include_root.ml}
+     2
+     %{lib:antic:antic/nf.h}))))
 
 (rule
  (targets

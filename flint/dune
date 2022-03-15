@@ -1,12 +1,11 @@
 (library
  (name flint)
  (public_name flint)
- (foreign_archives ((path lib/flint)(mode whole)))
+ (foreign_archives ((path flint/flint)(mode whole)))
  (foreign_stubs
   (language c)
   (names ocaml_flint_utils)
-  (include_dirs
-   (lib zarith)))
+  (include_dirs flint (lib zarith)))
  (libraries zarith ctypes)
  (flags -w -9-27)
  (ctypes
@@ -22,9 +21,9 @@
     "-lgmp -lmpfr"
 
   )))
-  (deps lib/flint.h lib/fmpz.h)
+  (deps flint/flint.h flint/fmpz.h)
   (headers
-   (include "lib/fmpz.h" "string.h"))
+   (include "flint/fmpz.h" "string.h"))
   (type_description
    (instance Type)
    (functor Type_description))

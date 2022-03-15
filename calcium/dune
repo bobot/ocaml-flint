@@ -4,7 +4,9 @@
  (foreign_archives ((path lib/calcium)(mode whole)))
  (foreign_stubs
   (language c)
-  (names ocaml_calcium_utils))
+  (names ocaml_calcium_utils)
+  (include_dirs lib (lib flint) (lib arb) (lib antic))
+ )
  (libraries zarith flint arb antic)
  (flags -w -9-27)
  (ctypes
@@ -14,6 +16,9 @@
     (c_flags
      "-Icalcium"
      "-I."
+     "-I%{read:lib/flint_dir}"
+     "-I%{read:lib/antic_dir}"
+     "-I%{read:lib/arb_dir}"
      "-Werror=implicit-function-declaration"
      :standard)
     (c_library_flags "-lgmp -lmpfr")))
