@@ -22,7 +22,7 @@ module Functions (F : Ctypes.FOREIGN) = struct
 
   let ca_set_fmpz =
     foreign "ca_set_fmpz"
-      (ca_t @-> Flint2.FMPZ.C.fmpz_t @-> ca_ctx_t @-> returning void)
+      (ca_t @-> Flint.FMPZ.C.fmpz_t @-> ca_ctx_t @-> returning void)
 
   let ca_ctx_init = foreign "ca_ctx_init" (ca_ctx_t @-> returning void)
   let ca_ctx_clear = foreign "ca_ctx_clear" (ca_ctx_t @-> returning void)

@@ -2,7 +2,7 @@
 	path = arb/lib/arb
 	url = https://github.com/fredrik-johansson/arb.git
 [submodule "flint2"]
-	path = flint2/lib/flint2
+	path = flint/lib/flint2
 	url = https://github.com/wbhart/flint2.git
 [submodule "antic"]
 	path = antic/lib/antic

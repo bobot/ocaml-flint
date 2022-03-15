@@ -1,9 +1,9 @@
 (tests
  (names units)
  (modules units)
- (libraries flint2)
+ (libraries flint)
  (modes byte)
- (package flint2)
+ (package flint)
 )
 
 (tests

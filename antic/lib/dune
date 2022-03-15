@@ -9,14 +9,14 @@
    (run
     %{ocaml}
     %{dep:../../utils/get_include_root.ml}
-    %{lib:flint2:include/flint/flint.h}))))
+    %{lib:flint:include/flint/flint.h}))))
 
 (rule
  (targets dllantic.so libantic.a nf_elem.h qfb.h nf.h)
  (deps
   (source_tree antic)
   (sandbox always)
-  (package flint2))
+  (package flint))
  (action
   (no-infer
    (progn

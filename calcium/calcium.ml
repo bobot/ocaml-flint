@@ -44,4 +44,4 @@ let of_fmpz ~ctx fmpz =
   ca_set_fmpz t fmpz ctx;
   t
 
-let of_z ~ctx z = of_fmpz ~ctx (Flint2.FMPZ.of_z z)
+let of_z ~ctx z = of_fmpz ~ctx (Flint.FMPZ.of_z z)

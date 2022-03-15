@@ -1,6 +1,6 @@
 (library
- (name flint2)
- (public_name flint2)
+ (name flint)
+ (public_name flint)
  (foreign_archives ((path lib/flint)(mode whole)))
  (foreign_stubs
   (language c)
@@ -14,7 +14,7 @@
   (build_flags_resolver
    (vendored
     (c_flags
-     "-Iflint2"
+     "-Iflint"
      "-I."
      "-Werror=implicit-function-declaration"
      :standard)

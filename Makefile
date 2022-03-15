@@ -1,5 +1,5 @@
 all:
-	dune build --root . @install
+	dune build --root .
 
 test:
 	dune runtest --root .

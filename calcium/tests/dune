@@ -8,5 +8,5 @@
  (names dynamic)
  (modules dynamic)
  (libraries dune-site.plugins zarith)
- (deps (package flint2)(package arb)(package antic)(package calcium))
+ (deps (package flint)(package arb)(package antic)(package calcium))
 )

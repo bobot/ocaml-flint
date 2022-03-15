@@ -274,7 +274,7 @@
 
 (install
  (section lib)
- (package flint2)
+ (package flint)
  (files
   (aprcl.h as include/flint/aprcl.h)
   (arith.h as include/flint/arith.h)

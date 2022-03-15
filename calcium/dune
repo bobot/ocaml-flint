@@ -5,7 +5,7 @@
  (foreign_stubs
   (language c)
   (names ocaml_calcium_utils))
- (libraries zarith flint2 arb antic)
+ (libraries zarith flint arb antic)
  (flags -w -9-27)
  (ctypes
   (external_library_name calcium)
