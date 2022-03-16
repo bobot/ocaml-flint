@@ -50,6 +50,14 @@ module CA = struct
   let of_z ~ctx z = of_fmpz ~ctx (Flint.FMPZ.of_z z)
   let of_q ~ctx z = of_fmpq ~ctx (Flint.FMPQ.of_q z)
 
+  let of_int ~ctx i =
+    let t = mk_ca ~ctx () in
+    ca_set_si t (Signed.Long.of_int i) ctx;
+    t
+
+  let zero ~ctx () = of_int ~ctx 0
+  let one ~ctx () = of_int ~ctx 1
+
   exception Incomplete
 
   let of_truth_exn = function
@@ -68,17 +76,10 @@ module CA = struct
 
   let compare_z ~ctx x y = compare ~ctx x (of_z ~ctx y)
   let compare_q ~ctx x y = compare ~ctx x (of_q ~ctx y)
+  let sign ~ctx x = compare ~ctx x (zero ~ctx ())
   let is_negative_real ~ctx x = of_truth_exn (ca_check_is_negative_real x ctx)
   let to_string ~ctx f = External.to_string f ctx
   let pp ~ctx fmt f = Format.pp_print_string fmt (to_string ~ctx f)
-
-  let of_int ~ctx i =
-    let t = mk_ca ~ctx () in
-    ca_set_si t (Signed.Long.of_int i) ctx;
-    t
-
-  let zero ~ctx () = of_int ~ctx 0
-  let one ~ctx () = of_int ~ctx 1
 
   let get_acb_accurate_parts ~ctx ~prec t =
     let acb = Arb.ACB.C.mk_acb () in

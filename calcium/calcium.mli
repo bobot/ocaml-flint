@@ -29,6 +29,7 @@ module CA : sig
   val equal : ctx:CTX.t -> t -> t -> bool
   val compare : ctx:CTX.t -> t -> t -> int
   val hash : ctx:CTX.t -> t -> int
+  val sign : ctx:CTX.t -> t -> int
   val le : ctx:CTX.t -> t -> t -> bool
   val lt : ctx:CTX.t -> t -> t -> bool
   val ge : ctx:CTX.t -> t -> t -> bool
