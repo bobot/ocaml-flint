@@ -14,8 +14,8 @@
   (build_flags_resolver
    (vendored
     (c_flags
-     "-Icalcium"
-     "-I."
+     "-I%{read-lines:pwd}/calcium"
+     "-I%{read-lines:pwd}/."
      "-I%{read:lib/flint_dir}"
      "-I%{read:lib/antic_dir}"
      "-I%{read:lib/arb_dir}"
@@ -35,4 +35,4 @@
   (generated_types Types_generated)
   (generated_entry_point C)))
 
-;(rule (action (copy %{lib:zarith:zarith.h} zarith.h)))
+(rule (action (with-stdout-to pwd (run pwd))))

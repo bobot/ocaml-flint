@@ -13,8 +13,8 @@
   (build_flags_resolver
    (vendored
     (c_flags
-     "-Iflint"
-     "-I."
+     "-I%{read-lines:pwd}/flint"
+     "-I%{read-lines:pwd}/."
      "-Werror=implicit-function-declaration"
      :standard)
     (c_library_flags
@@ -34,4 +34,4 @@
   (generated_types Types_generated)
   (generated_entry_point C)))
 
-;(rule (action (copy %{lib:zarith:zarith.h} zarith.h)))
+(rule (action (with-stdout-to pwd (run pwd))))
