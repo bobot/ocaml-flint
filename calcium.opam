@@ -12,6 +12,7 @@ depends: [
   "arb"
   "antic"
   "ctypes"
+  "conf-mpfr"
   "dune-site" {with-test}
   "odoc" {with-doc}
 ]

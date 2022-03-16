@@ -9,24 +9,24 @@
 (package
  (name flint)
  (synopsis "Stub of the C library Flint2.")
- (depends zarith ctypes (dune-site :with-test))
+ (depends zarith ctypes conf-mpfr (dune-site :with-test))
 )
 
 (package
  (name arb)
  (synopsis "Stub of the C library Arb. Ball approximation")
- (depends flint ctypes)
+ (depends flint ctypes conf-mpfr)
 )
 
 
 (package
  (name antic)
  (synopsis "Stub of the C library Antic. Algebraic number")
- (depends flint ctypes)
+ (depends flint ctypes conf-mpfr)
 )
 
 (package
  (name calcium)
  (synopsis "Stub of the C library Antic. For exact
            computation with real and complex numbers, presently in early development.")
- (depends zarith flint arb antic ctypes (dune-site :with-test)) )
+ (depends zarith flint arb antic ctypes conf-mpfr (dune-site :with-test)) )

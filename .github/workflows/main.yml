@@ -36,4 +36,4 @@ jobs:
 
       - run: opam exec -- dune build
 
-      - run: opam exec -- dune runtest# This is a basic workflow to help you get started with Actions
+      - run: opam exec -- dune runtest

@@ -7,6 +7,7 @@ depends: [
   "dune" {>= "3.1"}
   "flint"
   "ctypes"
+  "conf-mpfr"
   "odoc" {with-doc}
 ]
 build: [
