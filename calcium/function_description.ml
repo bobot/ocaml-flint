@@ -24,6 +24,85 @@ module Functions (F : Ctypes.FOREIGN) = struct
     foreign "ca_set_fmpz"
       (ca_t @-> Flint.FMPZ.C.fmpz_t @-> ca_ctx_t @-> returning void)
 
+  let ca_set_fmpq =
+    foreign "ca_set_fmpq"
+      (ca_t @-> Flint.FMPQ.C.fmpq_t @-> ca_ctx_t @-> returning void)
+
   let ca_ctx_init = foreign "ca_ctx_init" (ca_ctx_t @-> returning void)
   let ca_ctx_clear = foreign "ca_ctx_clear" (ca_ctx_t @-> returning void)
+
+  let ca_equal_repr =
+    foreign "ca_equal_repr" (ca_t @-> ca_t @-> ca_ctx_t @-> returning bool)
+
+  let ca_cmp_repr =
+    foreign "ca_cmp_repr" (ca_t @-> ca_t @-> ca_ctx_t @-> returning int)
+
+  let ca_hash_repr =
+    foreign "ca_hash_repr" (ca_t @-> ca_ctx_t @-> returning ulong)
+
+  let ca_is_unknown =
+    foreign "ca_is_unknown" (ca_t @-> ca_ctx_t @-> returning bool)
+
+  let ca_is_special =
+    foreign "ca_is_special" (ca_t @-> ca_ctx_t @-> returning bool)
+
+  let ca_check_equal =
+    foreign "ca_check_equal" (ca_t @-> ca_t @-> ca_ctx_t @-> returning truth_t)
+
+  let ca_check_lt =
+    foreign "ca_check_lt" (ca_t @-> ca_t @-> ca_ctx_t @-> returning truth_t)
+
+  let ca_check_le =
+    foreign "ca_check_le" (ca_t @-> ca_t @-> ca_ctx_t @-> returning truth_t)
+
+  let ca_check_gt =
+    foreign "ca_check_gt" (ca_t @-> ca_t @-> ca_ctx_t @-> returning truth_t)
+
+  let ca_check_ge =
+    foreign "ca_check_ge" (ca_t @-> ca_t @-> ca_ctx_t @-> returning truth_t)
+
+  let ca_floor =
+    foreign "ca_floor" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+
+  let ca_ceil = foreign "ca_ceil" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+
+  let ca_get_acb_accurate_parts =
+    foreign "ca_get_acb_accurate_parts"
+      (Arb.ACB.C.acb_t @-> ca_t @-> long @-> ca_ctx_t @-> returning void)
+
+  let ca_sqrt = foreign "ca_sqrt" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+
+  let ca_add =
+    foreign "ca_add" (ca_t @-> ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+
+  let ca_sub =
+    foreign "ca_sub" (ca_t @-> ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+
+  let ca_mul =
+    foreign "ca_mul" (ca_t @-> ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+
+  let ca_div =
+    foreign "ca_div" (ca_t @-> ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+
+  let ca_pow_si =
+    foreign "ca_pow_si" (ca_t @-> ca_t @-> long @-> ca_ctx_t @-> returning void)
+
+  let ca_pow_fmpq =
+    foreign "ca_pow_fmpq"
+      (ca_t @-> ca_t @-> Flint.FMPQ.C.fmpq_t @-> ca_ctx_t @-> returning void)
+
+  let ca_neg = foreign "ca_neg" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+  let ca_inv = foreign "ca_inv" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+  let ca_abs = foreign "ca_abs" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
+
+  let ca_get_fmpq =
+    foreign "ca_get_fmpq"
+      (Flint.FMPQ.C.fmpq_t @-> ca_t @-> ca_ctx_t @-> returning bool)
+
+  let ca_get_fmpz =
+    foreign "ca_get_fmpz"
+      (Flint.FMPZ.C.fmpz_t @-> ca_t @-> ca_ctx_t @-> returning bool)
+
+  let ca_check_is_negative_real =
+    foreign "ca_check_is_negative_real" (ca_t @-> ca_ctx_t @-> returning truth_t)
 end

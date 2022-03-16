@@ -14,8 +14,7 @@
   (build_flags_resolver
    (vendored
     (c_flags
-     "-I%{read-lines:pwd}/calcium"
-     "-I%{read-lines:pwd}/."
+     "-I%{read-lines:pwd}"
      "-I%{read:lib/flint_dir}"
      "-I%{read:lib/antic_dir}"
      "-I%{read:lib/arb_dir}"

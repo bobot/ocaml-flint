@@ -23,7 +23,7 @@
   )))
   (deps flint/flint.h flint/fmpz.h)
   (headers
-   (include "flint/fmpz.h" "string.h"))
+   (include "flint/fmpz.h" "flint/fmpq.h" "string.h"))
   (type_description
    (instance Type)
    (functor Type_description))

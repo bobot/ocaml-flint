@@ -2,10 +2,36 @@
  (name arb)
  (public_name arb)
  (foreign_archives ((path arb)(mode whole)))
+ (foreign_stubs
+  (language c)
+  (names ocaml_acb_utils)
+ )
  (libraries zarith flint)
- (flags -w -9-27))
+ (flags -w -9-27)
+ (ctypes
+  (external_library_name arb)
+  (build_flags_resolver
+   (vendored
+    (c_flags
+     "-I%{read-lines:pwd}"
+     "-I%{read:flint_dir}"
+     "-Werror=implicit-function-declaration"
+     :standard)
+    (c_library_flags "-lgmp -lmpfr")))
+  (deps arb.h acb.h)
+  (headers
+   (include "acb.h" "string.h"))
+  (type_description
+   (instance Type)
+   (functor Type_description))
+  (function_description
+   (concurrency sequential)
+   (instance Function)
+   (functor Function_description))
+  (generated_types Types_generated)
+  (generated_entry_point C)))
 
-;(rule (action (copy %{lib:zarith:zarith.h} zarith.h)))
+(rule (action (with-stdout-to pwd (run pwd))))
 
 (data_only_dirs arb)
 

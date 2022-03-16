@@ -3,23 +3,28 @@ open Ctypes
 module Types (F : Ctypes.TYPE) = struct
   open F
 
-  (* let version_major = constant "LIBPOLY_VERSION_MAJOR" int
-   * 
-   * let version_minor = constant "LIBPOLY_VERSION_MINOR" int
-   * 
-   * let version_patch = constant "LIBPOLY_VERSION_PATCH" int *)
-
   type fmpz = Signed.Long.t
   type fmpz_t = fmpz ptr
 
   let fmpz : fmpz typ = long
   let fmpz_t : fmpz_t typ = ptr fmpz
 
-  let libpoly_typedef_structure_nosize name =
-    typedef (structure (name ^ "_struct")) (name ^ "_t")
+  module FMPQ = struct
+    type s
+    type t = s structure
 
-  let libpoly_typedef_structure_sized name =
-    let s = structure (name ^ "_struct") in
-    seal s;
-    typedef s (name ^ "_t")
+    let t : t typ =
+      let s = structure "fmpq_struct" in
+      typedef s "fmpq"
+
+    let num = field t "num" fmpz
+    let den = field t "den" fmpz
+    let () = seal t
+  end
+
+  type fmpq = FMPQ.t structure
+  type fmpq_t = FMPQ.t ptr
+
+  let fmpq = FMPQ.t
+  let fmpq_t = ptr FMPQ.t
 end
