@@ -131,7 +131,7 @@ module CA = struct
 
   let div_t ~ctx a b = truncate ~ctx (div ~ctx a b)
   let div_f ~ctx a b = floor ~ctx (div ~ctx a b)
-  let mod_e ~ctx a b = sub ~ctx a (of_z ~ctx (div_e ~ctx a b))
-  let mod_t ~ctx a b = sub ~ctx a (of_z ~ctx (div_t ~ctx a b))
-  let mod_f ~ctx a b = sub ~ctx a (of_z ~ctx (div_f ~ctx a b))
+  let mod_e ~ctx a b = sub ~ctx a (mul ~ctx (of_z ~ctx (div_e ~ctx a b)) b)
+  let mod_t ~ctx a b = sub ~ctx a (mul ~ctx (of_z ~ctx (div_t ~ctx a b)) b)
+  let mod_f ~ctx a b = sub ~ctx a (mul ~ctx (of_z ~ctx (div_f ~ctx a b)) b)
 end
