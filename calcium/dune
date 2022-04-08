@@ -1,7 +1,8 @@
 (library
  (name calcium)
  (public_name calcium)
- (foreign_archives ((path lib/calcium)(mode whole)))
+; (foreign_archives ((path lib/calcium)(mode whole)))
+ (foreign_archives lib/calcium)
  (foreign_stubs
   (language c)
   (names ocaml_calcium_utils)

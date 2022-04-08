@@ -1,7 +1,8 @@
 (library
  (name flint)
  (public_name flint)
- (foreign_archives ((path flint/flint)(mode whole)))
+; (foreign_archives ((path flint/flint)(mode whole)))
+ (foreign_archives flint/flint)
  (foreign_stubs
   (language c)
   (names ocaml_flint_utils)

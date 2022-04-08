@@ -1,7 +1,8 @@
 (library
  (name arb)
  (public_name arb)
- (foreign_archives ((path arb)(mode whole)))
+; (foreign_archives ((path arb)(mode whole)))
+ (foreign_archives arb)
  (foreign_stubs
   (language c)
   (names ocaml_acb_utils)

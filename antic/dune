@@ -1,7 +1,8 @@
 (library
  (name antic)
  (public_name antic)
- (foreign_archives ((path antic/antic)(mode whole)))
+; (foreign_archives ((path antic/antic)(mode whole)))
+ (foreign_archives antic/antic)
  (libraries zarith flint)
  (flags -w -9-27))
 
