@@ -3,6 +3,8 @@ opam-version: "2.0"
 synopsis: "Stub of the C library Arb. Ball approximation"
 maintainer: ["François Bobot"]
 authors: ["François Bobot"]
+homepage: "https://github.com/bobot/flint"
+bug-reports: "https://github.com/bobot/flint/issues"
 depends: [
   "dune" {>= "3.1"}
   "flint"
@@ -24,6 +26,7 @@ build: [
     "@doc" {with-doc}
   ]
 ]
+dev-repo: "git+https://github.com/bobot/flint.git"
 pin-depends: [
   [ "dune.3.1" "git+https://github.com/bobot/jbuilder.git#for_flint" ]
   [ "dune-site.3.1" "git+https://github.com/bobot/jbuilder.git#for_flint" ]

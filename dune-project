@@ -5,6 +5,7 @@
 
 (maintainers "François Bobot")
 (authors "François Bobot")
+(source (github bobot/flint))
 
 (package
  (name flint)
