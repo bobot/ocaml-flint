@@ -2,6 +2,7 @@
 
 (generate_opam_files true)
 (using ctypes 0.1)
+(subst disabled)
 
 (maintainers "François Bobot")
 (authors "François Bobot")
