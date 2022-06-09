@@ -1,4 +1,0 @@
-(rule (action (copy opam.template flint.opam.template)))
-(rule (action (copy opam.template arb.opam.template)))
-(rule (action (copy opam.template antic.opam.template)))
-(rule (action (copy opam.template calcium.opam.template)))

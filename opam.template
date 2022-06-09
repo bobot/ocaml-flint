@@ -1,8 +1,0 @@
-pin-depends: [
-  [ "dune.3.1" "git+https://github.com/bobot/jbuilder.git#for_flint" ]
-  [ "dune-site.3.1" "git+https://github.com/bobot/jbuilder.git#for_flint" ]
-  [ "dune-private-libs.3.1" "git+https://github.com/bobot/jbuilder.git#for_flint" ]
-  [ "dyn.3.1" "git+https://github.com/bobot/jbuilder.git#for_flint" ]
-  [ "ordering.3.1" "git+https://github.com/bobot/jbuilder.git#for_flint" ]
-  [ "stdune.3.1" "git+https://github.com/bobot/jbuilder.git#for_flint" ]
-]
