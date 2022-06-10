@@ -3,6 +3,7 @@ opam-version: "2.0"
 synopsis: "Stub of the C library Arb. Ball approximation"
 maintainer: ["François Bobot"]
 authors: ["François Bobot"]
+license: "LGPL-2.1"
 homepage: "https://github.com/bobot/ocaml-flint"
 bug-reports: "https://github.com/bobot/ocaml-flint/issues"
 depends: [
