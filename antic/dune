@@ -1,8 +1,9 @@
 (library
  (name antic)
  (public_name antic)
- (foreign_archives ((path lib/antic)(mode whole)))
- (libraries zarith flint2)
+; (foreign_archives ((path antic/antic)(mode whole)))
+ (foreign_archives antic/antic)
+ (libraries zarith flint)
  (flags -w -9-27))
 
 ;(rule (action (copy %{lib:zarith:zarith.h} zarith.h)))

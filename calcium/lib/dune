@@ -8,8 +8,9 @@
    flint_dir
    (run
     %{ocaml}
-    %{dep:../../utils/get_include_root.ml}
-    %{lib:flint2:include/flint/flint.h}))))
+     %{dep:../../utils/get_include_root.ml}
+     2
+     %{lib:flint:flint/flint.h}))))
 
 (rule
  (action
@@ -17,8 +18,9 @@
    arb_dir
    (run
     %{ocaml}
-    %{dep:../../utils/get_include_root.ml}
-    %{lib:arb:include/arb/arb.h}))))
+     %{dep:../../utils/get_include_root.ml}
+     1
+     %{lib:arb:arb.h}))))
 
 (rule
  (action
@@ -26,8 +28,9 @@
    antic_dir
    (run
     %{ocaml}
-    %{dep:../../utils/get_include_root.ml}
-    %{lib:antic:include/antic/nf.h}))))
+     %{dep:../../utils/get_include_root.ml}
+     2
+     %{lib:antic:antic/nf.h}))))
 
 (rule
  (targets
@@ -48,7 +51,7 @@
  (deps
   (source_tree calcium)
   (sandbox always)
-  (package flint2))
+  (package flint)(package arb)(package antic))
  (action
   (no-infer
    (progn
@@ -64,7 +67,6 @@
        CFLAGS=-fPIC)
       (run make library -j)
       (run make install)))
-    (run find prefix)
     (copy prefix/lib/libcalcium.so dllcalcium.so)
     (copy prefix/lib/libcalcium.a libcalcium.a)
     (copy prefix/include/calcium/qqbar.h qqbar.h)

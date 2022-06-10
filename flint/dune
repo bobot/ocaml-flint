@@ -1,12 +1,12 @@
 (library
- (name flint2)
- (public_name flint2)
- (foreign_archives ((path lib/flint)(mode whole)))
+ (name flint)
+ (public_name flint)
+; (foreign_archives ((path flint/flint)(mode whole)))
+ (foreign_archives flint/flint)
  (foreign_stubs
   (language c)
   (names ocaml_flint_utils)
-  (include_dirs
-   (lib zarith)))
+  (include_dirs flint (lib zarith)))
  (libraries zarith ctypes)
  (flags -w -9-27)
  (ctypes
@@ -14,17 +14,17 @@
   (build_flags_resolver
    (vendored
     (c_flags
-     "-Iflint2"
-     "-I."
+     "-I%{read-lines:pwd}/flint"
+     "-I%{read-lines:pwd}/."
      "-Werror=implicit-function-declaration"
      :standard)
     (c_library_flags
     "-lgmp -lmpfr"
 
   )))
-  (deps lib/flint.h lib/fmpz.h)
+  (deps flint/flint.h flint/fmpz.h)
   (headers
-   (include "lib/fmpz.h" "string.h"))
+   (include "flint/fmpz.h" "flint/fmpq.h" "string.h"))
   (type_description
    (instance Type)
    (functor Type_description))
@@ -35,4 +35,4 @@
   (generated_types Types_generated)
   (generated_entry_point C)))
 
-;(rule (action (copy %{lib:zarith:zarith.h} zarith.h)))
+(rule (action (with-stdout-to pwd (run pwd))))

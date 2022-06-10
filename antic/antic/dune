@@ -8,15 +8,17 @@
    flint_dir
    (run
     %{ocaml}
-    %{dep:../../utils/get_include_root.ml}
-    %{lib:flint2:include/flint/flint.h}))))
+     %{dep:../../utils/get_include_root.ml}
+     2
+     %{lib:flint:flint/flint.h}))))
+
 
 (rule
  (targets dllantic.so libantic.a nf_elem.h qfb.h nf.h)
  (deps
   (source_tree antic)
   (sandbox always)
-  (package flint2))
+  (package flint))
  (action
   (no-infer
    (progn
@@ -40,6 +42,6 @@
  (section lib)
  (package antic)
  (files
-  (nf_elem.h as include/antic/nf_elem.h)
-  (qfb.h as include/antic/qfb.h)
-  (nf.h as include/antic/nf.h)))
+  (nf_elem.h as antic/nf_elem.h)
+  (qfb.h as antic/qfb.h)
+  (nf.h as antic/nf.h)))

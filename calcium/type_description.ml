@@ -25,4 +25,13 @@ module Types (F : Ctypes.TYPE) = struct
   type ca_ctx_t = ca_ctx structure ptr
 
   let ca_ctx_t : ca_ctx_t typ = ptr ca_ctx_struct
+
+  type truth_t = TRUE | FALSE | UNKNOWN
+
+  let truth_t =
+    let t_true = constant "T_TRUE" int64_t in
+    let t_false = constant "T_FALSE" int64_t in
+    let t_unknown = constant "T_UNKNOWN" int64_t in
+    enum ~typedef:true "truth_t"
+      [ (TRUE, t_true); (FALSE, t_false); (UNKNOWN, t_unknown) ]
 end

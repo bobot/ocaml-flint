@@ -22,6 +22,12 @@ module Functions (F : Ctypes.FOREIGN) = struct
   let fmpz_init_set_ui =
     foreign "fmpz_init_set_ui" (fmpz_t @-> ulong @-> returning void)
 
+  let fmpq_clear = foreign "fmpq_clear" (fmpq_t @-> returning void)
+
+  let fmpq_set_fmpz_frac =
+    foreign "fmpq_set_fmpz_frac"
+      (fmpq_t @-> fmpz_t @-> fmpz_t @-> returning void)
+
   let free = foreign "free" (ptr char @-> returning void)
   let strlen = foreign "strlen" (ptr char @-> returning size_t)
 end

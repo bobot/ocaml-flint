@@ -47,3 +47,22 @@ module FMPZ = struct
     fmpz_set_si f (Signed.Long.of_int i);
     f
 end
+
+module FMPQ = struct
+  type t = fmpq_t
+
+  module C = struct
+    let fmpq_t = C.Type.fmpq_t
+
+    let mk_fmpq () : fmpq_t =
+      allocate_n ~count:1 ~finalise:C.Function.fmpq_clear fmpq
+  end
+
+  let mk num den =
+    let q = C.mk_fmpq () in
+    fmpq_set_fmpz_frac q num den;
+    q
+
+  let of_q q = mk (FMPZ.of_z q.Q.num) (FMPZ.of_z q.Q.den)
+  let to_q q = Q.make (FMPZ.to_z (q |-> FMPQ.num)) (FMPZ.to_z (q |-> FMPQ.den))
+end

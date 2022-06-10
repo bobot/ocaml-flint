@@ -4,9 +4,11 @@
  (libraries calcium)
 )
 
-(tests
- (names dynamic)
- (modules dynamic)
- (libraries dune-site.plugins zarith)
- (deps (package flint2)(package arb)(package antic)(package calcium))
-)
+;; Need dune whole mode for foreign library
+
+; (tests
+;  (names dynamic)
+;  (modules dynamic)
+;  (libraries dune-site.plugins zarith)
+;  (deps (package flint)(package arb)(package antic)(package calcium))
+; )
