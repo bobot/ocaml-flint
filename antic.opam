@@ -3,8 +3,8 @@ opam-version: "2.0"
 synopsis: "Stub of the C library Antic. Algebraic number"
 maintainer: ["François Bobot"]
 authors: ["François Bobot"]
-homepage: "https://github.com/bobot/flint"
-bug-reports: "https://github.com/bobot/flint/issues"
+homepage: "https://github.com/bobot/ocaml-flint"
+bug-reports: "https://github.com/bobot/ocaml-flint/issues"
 depends: [
   "dune" {>= "3.1"}
   "flint"
@@ -13,6 +13,7 @@ depends: [
   "odoc" {with-doc}
 ]
 build: [
+  ["dune" "subst"] {dev}
   [
     "dune"
     "build"
@@ -25,4 +26,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/bobot/flint.git"
+dev-repo: "git+https://github.com/bobot/ocaml-flint.git"

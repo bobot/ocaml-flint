@@ -5,13 +5,13 @@
 
 (maintainers "François Bobot")
 (authors "François Bobot")
-(source (github bobot/flint))
+(source (github bobot/ocaml-flint))
 
 (name flint)
 
 (package
  (name flint)
- (synopsis "Stub of the C library Flint2.")
+ (synopsis "Stub of the C library Flint2")
  (depends zarith ctypes conf-mpfr (dune-site :with-test))
 )
 
@@ -30,6 +30,6 @@
 
 (package
  (name calcium)
- (synopsis "Stub of the C library Antic. For exact
-           computation with real and complex numbers, presently in early development.")
+ (synopsis "Stub of the C library Antic. For exact computation \
+            with real and complex numbers, presently in early development")
  (depends zarith flint arb antic ctypes conf-mpfr (dune-site :with-test)) )
