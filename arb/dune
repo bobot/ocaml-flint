@@ -1,12 +1,11 @@
 (library
  (name arb)
  (public_name arb)
-; (foreign_archives ((path arb)(mode whole)))
+ ; (foreign_archives ((path arb)(mode whole)))
  (foreign_archives arb)
  (foreign_stubs
   (language c)
-  (names ocaml_acb_utils)
- )
+  (names ocaml_acb_utils))
  (libraries zarith flint)
  (flags -w -9-27)
  (ctypes
@@ -32,7 +31,11 @@
   (generated_types Types_generated)
   (generated_entry_point C)))
 
-(rule (action (with-stdout-to pwd (run pwd))))
+(rule
+ (action
+  (with-stdout-to
+   pwd
+   (run pwd))))
 
 (data_only_dirs arb)
 
@@ -44,9 +47,9 @@
    flint_dir
    (run
     %{ocaml}
-     %{dep:../utils/get_include_root.ml}
-     2
-     %{lib:flint:flint/flint.h}))))
+    %{dep:../utils/get_include_root.ml}
+    2
+    %{lib:flint:flint/flint.h}))))
 
 (rule
  (targets

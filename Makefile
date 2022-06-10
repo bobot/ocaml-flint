@@ -3,3 +3,6 @@ all:
 
 test:
 	dune runtest --root .
+
+opam:
+	dune build --root . *.opam

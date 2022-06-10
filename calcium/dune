@@ -1,13 +1,16 @@
 (library
  (name calcium)
  (public_name calcium)
-; (foreign_archives ((path lib/calcium)(mode whole)))
+ ; (foreign_archives ((path lib/calcium)(mode whole)))
  (foreign_archives lib/calcium)
  (foreign_stubs
   (language c)
   (names ocaml_calcium_utils)
-  (include_dirs lib (lib flint) (lib arb) (lib antic))
- )
+  (include_dirs
+   lib
+   (lib flint)
+   (lib arb)
+   (lib antic)))
  (libraries zarith flint arb antic)
  (flags -w -9-27)
  (ctypes
@@ -35,4 +38,8 @@
   (generated_types Types_generated)
   (generated_entry_point C)))
 
-(rule (action (with-stdout-to pwd (run pwd))))
+(rule
+ (action
+  (with-stdout-to
+   pwd
+   (run pwd))))

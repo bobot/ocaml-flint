@@ -7,10 +7,11 @@ homepage: "https://github.com/bobot/ocaml-flint"
 bug-reports: "https://github.com/bobot/ocaml-flint/issues"
 depends: [
   "dune" {>= "3.1"}
-  "zarith"
-  "ctypes"
-  "conf-mpfr"
+  "zarith" {>= "1.12"}
+  "ctypes" {>= "0.20.1"}
+  "conf-mpfr" {>= "3"}
   "dune-site" {with-test}
+  "ocaml" {>= "4.10"}
   "odoc" {with-doc}
 ]
 build: [

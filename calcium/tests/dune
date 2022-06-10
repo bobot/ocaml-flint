@@ -1,8 +1,7 @@
 (tests
  (names units)
  (modules units)
- (libraries calcium)
-)
+ (libraries calcium))
 
 ;; Need dune whole mode for foreign library
 
