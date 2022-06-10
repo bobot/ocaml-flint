@@ -11,6 +11,7 @@ depends: [
   "ctypes"
   "conf-mpfr"
   "dune-site" {with-test}
+  "ocaml" {>= "4.10"}
   "odoc" {with-doc}
 ]
 build: [

@@ -10,6 +10,7 @@ depends: [
   "flint"
   "ctypes"
   "conf-mpfr"
+  "ocaml" {>= "4.10"}
   "odoc" {with-doc}
 ]
 build: [
