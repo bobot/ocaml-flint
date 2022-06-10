@@ -8,19 +8,15 @@
    flint_dir
    (run
     %{ocaml}
-     %{dep:../../utils/get_include_root.ml}
-     2
-     %{lib:flint:flint/flint.h}))))
+    %{dep:../../utils/get_include_root.ml}
+    2
+    %{lib:flint:flint/flint.h}))))
 
 (rule
  (action
   (with-stdout-to
    arb_dir
-   (run
-    %{ocaml}
-     %{dep:../../utils/get_include_root.ml}
-     1
-     %{lib:arb:arb.h}))))
+   (run %{ocaml} %{dep:../../utils/get_include_root.ml} 1 %{lib:arb:arb.h}))))
 
 (rule
  (action
@@ -28,9 +24,9 @@
    antic_dir
    (run
     %{ocaml}
-     %{dep:../../utils/get_include_root.ml}
-     2
-     %{lib:antic:antic/nf.h}))))
+    %{dep:../../utils/get_include_root.ml}
+    2
+    %{lib:antic:antic/nf.h}))))
 
 (rule
  (targets
@@ -51,7 +47,9 @@
  (deps
   (source_tree calcium)
   (sandbox always)
-  (package flint)(package arb)(package antic))
+  (package flint)
+  (package arb)
+  (package antic))
  (action
   (no-infer
    (progn

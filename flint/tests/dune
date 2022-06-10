@@ -3,8 +3,7 @@
  (modules units)
  (libraries flint)
  (modes byte)
- (package flint)
-)
+ (package flint))
 
 (tests
  (names dynamic)
