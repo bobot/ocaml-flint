@@ -8,4 +8,7 @@
 (tests
  (names dynamic)
  (modules dynamic)
- (libraries dune-site.plugins zarith))
+ (libraries dune-site.plugins zarith)
+ (deps (package flint))
+ (package flint)
+)
