@@ -10,7 +10,9 @@
    lib
    (lib flint)
    (lib arb)
-   (lib antic)))
+   (lib antic))
+   (flags "-D_GNU_SOURCE")
+ )
  (libraries zarith flint arb antic threads)
  (flags -w -9-27)
  (ctypes
@@ -23,6 +25,7 @@
      "-I%{read:lib/antic_dir}"
      "-I%{read:lib/arb_dir}"
      "-Werror=implicit-function-declaration"
+     "-D_GNU_SOURCE"
      :standard)
     (c_library_flags "-lgmp -lmpfr")))
   (deps lib/ca.h)

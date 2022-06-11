@@ -8,7 +8,9 @@
   (names ocaml_flint_utils)
   (include_dirs
    flint
-   (lib zarith)))
+   (lib zarith))
+  (flags "-D_GNU_SOURCE")
+ )
  (libraries zarith ctypes threads)
  (flags -w -9-27)
  (ctypes
@@ -19,6 +21,7 @@
      "-I%{read-lines:pwd}/flint"
      "-I%{read-lines:pwd}/."
      "-Werror=implicit-function-declaration"
+     "-D_GNU_SOURCE"
      :standard)
     (c_library_flags "-lgmp -lmpfr")))
   (deps flint/flint.h flint/fmpz.h)

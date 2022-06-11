@@ -62,7 +62,7 @@
        --with-arb=%{read:arb_dir}
        --with-antic=%{read:antic_dir}
        --prefix=../prefix
-       CFLAGS=-fPIC)
+       "CFLAGS=-fPIC -D_GNU_SOURCE")
       (run make library -j)
       (run make install)))
     (copy prefix/lib/libcalcium.so dllcalcium.so)
