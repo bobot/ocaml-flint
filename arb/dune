@@ -6,7 +6,7 @@
  (foreign_stubs
   (language c)
   (names ocaml_acb_utils))
- (libraries zarith flint)
+ (libraries zarith flint threads)
  (flags -w -9-27)
  (ctypes
   (external_library_name arb)
@@ -95,11 +95,8 @@
       (run
        ./configure
        --with-flint=%{read:flint_dir}
-        --prefix=../prefix
-        CFLAGS=-fPIC
-        ; Simplify linking
-        --disable-pthread --disable-tls
-      )
+       --prefix=../prefix
+       CFLAGS=-fPIC)
       (run make library -j)
       (run make install)))
     (copy prefix/lib/libarb.so dllarb.so)

@@ -62,10 +62,7 @@
        --with-arb=%{read:arb_dir}
        --with-antic=%{read:antic_dir}
        --prefix=../prefix
-       CFLAGS=-fPIC
-       ; Simplify linking
-        --disable-pthread --disable-tls
-      )
+       CFLAGS=-fPIC)
       (run make library -j)
       (run make install)))
     (copy prefix/lib/libcalcium.so dllcalcium.so)

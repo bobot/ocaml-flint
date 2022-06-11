@@ -9,7 +9,7 @@
   (include_dirs
    flint
    (lib zarith)))
- (libraries zarith ctypes)
+ (libraries zarith ctypes threads)
  (flags -w -9-27)
  (ctypes
   (external_library_name flint)

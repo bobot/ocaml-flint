@@ -11,7 +11,7 @@
    (lib flint)
    (lib arb)
    (lib antic)))
- (libraries zarith flint arb antic)
+ (libraries zarith flint arb antic threads)
  (flags -w -9-27)
  (ctypes
   (external_library_name calcium)
