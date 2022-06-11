@@ -1,3 +1,7 @@
+## Release 0.1.4 ##
+
+   - Fix tests arm32 architecture and others
+
 ## Release 0.1.3 ##
 
   - fixes compilation on ocaml < 4.13
