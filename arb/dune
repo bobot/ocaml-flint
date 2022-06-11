@@ -95,8 +95,11 @@
       (run
        ./configure
        --with-flint=%{read:flint_dir}
-       --prefix=../prefix
-       CFLAGS=-fPIC)
+        --prefix=../prefix
+        CFLAGS=-fPIC
+        ; Simplify linking
+        --disable-pthread --disable-tls
+      )
       (run make library -j)
       (run make install)))
     (copy prefix/lib/libarb.so dllarb.so)
