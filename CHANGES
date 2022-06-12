@@ -1,5 +1,7 @@
-## Release 0.1.4 ##
+## Release 0.1.5 ##
+  - Forgotten standard options for c_flag
 
+## Release 0.1.4 ##
    - Fix tests arm32 architecture and others
    - Force _GNU_SOURCE for musl libc
 

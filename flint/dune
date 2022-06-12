@@ -9,7 +9,7 @@
   (include_dirs
    flint
    (lib zarith))
-  (flags "-D_GNU_SOURCE")
+  (flags "-D_GNU_SOURCE" :standard)
  )
  (libraries zarith ctypes threads)
  (flags -w -9-27)

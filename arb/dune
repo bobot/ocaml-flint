@@ -6,7 +6,7 @@
  (foreign_stubs
   (language c)
   (names ocaml_acb_utils)
-  (flags "-D_GNU_SOURCE")
+  (flags "-D_GNU_SOURCE" :standard)
  )
  (libraries zarith flint threads)
  (flags -w -9-27)

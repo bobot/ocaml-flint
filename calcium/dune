@@ -11,7 +11,7 @@
    (lib flint)
    (lib arb)
    (lib antic))
-   (flags "-D_GNU_SOURCE")
+   (flags "-D_GNU_SOURCE" :standard)
  )
  (libraries zarith flint arb antic threads)
  (flags -w -9-27)
