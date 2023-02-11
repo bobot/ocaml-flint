@@ -28,6 +28,7 @@
        ./configure
        --with-flint=%{read:flint_dir}
        --prefix=../prefix
+       --with-pkg-config
        CFLAGS=-fPIC)
       (run make library -j)
       (run make install)))

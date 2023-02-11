@@ -137,7 +137,7 @@
     (chdir
      flint2
      (progn
-      (run ./configure --prefix=../prefix CFLAGS=-fPIC)
+      (run ./configure --prefix=../prefix CFLAGS=-fPIC --with-pkg-config)
       (run make library -j)
       (run make install)))
     (copy prefix/lib/libflint.a libflint.a)

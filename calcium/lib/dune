@@ -62,6 +62,7 @@
        --with-arb=%{read:arb_dir}
        --with-antic=%{read:antic_dir}
        --prefix=../prefix
+       --with-pkg-config
        CFLAGS=-fPIC)
       (run make library -j)
       (run make install)))

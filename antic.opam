@@ -12,6 +12,7 @@ depends: [
   "ctypes" {>= "0.20.1"}
   "conf-mpfr" {>= "3"}
   "ocaml" {>= "4.10"}
+  "conf-pkg-config" {>= "2"}
   "odoc" {with-doc}
 ]
 build: [
