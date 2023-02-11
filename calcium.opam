@@ -4,7 +4,7 @@ synopsis:
   "Stub of the C library Antic. For exact computation with real and complex numbers, presently in early development"
 maintainer: ["François Bobot"]
 authors: ["François Bobot"]
-license: "LGPL-2.1"
+license: "LGPL-2.1-only"
 homepage: "https://github.com/bobot/ocaml-flint"
 bug-reports: "https://github.com/bobot/ocaml-flint/issues"
 depends: [

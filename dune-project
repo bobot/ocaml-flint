@@ -6,7 +6,7 @@
 (maintainers "François Bobot")
 (authors "François Bobot")
 (source (github bobot/ocaml-flint))
-(license "LGPL-2.1")
+(license "LGPL-2.1-only")
 
 (name flint)
 
