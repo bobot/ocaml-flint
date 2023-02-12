@@ -25,6 +25,7 @@ let () =
   pr "acb8" acb8;
   pr "acb0" acb0;
   pr "acb16" acb16;
-  Format.printf "%i@." (Calcium.CA.hash ~ctx z2);
+  let h1 = (Calcium.CA.hash ~ctx z2) in
   let z2' = Calcium.CA.pow ~ctx z1 (Q.of_string "0.5") in
-  Format.printf "%i@." (Calcium.CA.hash ~ctx z2')
+  let h2 = (Calcium.CA.hash ~ctx z2') in
+  Format.printf "h1=h2:%b@." (h1 = h2)
