@@ -31,7 +31,9 @@
        --with-pkg-config
        CFLAGS=-fPIC)
       (run make library -j)
-      (run make install)))
+      (run make install)
+      (system "if [ -f ../prefix/lib/libantic.dylib ]; then mv ../prefix/lib/libantic.dylib ../prefix/lib/libantic.so; fi")
+      ))
     (copy prefix/lib/libantic%{ext_dll} dllantic%{ext_dll})
     (copy prefix/lib/libantic%{ext_lib} libantic%{ext_lib})
     (copy prefix/include/antic/nf_elem.h nf_elem.h)

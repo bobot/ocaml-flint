@@ -139,7 +139,9 @@
      (progn
       (run ./configure --prefix=../prefix CFLAGS=-fPIC --with-pkg-config)
       (run make library -j)
-      (run make install)))
+      (run make install)
+      (system "if [ -f ../prefix/lib/libflint.dylib ]; then mv ../prefix/lib/libflint.dylib ../prefix/lib/libflint.so; fi")
+      ))
     (copy prefix/lib/libflint%{ext_lib} libflint%{ext_lib})
     (copy prefix/lib/libflint%{ext_dll} dllflint%{ext_dll})
     (copy prefix/include/flint/aprcl.h aprcl.h)

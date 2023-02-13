@@ -65,7 +65,9 @@
        --with-pkg-config
        CFLAGS=-fPIC)
       (run make library -j)
-      (run make install)))
+      (run make install)
+      (system "if [ -f ../prefix/lib/libcalcium.dylib ]; then mv ../prefix/lib/libcalcium.dylib ../prefix/lib/libcalcium.so; fi")
+      ))
     (copy prefix/lib/libcalcium%{ext_dll} dllcalcium%{ext_dll})
     (copy prefix/lib/libcalcium%{ext_lib} libcalcium%{ext_lib})
     (copy prefix/include/calcium/qqbar.h qqbar.h)
