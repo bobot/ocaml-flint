@@ -1,6 +1,6 @@
 (data_only_dirs flint2)
 
-;make sure the library .a is compiled with pic, and is used for .cmxs
+;make sure the library %{ext_lib} is compiled with pic, and is used for .cmxs
 
 (rule
  (alias flint2_build)
@@ -126,8 +126,8 @@
   thread_pool.h
   thread_support.h
   ulong_extras.h
-  libflint.a
-  dllflint.so)
+  libflint%{ext_lib}
+  dllflint%{ext_dll})
  (deps
   (source_tree flint2)
   (sandbox always))
@@ -140,8 +140,8 @@
       (run ./configure --prefix=../prefix CFLAGS=-fPIC --with-pkg-config)
       (run make library -j)
       (run make install)))
-    (copy prefix/lib/libflint.a libflint.a)
-    (copy prefix/lib/libflint.so dllflint.so)
+    (copy prefix/lib/libflint%{ext_lib} libflint%{ext_lib})
+    (copy prefix/lib/libflint%{ext_dll} dllflint%{ext_dll})
     (copy prefix/include/flint/aprcl.h aprcl.h)
     (copy prefix/include/flint/arith.h arith.h)
     (copy prefix/include/flint/arithxx.h arithxx.h)

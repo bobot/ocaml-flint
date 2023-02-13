@@ -1,6 +1,6 @@
 (data_only_dirs antic)
 
-;make sure the library .a is compiled with pic, and is used for .cmxs
+;make sure the library .a (i.e. %{ext_lib}) is compiled with pic, and is used for .cmxs
 
 (rule
  (action
@@ -13,7 +13,7 @@
     %{lib:flint:flint/flint.h}))))
 
 (rule
- (targets dllantic.so libantic.a nf_elem.h qfb.h nf.h)
+ (targets dllantic%{ext_dll} libantic%{ext_lib} nf_elem.h qfb.h nf.h)
  (deps
   (source_tree antic)
   (sandbox always)
@@ -32,8 +32,8 @@
        CFLAGS=-fPIC)
       (run make library -j)
       (run make install)))
-    (copy prefix/lib/libantic.so dllantic.so)
-    (copy prefix/lib/libantic.a libantic.a)
+    (copy prefix/lib/libantic%{ext_dll} dllantic%{ext_dll})
+    (copy prefix/lib/libantic%{ext_lib} libantic%{ext_lib})
     (copy prefix/include/antic/nf_elem.h nf_elem.h)
     (copy prefix/include/antic/qfb.h qfb.h)
     (copy prefix/include/antic/nf.h nf.h)))))

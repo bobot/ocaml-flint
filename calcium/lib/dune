@@ -1,6 +1,6 @@
 (data_only_dirs calcium)
 
-;make sure the library .a is compiled with pic, and is used for .cmxs
+;make sure the library %{ext_lib} is compiled with pic, and is used for .cmxs
 
 (rule
  (action
@@ -30,8 +30,8 @@
 
 (rule
  (targets
-  dllcalcium.so
-  libcalcium.a
+  dllcalcium%{ext_dll}
+  libcalcium%{ext_lib}
   qqbar.h
   ca_field.h
   calcium.h
@@ -66,8 +66,8 @@
        CFLAGS=-fPIC)
       (run make library -j)
       (run make install)))
-    (copy prefix/lib/libcalcium.so dllcalcium.so)
-    (copy prefix/lib/libcalcium.a libcalcium.a)
+    (copy prefix/lib/libcalcium%{ext_dll} dllcalcium%{ext_dll})
+    (copy prefix/lib/libcalcium%{ext_lib} libcalcium%{ext_lib})
     (copy prefix/include/calcium/qqbar.h qqbar.h)
     (copy prefix/include/calcium/ca_field.h ca_field.h)
     (copy prefix/include/calcium/calcium.h calcium.h)

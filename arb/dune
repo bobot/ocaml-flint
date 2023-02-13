@@ -39,7 +39,7 @@
 
 (data_only_dirs arb)
 
-;make sure the library .a is compiled with pic, and is used for .cmxs
+;make sure the library %{ext_lib} is compiled with pic, and is used for .cmxs
 
 (rule
  (action
@@ -53,8 +53,8 @@
 
 (rule
  (targets
-  dllarb.so
-  libarb.a
+  dllarb%{ext_dll}
+  libarb%{ext_lib}
   dirichlet.h
   mag.h
   acb_poly.h
@@ -100,8 +100,8 @@
        CFLAGS=-fPIC)
       (run make library -j)
       (run make install)))
-    (copy prefix/lib/libarb.so dllarb.so)
-    (copy prefix/lib/libarb.a libarb.a)
+    (copy prefix/lib/libarb%{ext_dll} dllarb%{ext_dll})
+    (copy prefix/lib/libarb%{ext_lib} libarb%{ext_lib})
     (copy prefix/include/dirichlet.h dirichlet.h)
     (copy prefix/include/mag.h mag.h)
     (copy prefix/include/acb_poly.h acb_poly.h)
