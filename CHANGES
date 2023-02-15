@@ -1,3 +1,11 @@
+## Release 0.2 ##
+  - Bump flint to 2.9
+    - should fix alpine
+  - Bump antic to 0.2.5
+  - Bump arb to 2.23.0
+  - calcium already at 0.4.1
+  - macosx: move .dylib to .so
+
 ## Release 0.1.6 ##
   - use pkg-config for finding gmp and mpfr
 
