@@ -16,6 +16,7 @@
      "-I%{read-lines:pwd}"
      "-I%{read:flint_dir}"
      "-Werror=implicit-function-declaration"
+     (:include ../configure/c_flags.sexp)
      :standard)
     (c_library_flags "-lgmp -lmpfr")))
   (deps arb.h acb.h)

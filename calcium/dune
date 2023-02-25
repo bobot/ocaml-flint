@@ -23,6 +23,7 @@
      "-I%{read:lib/antic_dir}"
      "-I%{read:lib/arb_dir}"
      "-Werror=implicit-function-declaration"
+     (:include ../configure/c_flags.sexp)
      :standard)
     (c_library_flags "-lgmp -lmpfr")))
   (deps lib/ca.h)

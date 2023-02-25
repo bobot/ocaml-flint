@@ -18,6 +18,7 @@ depends: [
   "dune-site" {with-test}
   "ocaml" {>= "4.10"}
   "conf-pkg-config" {>= "2"}
+  "dune-configurator"
   "odoc" {with-doc}
 ]
 build: [
