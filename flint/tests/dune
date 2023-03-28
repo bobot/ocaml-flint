@@ -9,6 +9,6 @@
  (names dynamic)
  (modules dynamic)
  (libraries dune-site.plugins zarith threads)
- (deps (package flint))
- (package flint)
-)
+ (deps
+  (package flint))
+ (package flint))

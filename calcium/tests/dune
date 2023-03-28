@@ -2,8 +2,7 @@
  (names units)
  (modules units)
  (libraries calcium)
- (package calcium)
-)
+ (package calcium))
 
 ;; Need dune whole mode for foreign library
 
