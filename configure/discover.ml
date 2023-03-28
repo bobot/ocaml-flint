@@ -2,19 +2,20 @@ module C = Configurator.V1
 
 let () =
   C.main ~name:"discover" (fun c ->
-      let conf =
+      let cflags, libs =
         match C.Pkg_config.get c with
-        | None -> []
+        | None -> ([], [])
         | Some pc ->
-            let cflags ~package =
+            let flags ~package =
               match C.Pkg_config.query pc ~package with
-              | None -> []
-              | Some info -> info.cflags
+              | None -> ([], [])
+              | Some info -> (info.cflags, info.libs)
             in
-            let gmp = cflags ~package:"gmp" in
-            let mpfr = cflags ~package:"mpfr" in
+            let gmp = flags ~package:"gmp" in
+            let mpfr = flags ~package:"mpfr" in
 
-            gmp @ mpfr
+            (fst gmp @ fst mpfr, snd gmp @ snd mpfr)
       in
 
-      C.Flags.write_sexp "c_flags.sexp" conf)
+      C.Flags.write_sexp "c_flags.sexp" cflags;
+      C.Flags.write_sexp "libs.sexp" libs)

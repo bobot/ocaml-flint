@@ -3,5 +3,6 @@
  (libraries dune-configurator))
 
 (rule
- (targets c_flags.sexp)
- (action (run ./discover.exe)))
+ (targets c_flags.sexp libs.sexp)
+ (action
+  (run ./discover.exe)))

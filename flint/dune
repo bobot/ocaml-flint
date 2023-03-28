@@ -6,6 +6,9 @@
  (foreign_stubs
   (language c)
   (names ocaml_flint_utils)
+  (flags
+   (:include ../configure/c_flags.sexp)
+   :standard)
   (include_dirs
    flint
    (lib zarith)))
@@ -21,7 +24,9 @@
      "-Werror=implicit-function-declaration"
      (:include ../configure/c_flags.sexp)
      :standard)
-    (c_library_flags "-lgmp -lmpfr")))
+    (c_library_flags
+     (:include ../configure/libs.sexp)
+     "-lgmp -lmpfr")))
   (deps flint/flint.h flint/fmpz.h)
   (headers
    (include "flint/fmpz.h" "flint/fmpq.h" "string.h"))
