@@ -5,7 +5,10 @@
  (foreign_archives arb)
  (foreign_stubs
   (language c)
-  (names ocaml_acb_utils))
+  (names ocaml_acb_utils)
+  (flags
+   (:include ../configure/c_flags.sexp)
+   :standard))
  (libraries zarith flint threads)
  (flags -w -9-27)
  (ctypes
@@ -18,7 +21,9 @@
      "-Werror=implicit-function-declaration"
      (:include ../configure/c_flags.sexp)
      :standard)
-    (c_library_flags "-lgmp -lmpfr")))
+    (c_library_flags
+     (:include ../configure/libs.sexp)
+     "-lgmp -lmpfr")))
   (deps arb.h acb.h)
   (headers
    (include "acb.h" "string.h"))
@@ -101,8 +106,8 @@
        CFLAGS=-fPIC)
       (run make library -j)
       (run make install)
-      (system "if [ -f ../prefix/lib/libarb.dylib ]; then mv ../prefix/lib/libarb.dylib ../prefix/lib/libarb.so; fi")
-      ))
+      (system
+       "if [ -f ../prefix/lib/libarb.dylib ]; then mv ../prefix/lib/libarb.dylib ../prefix/lib/libarb.so; fi")))
     (copy prefix/lib/libarb%{ext_dll} dllarb%{ext_dll})
     (copy prefix/lib/libarb%{ext_lib} libarb%{ext_lib})
     (copy prefix/include/dirichlet.h dirichlet.h)

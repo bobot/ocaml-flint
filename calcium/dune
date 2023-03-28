@@ -6,6 +6,9 @@
  (foreign_stubs
   (language c)
   (names ocaml_calcium_utils)
+  (flags
+   (:include ../configure/c_flags.sexp)
+   :standard)
   (include_dirs
    lib
    (lib flint)
@@ -25,7 +28,9 @@
      "-Werror=implicit-function-declaration"
      (:include ../configure/c_flags.sexp)
      :standard)
-    (c_library_flags "-lgmp -lmpfr")))
+    (c_library_flags
+     (:include ../configure/libs.sexp)
+     "-lgmp -lmpfr")))
   (deps lib/ca.h)
   (headers
    (include "lib/ca.h" "string.h"))
