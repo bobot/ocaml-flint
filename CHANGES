@@ -1,3 +1,6 @@
+## Release 0.2.2 ## 
+   - Fix really stub compilation on macosx (@msri)
+
 ## Release 0.2.1 ##
    - Fix stub compilation on macosx
 
