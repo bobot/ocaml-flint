@@ -1,4 +1,5 @@
 #include "flint/fmpz.h"
+#include "flint/fmpz_poly.h"
 #include "ctypes_cstubs_internals.h"
 #include "gmp.h"
 #include "zarith.h"
@@ -24,13 +25,26 @@ value flint_stubs_utils_fmpz_of_z(value vfmpz, value z)
    return Val_unit;
 }
 
-value flint_stubs_utils_to_string(value vfmpz)
+value flint_stubs_utils_fmpz_to_string(value vfmpz)
 {
   char* str = 0;
   size_t size;
   FILE* file = open_memstream(&str, &size);
   fmpz *f = CTYPES_ADDR_OF_FATPTR(vfmpz);
   fmpz_fprint(file,f);
+  fclose(file);
+  value r = caml_copy_string(str);
+  free(str);
+  return r;
+}
+
+value flint_stubs_utils_fmpz_poly_to_string(value vfmpz)
+{
+  char* str = 0;
+  size_t size;
+  FILE* file = open_memstream(&str, &size);
+  fmpz_poly_struct *f = CTYPES_ADDR_OF_FATPTR(vfmpz);
+  fmpz_poly_fprint_pretty(file,f,"x");
   fclose(file);
   value r = caml_copy_string(str);
   free(str);

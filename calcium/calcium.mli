@@ -4,6 +4,26 @@ module CTX : sig
   val mk : unit -> t
 end
 
+module QQBAR : sig
+  type t
+
+  val equal: t -> t -> bool
+  val compare: t -> t -> int
+
+  val debug_print: t -> unit
+  (** to stdout *)
+
+  val is_real: t -> bool
+  val is_one: t -> bool
+  val is_zero: t -> bool
+
+  val poly : t -> Flint.FMPZ_poly.t
+  val enclosure: t -> Arb.ACB.t
+  val from_enclosure: Flint.FMPZ_poly.t -> Arb.ACB.t -> t option
+  val from_roots : ?unsorted:bool -> ?irreducible:bool -> Flint.FMPZ_poly.t -> t array
+  (** default optional value is false *)
+end
+
 module CA : sig
   type t
 
@@ -73,4 +93,6 @@ module CA : sig
   val sqrt : ctx:CTX.t -> t -> t
   val pow_int : ctx:CTX.t -> t -> int -> t
   val pow : ctx:CTX.t -> t -> Q.t -> t
+  val from_qqbar : ctx:CTX.t -> QQBAR.t -> t
+  val to_qqbar : ctx:CTX.t -> t -> QQBAR.t
 end

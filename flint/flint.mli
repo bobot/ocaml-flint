@@ -28,3 +28,32 @@ module FMPQ : sig
   val of_q : Q.t -> t
   val to_q : t -> Q.t
 end
+
+module FMPZ_poly : sig
+  type t
+
+  module C : sig
+    open Ctypes
+    type fmpz_poly 
+    val fmpz_poly_struct : fmpz_poly structure typ
+    val convert : fmpz_poly structure ptr -> t
+    val fmpz_poly_t : t typ
+    val set : dst:t -> src:t -> unit
+    val mk_fmpz_poly : unit -> t
+  end
+
+  val to_string: t -> string
+  val pp: Format.formatter -> t -> unit
+
+  val create: Z.t array -> t
+  val create_fmpz: FMPZ.t array -> t
+  val get_coef_fmpz: t -> int -> FMPZ.t
+  val get_coef: t -> int -> Z.t
+val of_int: int -> t
+
+  val length: t -> int
+  val add : t -> t -> t
+  val sub : t -> t -> t
+  val mul : t -> t -> t
+  val mul_scalar : t -> FMPZ.t -> t
+end
