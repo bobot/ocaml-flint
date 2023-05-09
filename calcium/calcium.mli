@@ -7,20 +7,21 @@ end
 module QQBAR : sig
   type t
 
-  val equal: t -> t -> bool
-  val compare: t -> t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
 
-  val debug_print: t -> unit
+  val debug_print : t -> unit
   (** to stdout *)
 
-  val is_real: t -> bool
-  val is_one: t -> bool
-  val is_zero: t -> bool
-
+  val is_real : t -> bool
+  val is_one : t -> bool
+  val is_zero : t -> bool
   val poly : t -> Flint.FMPZ_poly.t
-  val enclosure: t -> Arb.ACB.t
-  val from_enclosure: Flint.FMPZ_poly.t -> Arb.ACB.t -> t option
-  val from_roots : ?unsorted:bool -> ?irreducible:bool -> Flint.FMPZ_poly.t -> t array
+  val enclosure : t -> Arb.ACB.t
+  val from_enclosure : Flint.FMPZ_poly.t -> Arb.ACB.t -> t option
+
+  val from_roots :
+    ?unsorted:bool -> ?irreducible:bool -> Flint.FMPZ_poly.t -> t array
   (** default optional value is false *)
 end
 
