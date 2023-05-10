@@ -29,4 +29,22 @@ module Functions (F : Ctypes.FOREIGN) = struct
   let arf_get_fmpz_fixed_si =
     foreign "arf_get_fmpz_fixed_si"
       (Flint.FMPZ.C.fmpz_t @-> arf_t @-> long @-> returning bool)
+
+  let acb_set_arb_arb =
+    foreign "acb_set_arb_arb" (ACB.t @-> ARB.t @-> ARB.t @-> returning void)
+
+  let arb_set_round_fmpz_2exp =
+    foreign "arb_set_round_fmpz_2exp"
+      (ARB.t @-> Flint.FMPZ.C.fmpz_t @-> Flint.FMPZ.C.fmpz_t @-> long
+     @-> returning void)
+
+  let arf_set_fmpz_2exp =
+    foreign "arf_set_fmpz_2exp"
+      (ARF.t @-> Flint.FMPZ.C.fmpz_t @-> Flint.FMPZ.C.fmpz_t @-> returning void)
+
+  let arb_set_interval_arf =
+    foreign "arb_set_interval_arf"
+      (ARB.t @-> ARF.t @-> ARF.t @-> long @-> returning void)
+
+  let arb_zero = foreign "arb_zero" (ARB.t @-> returning void)
 end

@@ -105,4 +105,53 @@ module Functions (F : Ctypes.FOREIGN) = struct
 
   let ca_check_is_negative_real =
     foreign "ca_check_is_negative_real" (ca_t @-> ca_ctx_t @-> returning truth_t)
+
+  let qqbar_init = foreign "qqbar_init" (qqbar_t @-> returning void)
+  let qqbar_clear = foreign "qqbar_clear" (qqbar_t @-> returning void)
+
+  let ca_get_qqbar =
+    foreign "ca_get_qqbar" (qqbar_t @-> ca_t @-> ca_ctx_t @-> returning bool)
+
+  let ca_set_qqbar =
+    foreign "ca_set_qqbar" (ca_t @-> qqbar_t @-> ca_ctx_t @-> returning void)
+
+  let flag_qqbar_roots =
+    let cons_if i cst cst' l = if Int.logand i cst = 0 then l else cst' :: l in
+    view int
+      ~read:(fun i ->
+        cons_if i qqbar_roots_irreducible QQBAR_ROOTS_IRREDUCIBLE
+        @@ cons_if i qqbar_roots_unsorted QQBAR_ROOTS_UNSORTED
+        @@ [])
+      ~write:(fun l ->
+        List.fold_left
+          (fun acc -> function
+            | QQBAR_ROOTS_IRREDUCIBLE -> Int.logor acc qqbar_roots_irreducible
+            | QQBAR_ROOTS_UNSORTED -> Int.logor acc qqbar_roots_unsorted)
+          0 l)
+
+  let qqbar_roots_fmpz_poly =
+    foreign "qqbar_roots_fmpz_poly"
+      (qqbar_t @-> Flint.FMPZ_poly.C.fmpz_poly_t @-> flag_qqbar_roots
+     @-> returning void)
+
+  let qqbar_validate_existence_uniqueness =
+    foreign "_qqbar_validate_existence_uniqueness"
+      (Arb.ACB.C.acb_t @-> Flint.FMPZ_poly.C.fmpz_poly_t @-> Arb.ACB.C.acb_t
+     @-> long @-> returning bool)
+
+  let qqbar_set = foreign "qqbar_set" (qqbar_t @-> qqbar_t @-> returning void)
+  let qqbar_swap = foreign "qqbar_swap" (qqbar_t @-> qqbar_t @-> returning void)
+
+  let qqbar_equal =
+    foreign "qqbar_equal" (qqbar_t @-> qqbar_t @-> returning bool)
+
+  let qqbar_hash = foreign "qqbar_hash" (qqbar_t @-> returning ulong)
+
+  let qqbar_cmp_root_order =
+    foreign "qqbar_cmp_root_order" (qqbar_t @-> qqbar_t @-> returning int)
+
+  let qqbar_is_real = foreign "qqbar_is_real" (qqbar_t @-> returning bool)
+  let qqbar_is_zero = foreign "qqbar_is_zero" (qqbar_t @-> returning bool)
+  let qqbar_is_one = foreign "qqbar_is_one" (qqbar_t @-> returning bool)
+  let qqbar_print = foreign "qqbar_print" (qqbar_t @-> returning void)
 end

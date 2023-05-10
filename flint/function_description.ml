@@ -30,4 +30,44 @@ module Functions (F : Ctypes.FOREIGN) = struct
 
   let free = foreign "free" (ptr char @-> returning void)
   let strlen = foreign "strlen" (ptr char @-> returning size_t)
+  let fmpz_poly_init = foreign "fmpz_poly_init" (fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_init2 =
+    foreign "fmpz_poly_init2" (fmpz_poly_t @-> long @-> returning void)
+
+  let fmpz_poly_realloc =
+    foreign "fmpz_poly_realloc" (fmpz_poly_t @-> long @-> returning void)
+
+  let fmpz_poly_clear =
+    foreign "fmpz_poly_clear" (fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_get_coeff_fmpz =
+    foreign "fmpz_poly_get_coeff_fmpz"
+      (fmpz_t @-> fmpz_poly_t @-> long @-> returning void)
+
+  let fmpz_poly_set_coeff_fmpz =
+    foreign "fmpz_poly_set_coeff_fmpz"
+      (fmpz_poly_t @-> long @-> fmpz_t @-> returning void)
+
+  let fmpz_poly_set =
+    foreign "fmpz_poly_set" (fmpz_poly_t @-> fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_add =
+    foreign "fmpz_poly_add"
+      (fmpz_poly_t @-> fmpz_poly_t @-> fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_sub =
+    foreign "fmpz_poly_sub"
+      (fmpz_poly_t @-> fmpz_poly_t @-> fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_mul =
+    foreign "fmpz_poly_mul"
+      (fmpz_poly_t @-> fmpz_poly_t @-> fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_scalar_mul_fmpz =
+    foreign "fmpz_poly_scalar_mul_fmpz"
+      (fmpz_poly_t @-> fmpz_poly_t @-> fmpz_t @-> returning void)
+
+  let fmpz_poly_set_si =
+    foreign "fmpz_poly_set_si" (fmpz_poly_t @-> long @-> returning void)
 end

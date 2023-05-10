@@ -14,6 +14,62 @@ module CTX = struct
     ctx
 end
 
+module QQBAR = struct
+  type t = qqbar_t
+
+  module C = struct
+    let mk_qqbar () : t = allocate_n ~count:1 ~finalise:qqbar_clear qqbar_struct
+  end
+
+  let equal q1 q2 = qqbar_equal q1 q2
+  let compare q1 q2 = qqbar_cmp_root_order q1 q2
+  let hash q1 = Unsigned.ULong.to_int @@ qqbar_hash q1
+  let is_real = qqbar_is_real
+  let is_zero = qqbar_is_zero
+  let is_one = qqbar_is_one
+
+  let poly qqbar : Flint.FMPZ_poly.t =
+    Flint.FMPZ_poly.C.convert @@ (qqbar |-> QQBAR.poly)
+
+  let enclosure qqbar : Arb.ACB.t =
+    Arb.ACB.C.convert @@ (qqbar |-> QQBAR.enclosure)
+
+  let debug_print = qqbar_print
+
+  let from_enclosure p e =
+    let qqbar = C.mk_qqbar () in
+    qqbar_init qqbar;
+    if
+      qqbar_validate_existence_uniqueness (enclosure qqbar) p e
+        qqbar_default_prec
+    then (
+      Flint.FMPZ_poly.C.set ~dst:(poly qqbar) ~src:p;
+      Some qqbar)
+    else None
+
+  let from_roots ?(unsorted = false) ?(irreducible = false) p =
+    let deg = max 0 (Flint.FMPZ_poly.length p - 1) in
+    let finalise v =
+      for i = 0 to deg - 1 do
+        qqbar_clear (v +@ i)
+      done
+    in
+    let v = allocate_n ~count:deg ~finalise qqbar_struct in
+    for i = 0 to deg - 1 do
+      qqbar_init (v +@ i)
+    done;
+    let flags =
+      let flags = [] in
+      let flags =
+        if irreducible then QQBAR_ROOTS_IRREDUCIBLE :: flags else flags
+      in
+      let flags = if unsorted then QQBAR_ROOTS_UNSORTED :: flags else flags in
+      flags
+    in
+    qqbar_roots_fmpz_poly v p flags;
+    Array.init deg (fun i -> v +@ i)
+end
+
 module CA = struct
   type t = ca_t
 
@@ -134,4 +190,17 @@ module CA = struct
   let mod_e ~ctx a b = sub ~ctx a (mul ~ctx (of_z ~ctx (div_e ~ctx a b)) b)
   let mod_t ~ctx a b = sub ~ctx a (mul ~ctx (of_z ~ctx (div_t ~ctx a b)) b)
   let mod_f ~ctx a b = sub ~ctx a (mul ~ctx (of_z ~ctx (div_f ~ctx a b)) b)
+
+  let from_qqbar ~ctx qqbar =
+    let ca = mk_ca ~ctx () in
+    ca_set_qqbar ca qqbar ctx;
+    (* only algebraic currently *)
+    ca
+
+  let to_qqbar ~ctx ca =
+    let qqbar = QQBAR.C.mk_qqbar () in
+    let b = ca_get_qqbar qqbar ca ctx in
+    assert b;
+    (* only algebraic currently *)
+    qqbar
 end

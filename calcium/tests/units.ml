@@ -29,3 +29,25 @@ let () =
   let z2' = Calcium.CA.pow ~ctx z1 (Q.of_string "0.5") in
   let h2 = Calcium.CA.hash ~ctx z2' in
   Format.printf "h1=h2:%b@." (h1 = h2)
+
+let () =
+  let p = Flint.FMPZ_poly.create [| Z.of_int (-2); Z.of_int 0; Z.of_int 1 |] in
+  Format.printf "%a@." Flint.FMPZ_poly.pp p;
+  let roots = Calcium.QQBAR.from_roots p in
+  Array.iteri
+    (fun i a ->
+      Format.printf "r%i:%a@." i (Calcium.CA.pp ~ctx)
+        (Calcium.CA.from_qqbar ~ctx a))
+    roots
+
+let () =
+  let min = Arb.ARF.of_2exp (Z.of_int 1) ~exp:Z.zero in
+  let max = Arb.ARF.of_2exp (Z.of_int 3) ~exp:Z.minus_one in
+  let arb = Arb.ARB.of_interval min max in
+  let acb = Arb.ACB.make ~real:arb ~imag:(Arb.ARB.zero ()) in
+  Format.printf "acb:%a@." Arb.ACB.pp acb;
+  let p = Flint.FMPZ_poly.create [| Z.of_int (-2); Z.of_int 0; Z.of_int 1 |] in
+  let a = Calcium.QQBAR.from_enclosure p acb in
+  match a with
+  | None -> Format.printf "no roots@."
+  | Some a -> pp "a" (Calcium.CA.from_qqbar ~ctx a)

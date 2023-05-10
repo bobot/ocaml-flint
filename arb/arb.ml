@@ -29,6 +29,14 @@ module ARF = struct
     let z = Flint.FMPZ.C.mk_fmpz () in
     ignore (arf_get_fmpz_fixed_si z x (Signed.Long.of_int n));
     Flint.FMPZ.to_z z
+
+  let of_fmpz_2exp ~exp m =
+    let arf = C.mk_arf () in
+    arf_set_fmpz_2exp arf m exp;
+    arf
+
+  let of_2exp ~exp m =
+    of_fmpz_2exp ~exp:(Flint.FMPZ.of_z exp) (Flint.FMPZ.of_z m)
 end
 
 module MAG = struct
@@ -79,12 +87,34 @@ module ARB = struct
   let pp fmt x = Format.pp_print_string fmt (External.to_string x)
   let mid x = x |-> ARB.mid
   let rad x = x |-> ARB.rad
+
+  let of_round_fmpz_2exp ?(prec = 0) ~exp base =
+    let arb = C.mk_arb () in
+    arb_set_round_fmpz_2exp arb base exp (Signed.Long.of_int prec);
+    arb
+
+  let of_round_2exp ?(prec = 0) ~exp base =
+    of_round_fmpz_2exp ~prec ~exp:(Flint.FMPZ.of_z exp) (Flint.FMPZ.of_z base)
+
+  let of_interval ?(prec = 0) min max =
+    let arb = C.mk_arb () in
+    arb_set_interval_arf arb min max (Signed.Long.of_int prec);
+    arb
+
+  let zero () =
+    let arb = C.mk_arb () in
+    arb_zero arb;
+    arb
 end
 
 module ACB = struct
   type t = ACB.t
 
   module C = struct
+    type acb = C.Type.ACB.a
+
+    let acb_struct = C.Type.ACB.s
+    let convert = Fun.id
     let acb_t = C.Type.ACB.t
 
     let mk_acb () : ACB.t =
@@ -106,4 +136,9 @@ module ACB = struct
   let rel_accuracy_bits t = Signed.Long.to_int @@ acb_rel_accuracy_bits t
   let real x = x |-> ACB.real
   let imag x = x |-> ACB.imag
+
+  let make ~real ~imag =
+    let acb = C.mk_acb () in
+    acb_set_arb_arb acb real imag;
+    acb
 end

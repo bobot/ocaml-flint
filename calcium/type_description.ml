@@ -34,4 +34,29 @@ module Types (F : Ctypes.TYPE) = struct
     let t_unknown = constant "T_UNKNOWN" int64_t in
     enum ~typedef:true "truth_t"
       [ (TRUE, t_true); (FALSE, t_false); (UNKNOWN, t_unknown) ]
+
+  type qqbar
+
+  let qqbar_struct : qqbar structure typ =
+    typedef (structure "qqbar_struct_struct") "qqbar_struct"
+
+  module QQBAR = struct
+    let poly =
+      field qqbar_struct "poly" (F.lift_typ Flint.FMPZ_poly.C.fmpz_poly_struct)
+
+    let enclosure =
+      field qqbar_struct "enclosure" (F.lift_typ Arb.ACB.C.acb_struct)
+
+    let () = seal qqbar_struct
+  end
+
+  type qqbar_t = qqbar structure ptr
+
+  let qqbar_t : qqbar_t typ = ptr qqbar_struct
+
+  type flag_qqbar_roots = QQBAR_ROOTS_IRREDUCIBLE | QQBAR_ROOTS_UNSORTED
+
+  let qqbar_roots_irreducible = constant "QQBAR_ROOTS_IRREDUCIBLE" int
+  let qqbar_roots_unsorted = constant "QQBAR_ROOTS_UNSORTED" int
+  let qqbar_default_prec = constant "QQBAR_DEFAULT_PREC" long
 end
