@@ -1,3 +1,8 @@
+## Release 0.3 ##
+  - For computing algebraic root of polynomial:
+   - Add small binding to qqbar from calcium
+   - Add small binding to fmpz_poly
+
 ## Release 0.2.3 ## 
   - revert flint version to 2.9.0
 
