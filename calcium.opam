@@ -9,6 +9,7 @@ homepage: "https://github.com/bobot/ocaml-flint"
 bug-reports: "https://github.com/bobot/ocaml-flint/issues"
 depends: [
   "dune" {>= "3.2"}
+  "conf-calcium"
   "zarith" {>= "1.12"}
   "flint" {= version}
   "arb" {= version}
@@ -37,3 +38,6 @@ build: [
 ]
 dev-repo: "git+https://github.com/bobot/ocaml-flint.git"
 conflicts: [ "ocaml-option-bytecode-only" ]
+messages: [ "Problem with the installation of the external
+             libraries can be fixed using version 0.3 which
+             compile them locally" { failure } ]

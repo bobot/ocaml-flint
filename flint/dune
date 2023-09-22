@@ -1,8 +1,7 @@
 (library
  (name flint)
  (public_name flint)
- ; (foreign_archives ((path flint/flint)(mode whole)))
- (foreign_archives flint/flint)
+ (c_library_flags "-lflint")
  (foreign_stubs
   (language c)
   (names ocaml_flint_utils)
@@ -10,9 +9,7 @@
    (:include ../configure/c_flags.sexp)
    "-Werror=implicit-function-declaration"
    :standard)
-  (include_dirs
-   flint
-   (lib zarith)))
+  (include_dirs (lib zarith)))
  (libraries zarith ctypes threads)
  (flags -w -9-27)
  (ctypes
@@ -20,15 +17,12 @@
   (build_flags_resolver
    (vendored
     (c_flags
-     "-I%{read-lines:pwd}/flint"
-     "-I%{read-lines:pwd}/."
      "-Werror=implicit-function-declaration"
      (:include ../configure/c_flags.sexp)
      :standard)
     (c_library_flags
      (:include ../configure/libs.sexp)
-     "-lgmp -lmpfr")))
-  (deps flint/flint.h flint/fmpz.h flint/fmpz_poly.h)
+     "-lgmp -lmpfr -lflint")))
   (headers
    (include "flint/fmpz.h" "flint/fmpq.h" "flint/fmpz_poly.h" "string.h"))
   (type_description
@@ -40,9 +34,3 @@
    (functor Function_description))
   (generated_types Types_generated)
   (generated_entry_point C)))
-
-(rule
- (action
-  (with-stdout-to
-   pwd
-   (run pwd))))

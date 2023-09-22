@@ -1,19 +1,14 @@
 (library
  (name calcium)
  (public_name calcium)
- ; (foreign_archives ((path lib/calcium)(mode whole)))
- (foreign_archives lib/calcium)
+ (c_library_flags -lflint -lflint-arb -lantic -lcalcium)
  (foreign_stubs
   (language c)
   (names ocaml_calcium_utils)
   (flags
    (:include ../configure/c_flags.sexp)
    :standard)
-  (include_dirs
-   lib
-   (lib flint)
-   (lib arb)
-   (lib antic)))
+  )
  (libraries zarith flint arb antic threads)
  (flags -w -9-27)
  (ctypes
@@ -21,19 +16,17 @@
   (build_flags_resolver
    (vendored
     (c_flags
-     "-I%{read-lines:pwd}"
-     "-I%{read:lib/flint_dir}"
-     "-I%{read:lib/antic_dir}"
-     "-I%{read:lib/arb_dir}"
+     "-Iflint"
+     "-Iantic"
+     "-Icalcium"
      "-Werror=implicit-function-declaration"
      (:include ../configure/c_flags.sexp)
      :standard)
     (c_library_flags
      (:include ../configure/libs.sexp)
-     "-lgmp -lmpfr")))
-  (deps lib/ca.h)
+     "-lgmp -lmpfr -lflint -lflint-arb -lantic -lcalcium")))
   (headers
-   (include "lib/ca.h" "string.h"))
+   (include "calcium/ca.h" "string.h"))
   (type_description
    (instance Type)
    (functor Type_description))
@@ -43,9 +36,3 @@
    (functor Function_description))
   (generated_types Types_generated)
   (generated_entry_point C)))
-
-(rule
- (action
-  (with-stdout-to
-   pwd
-   (run pwd))))

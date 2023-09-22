@@ -13,25 +13,25 @@
 (package
  (name flint)
  (synopsis "Stub of the C library Flint2")
- (depends (zarith (>= 1.12)) (ctypes (>= 0.20.1)) (conf-mpfr (>= 3)) (dune-site :with-test) (ocaml (>= 4.10)) (conf-pkg-config (>= 2)) dune-configurator)
+ (depends conf-flint (zarith (>= 1.12)) (ctypes (>= 0.20.1)) (conf-mpfr (>= 3)) (dune-site :with-test) (ocaml (>= 4.10)) (conf-pkg-config (>= 2)) dune-configurator)
 )
 
 (package
  (name arb)
  (synopsis "Stub of the C library Arb. Ball approximation")
- (depends (flint (= :version)) (ctypes (>= 0.20.1)) (conf-mpfr (>= 3)) (ocaml (>= 4.10)) (conf-pkg-config (>= 2)) dune-configurator)
+ (depends conf-arb (flint (= :version)) (ctypes (>= 0.20.1)) (conf-mpfr (>= 3)) (ocaml (>= 4.10)) (conf-pkg-config (>= 2)) dune-configurator)
 )
 
 
 (package
  (name antic)
  (synopsis "Stub of the C library Antic. Algebraic number")
- (depends (flint (= :version)) (ctypes (>= 0.20.1)) (conf-mpfr (>= 3)) (ocaml (>= 4.10)) (conf-pkg-config (>= 2)) dune-configurator)
+ (depends conf-antic (flint (= :version)) (ctypes (>= 0.20.1)) (conf-mpfr (>= 3)) (ocaml (>= 4.10)) (conf-pkg-config (>= 2)) dune-configurator)
 )
 
 (package
  (name calcium)
  (synopsis "Stub of the C library Antic. For exact computation \
             with real and complex numbers, presently in early development")
- (depends (zarith (>= 1.12)) (flint (= :version)) (arb (= :version)) (antic (= :version)) (ctypes (>= 0.20.1)) (conf-mpfr (>= 3)) (dune-site :with-test) (ocaml (>= 4.10)) (conf-pkg-config (>= 2)) dune-configurator)
+ (depends conf-calcium (zarith (>= 1.12)) (flint (= :version)) (arb (= :version)) (antic (= :version)) (ctypes (>= 0.20.1)) (conf-mpfr (>= 3)) (dune-site :with-test) (ocaml (>= 4.10)) (conf-pkg-config (>= 2)) dune-configurator)
 )

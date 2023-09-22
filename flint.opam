@@ -8,6 +8,7 @@ homepage: "https://github.com/bobot/ocaml-flint"
 bug-reports: "https://github.com/bobot/ocaml-flint/issues"
 depends: [
   "dune" {>= "3.2"}
+  "conf-flint"
   "zarith" {>= "1.12"}
   "ctypes" {>= "0.20.1"}
   "conf-mpfr" {>= "3"}
@@ -33,3 +34,6 @@ build: [
 ]
 dev-repo: "git+https://github.com/bobot/ocaml-flint.git"
 conflicts: [ "ocaml-option-bytecode-only" ]
+messages: [ "Problem with the installation of the external
+             libraries can be fixed using version 0.3 which
+             compile them locally" { failure } ]

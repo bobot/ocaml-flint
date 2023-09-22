@@ -1,3 +1,6 @@
+## Release 0.3.1 ##
+  - Use installed C libraries instead of compiling them internally
+
 ## Release 0.3 ##
   - For computing algebraic root of polynomial:
    - Add small binding to qqbar from calcium

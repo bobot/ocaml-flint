@@ -14,7 +14,7 @@ release:
 	@echo "Is the CHANGES correct for $(TAG) (y/n)?"
 	@read yesno; test "$$yesno" = y
 	dune-release tag $(TAG)
-	dune-release distrib --skip-build --skip-lint --include-submodules
+	dune-release distrib --skip-lint
 	dune-release publish
 	dune-release opam pkg
 	dune-release opam submit

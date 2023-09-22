@@ -1,1 +1,4 @@
 conflicts: [ "ocaml-option-bytecode-only" ]
+messages: [ "Problem with the installation of the external
+             libraries can be fixed using version 0.3 which
+             compile them locally" { failure } ]
