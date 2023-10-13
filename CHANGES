@@ -1,3 +1,6 @@
+## Release 0.3.2 ##
+  - Bump to dune 3.7 using ctypes stanza 0.3
+
 ## Release 0.3.1 ##
   - Use installed C libraries instead of compiling them internally
 

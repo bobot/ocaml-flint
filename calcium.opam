@@ -8,7 +8,7 @@ license: "LGPL-2.1-only"
 homepage: "https://github.com/bobot/ocaml-flint"
 bug-reports: "https://github.com/bobot/ocaml-flint/issues"
 depends: [
-  "dune" {>= "3.2"}
+  "dune" {>= "3.7"}
   "conf-calcium"
   "zarith" {>= "1.12"}
   "flint" {= version}
