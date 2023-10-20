@@ -9,7 +9,8 @@
    (:include ../configure/c_flags.sexp)
    "-Werror=implicit-function-declaration"
    :standard)
-  (include_dirs (lib zarith)))
+  (include_dirs
+   (lib zarith)))
  (libraries zarith ctypes threads)
  (flags -w -9-27)
  (ctypes

@@ -1,14 +1,17 @@
 (library
  (name calcium)
  (public_name calcium)
- (c_library_flags -lflint (:include ../configure/arb_cflag.sexp) -lantic -lcalcium)
+ (c_library_flags
+  -lflint
+  (:include ../configure/arb_cflag.sexp)
+  -lantic
+  -lcalcium)
  (foreign_stubs
   (language c)
   (names ocaml_calcium_utils)
   (flags
    (:include ../configure/c_flags.sexp)
-   :standard)
-  )
+   :standard))
  (libraries zarith flint arb antic threads)
  (flags -w -9-27)
  (ctypes

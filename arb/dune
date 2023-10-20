@@ -1,7 +1,9 @@
 (library
  (name arb)
  (public_name arb)
- (c_library_flags -lflint (:include ../configure/arb_cflag.sexp))
+ (c_library_flags
+  -lflint
+  (:include ../configure/arb_cflag.sexp))
  (foreign_stubs
   (language c)
   (names ocaml_acb_utils)
