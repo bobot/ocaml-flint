@@ -5,9 +5,12 @@
  (package calcium))
 
 (tests
-  (names dynamic)
-  (modules dynamic)
-  (libraries dune-site.plugins zarith threads)
-  (deps (package flint)(package arb)(package antic)(package calcium))
-  (package calcium)
-)
+ (names dynamic)
+ (modules dynamic)
+ (libraries dune-site.plugins zarith threads)
+ (deps
+  (package flint)
+  (package arb)
+  (package antic)
+  (package calcium))
+ (package calcium))
