@@ -32,7 +32,7 @@ let () =
   C.main ~name:"find_calcium" (fun c ->
       let libs, cflags =
         match version c with
-        | `Calcium2 -> ([ "-lcalcium" ], [])
+        | `Calcium2 -> ([ "-lcalcium" ], [ "-I/usr/include/calcium" ])
         | `Flint3 -> ([], [ "-I/usr/include/flint" ])
       in
       C.Flags.write_sexp "calcium_cflags.sexp" cflags;

@@ -32,7 +32,7 @@ let () =
   C.main ~name:"find_antic" (fun c ->
       let libs, cflags =
         match version c with
-        | `Antic2 -> ([ "-lantic" ], [])
+        | `Antic2 -> ([ "-lantic" ], [ "-I/usr/include/antic" ])
         | `Flint3 -> ([], [ "-I/usr/include/flint" ])
       in
       C.Flags.write_sexp "antic_cflags.sexp" cflags;
