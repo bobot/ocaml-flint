@@ -1,12 +1,15 @@
 (library
  (name flint)
  (public_name flint)
- (c_library_flags "-lflint")
+ (c_library_flags
+  (:include ../configure/common_libs.sexp)
+  (:include ../configure/flint_libs.sexp))
  (foreign_stubs
   (language c)
   (names ocaml_flint_utils)
   (flags
-   (:include ../configure/c_flags.sexp)
+   (:include ../configure/common_cflags.sexp)
+   (:include ../configure/flint_cflags.sexp)
    "-Werror=implicit-function-declaration"
    :standard)
   (include_dirs
@@ -19,13 +22,14 @@
    (vendored
     (c_flags
      "-Werror=implicit-function-declaration"
-     (:include ../configure/c_flags.sexp)
+     (:include ../configure/common_cflags.sexp)
+     (:include ../configure/flint_cflags.sexp)
      :standard)
     (c_library_flags
-     (:include ../configure/libs.sexp)
-     "-lgmp -lmpfr -lflint")))
+     (:include ../configure/common_libs.sexp)
+     (:include ../configure/flint_libs.sexp))))
   (headers
-   (include "flint/fmpz.h" "flint/fmpq.h" "flint/fmpz_poly.h" "string.h"))
+   (include "fmpz.h" "fmpq.h" "fmpz_poly.h" "string.h"))
   (type_description
    (instance Type)
    (functor Type_description))

@@ -1,13 +1,29 @@
 (executables
- (names discover find_arb)
+ (names find_common find_flint find_arb find_antic find_calcium)
+ (modules find_common find_flint find_arb find_antic find_calcium util)
  (libraries dune-configurator))
 
 (rule
- (targets c_flags.sexp libs.sexp)
+ (targets common_cflags.sexp common_libs.sexp)
  (action
-  (run ./discover.exe)))
+  (run ./find_common.exe)))
 
 (rule
- (targets arb_cflag.sexp)
+ (targets flint_cflags.sexp flint_libs.sexp)
+ (action
+  (run ./find_flint.exe)))
+
+(rule
+ (targets arb_cflags.sexp arb_libs.sexp)
  (action
   (run ./find_arb.exe)))
+
+(rule
+ (targets antic_cflags.sexp antic_libs.sexp)
+ (action
+  (run ./find_antic.exe)))
+
+(rule
+ (targets calcium_cflags.sexp calcium_libs.sexp)
+ (action
+  (run ./find_calcium.exe)))

@@ -1,6 +1,9 @@
 (library
  (name antic)
  (public_name antic)
- (c_library_flags -lantic)
+ (c_library_flags
+  (:include ../configure/flint_libs.sexp)
+  (:include ../configure/antic_libs.sexp)
+  )
  (libraries zarith flint threads)
  (flags -w -9-27))

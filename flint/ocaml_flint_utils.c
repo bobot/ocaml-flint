@@ -1,5 +1,5 @@
-#include "flint/fmpz.h"
-#include "flint/fmpz_poly.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "ctypes_cstubs_internals.h"
 #include "gmp.h"
 #include "zarith.h"
