@@ -14,27 +14,27 @@ module C = Configurator.V1
 
    These are the different situations:
    - on version <2 (and distros such as Debian):
-     + arb headers are directly in `/usr/include`
-     + arb lib file is libflint-arb.so
+     + antic headers are in `/usr/include/antic`
+     + antic lib file is libantic.so
    - on version 3 (and distros such as archlinux):
-     + arb headers are in `/usr/include/flint`
-     + arb library file does not exist (included in flint.so)
+     + antic headers are in `/usr/include/flint`
+     + antic library file does not exist (included in flint.so)
 *)
 
-(* Test the location of the `arb.h` header to determine the
+(* Test the location of the `qfb.h` header to determine the
    current situation *)
 let version c =
-  if Util.is_header_available c "arb.h" then `Arb2
-  else if Util.is_header_available c "flint/arb.h" then `Flint3
-  else C.die "Could not find the `arb` library"
+  if Util.is_header_available c "antic/qfb.h" then `Antic2
+  else if Util.is_header_available c "flint/qfb.h" then `Flint3
+  else C.die "Could not find the `antic` library"
 
 let () =
-  C.main ~name:"find_arb" (fun c ->
+  C.main ~name:"find_antic" (fun c ->
       let libs, cflags =
         match version c with
-        | `Arb2 -> ([ "-lflint-arb" ], [])
+        | `Antic2 -> ([ "-lantic" ], [ "-I/usr/include/antic" ])
         | `Flint3 -> ([], [ "-I/usr/include/flint" ])
       in
-      C.Flags.write_sexp "arb_cflags.sexp" cflags;
-      C.Flags.write_sexp "arb_libs.sexp" libs;
+      C.Flags.write_sexp "antic_cflags.sexp" cflags;
+      C.Flags.write_sexp "antic_libs.sexp" libs;
       ())

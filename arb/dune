@@ -2,13 +2,16 @@
  (name arb)
  (public_name arb)
  (c_library_flags
-  -lflint
-  (:include ../configure/arb_cflag.sexp))
+  (:include ../configure/common_libs.sexp)
+  (:include ../configure/flint_libs.sexp)
+  (:include ../configure/arb_libs.sexp))
  (foreign_stubs
   (language c)
   (names ocaml_acb_utils)
   (flags
-   (:include ../configure/c_flags.sexp)
+   (:include ../configure/common_cflags.sexp)
+   (:include ../configure/flint_cflags.sexp)
+   (:include ../configure/arb_cflags.sexp)
    :standard))
  (libraries zarith flint threads)
  (flags -w -9-27)
@@ -18,11 +21,14 @@
    (vendored
     (c_flags
      "-Werror=implicit-function-declaration"
-     (:include ../configure/c_flags.sexp)
+     (:include ../configure/common_cflags.sexp)
+     (:include ../configure/flint_cflags.sexp)
+     (:include ../configure/arb_cflags.sexp)
      :standard)
     (c_library_flags
-     (:include ../configure/libs.sexp)
-     "-lgmp -lmpfr")))
+     (:include ../configure/common_libs.sexp)
+     (:include ../configure/flint_libs.sexp)
+     (:include ../configure/arb_libs.sexp))))
   (headers
    (include "acb.h" "string.h"))
   (type_description

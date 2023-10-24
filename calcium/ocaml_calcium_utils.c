@@ -1,4 +1,4 @@
-#include "calcium/ca.h"
+#include "ca.h"
 #include "ctypes_cstubs_internals.h"
 #include <stdio.h>
 

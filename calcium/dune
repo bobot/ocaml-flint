@@ -2,15 +2,20 @@
  (name calcium)
  (public_name calcium)
  (c_library_flags
-  -lflint
-  (:include ../configure/arb_cflag.sexp)
-  -lantic
-  -lcalcium)
+  (:include ../configure/common_libs.sexp)
+  (:include ../configure/flint_libs.sexp)
+  (:include ../configure/arb_libs.sexp)
+  (:include ../configure/antic_libs.sexp)
+  (:include ../configure/calcium_libs.sexp))
  (foreign_stubs
   (language c)
   (names ocaml_calcium_utils)
   (flags
-   (:include ../configure/c_flags.sexp)
+   (:include ../configure/common_cflags.sexp)
+   (:include ../configure/flint_cflags.sexp)
+   (:include ../configure/arb_cflags.sexp)
+   (:include ../configure/antic_cflags.sexp)
+   (:include ../configure/calcium_cflags.sexp)
    :standard))
  (libraries zarith flint arb antic threads)
  (flags -w -9-27)
@@ -19,19 +24,21 @@
   (build_flags_resolver
    (vendored
     (c_flags
-     "-Iflint"
-     "-Iantic"
-     "-Icalcium"
      "-Werror=implicit-function-declaration"
-     (:include ../configure/c_flags.sexp)
+     (:include ../configure/common_cflags.sexp)
+     (:include ../configure/flint_cflags.sexp)
+     (:include ../configure/arb_cflags.sexp)
+     (:include ../configure/antic_cflags.sexp)
+     (:include ../configure/calcium_cflags.sexp)
      :standard)
     (c_library_flags
-     (:include ../configure/libs.sexp)
-     "-lgmp -lmpfr -lflint"
-     (:include ../configure/arb_cflag.sexp)
-     "-lantic -lcalcium")))
+     (:include ../configure/common_libs.sexp)
+     (:include ../configure/flint_libs.sexp)
+     (:include ../configure/arb_libs.sexp)
+     (:include ../configure/antic_libs.sexp)
+     (:include ../configure/calcium_libs.sexp))))
   (headers
-   (include "calcium/ca.h" "string.h"))
+   (include "ca.h" "string.h"))
   (type_description
    (instance Type)
    (functor Type_description))
