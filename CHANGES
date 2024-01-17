@@ -1,3 +1,6 @@
+  - As in the C library regroup all package into flint  
+  - Bump to flint version 3.0.0
+
 ## Release 0.3.3 ##
   - Fix library name for archlinux: arb instead of flint-arb
 

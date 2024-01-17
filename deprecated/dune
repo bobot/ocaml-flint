@@ -1,0 +1,20 @@
+(library
+ (public_name calcium)
+ (modules calcium)
+ (libraries flint arb antic)
+ (synopsis "Deprecated use flint")
+)
+
+(library
+ (public_name arb)
+ (modules arb)
+ (libraries flint)
+ (synopsis "Deprecated use flint")
+)
+
+(library
+ (public_name antic)
+ (modules)
+ (libraries flint)
+ (synopsis "Deprecated use flint")
+)

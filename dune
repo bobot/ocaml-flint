@@ -1,11 +1,4 @@
 (rule
  (copy opam.template flint.opam.template))
 
-(rule
- (copy opam.template antic.opam.template))
-
-(rule
- (copy opam.template arb.opam.template))
-
-(rule
- (copy opam.template calcium.opam.template))
+(data_only_dirs flint calcium arb antic)

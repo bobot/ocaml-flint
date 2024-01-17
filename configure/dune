@@ -1,13 +1,8 @@
 (executables
- (names discover find_arb)
+ (names discover)
  (libraries dune-configurator))
 
 (rule
  (targets c_flags.sexp libs.sexp)
  (action
   (run ./discover.exe)))
-
-(rule
- (targets arb_cflag.sexp)
- (action
-  (run ./find_arb.exe)))
