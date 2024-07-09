@@ -14,6 +14,94 @@ module Functions (F : Ctypes.FOREIGN) = struct
    *
    * let ml_z_from_mpz = foreign "ml_z_from_mpz" (MPZ.t @-> returning z) *)
 
+  let fmpz_clear = foreign "fmpz_clear" (fmpz_t @-> returning void)
+  let fmpz_get_si = foreign "fmpz_get_si" (fmpz_t @-> returning long)
+  let fmpz_set_si = foreign "fmpz_set_si" (fmpz_t @-> long @-> returning void)
+  let fmpz_init = foreign "fmpz_init" (fmpz_t @-> returning void)
+
+  let fmpz_init_set_ui =
+    foreign "fmpz_init_set_ui" (fmpz_t @-> ulong @-> returning void)
+
+  let fmpq_clear = foreign "fmpq_clear" (fmpq_t @-> returning void)
+
+  let fmpq_set_fmpz_frac =
+    foreign "fmpq_set_fmpz_frac"
+      (fmpq_t @-> fmpz_t @-> fmpz_t @-> returning void)
+
+  let free = foreign "free" (ptr char @-> returning void)
+  let strlen = foreign "strlen" (ptr char @-> returning size_t)
+  let fmpz_poly_init = foreign "fmpz_poly_init" (fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_init2 =
+    foreign "fmpz_poly_init2" (fmpz_poly_t @-> long @-> returning void)
+
+  let fmpz_poly_realloc =
+    foreign "fmpz_poly_realloc" (fmpz_poly_t @-> long @-> returning void)
+
+  let fmpz_poly_clear =
+    foreign "fmpz_poly_clear" (fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_get_coeff_fmpz =
+    foreign "fmpz_poly_get_coeff_fmpz"
+      (fmpz_t @-> fmpz_poly_t @-> long @-> returning void)
+
+  let fmpz_poly_set_coeff_fmpz =
+    foreign "fmpz_poly_set_coeff_fmpz"
+      (fmpz_poly_t @-> long @-> fmpz_t @-> returning void)
+
+  let fmpz_poly_set =
+    foreign "fmpz_poly_set" (fmpz_poly_t @-> fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_add =
+    foreign "fmpz_poly_add"
+      (fmpz_poly_t @-> fmpz_poly_t @-> fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_sub =
+    foreign "fmpz_poly_sub"
+      (fmpz_poly_t @-> fmpz_poly_t @-> fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_mul =
+    foreign "fmpz_poly_mul"
+      (fmpz_poly_t @-> fmpz_poly_t @-> fmpz_poly_t @-> returning void)
+
+  let fmpz_poly_scalar_mul_fmpz =
+    foreign "fmpz_poly_scalar_mul_fmpz"
+      (fmpz_poly_t @-> fmpz_poly_t @-> fmpz_t @-> returning void)
+
+  let fmpz_poly_set_si =
+    foreign "fmpz_poly_set_si" (fmpz_poly_t @-> long @-> returning void)
+
+  let acb_init = foreign "acb_init" (ACB.t @-> returning void)
+  let acb_clear = foreign "acb_clear" (ACB.t @-> returning void)
+  let mag_init = foreign "mag_init" (mag_t @-> returning void)
+  let mag_clear = foreign "mag_clear" (mag_t @-> returning void)
+  let arf_init = foreign "arf_init" (arf_t @-> returning void)
+  let arf_clear = foreign "arf_clear" (arf_t @-> returning void)
+  let arb_init = foreign "arb_init" (ARB.t @-> returning void)
+  let arb_clear = foreign "arb_clear" (ARB.t @-> returning void)
+
+  let acb_rel_accuracy_bits =
+    foreign "acb_rel_accuracy_bits" (ACB.t @-> returning long)
+
+  let arf_get_fmpz_fixed_si =
+    foreign "arf_get_fmpz_fixed_si"
+      (fmpz_t @-> arf_t @-> long @-> returning bool)
+
+  let acb_set_arb_arb =
+    foreign "acb_set_arb_arb" (ACB.t @-> ARB.t @-> ARB.t @-> returning void)
+
+  let arb_set_round_fmpz_2exp =
+    foreign "arb_set_round_fmpz_2exp"
+      (ARB.t @-> fmpz_t @-> fmpz_t @-> long @-> returning void)
+
+  let arf_set_fmpz_2exp =
+    foreign "arf_set_fmpz_2exp" (ARF.t @-> fmpz_t @-> fmpz_t @-> returning void)
+
+  let arb_set_interval_arf =
+    foreign "arb_set_interval_arf"
+      (ARB.t @-> ARF.t @-> ARF.t @-> long @-> returning void)
+
+  let arb_zero = foreign "arb_zero" (ARB.t @-> returning void)
   let ca_init = foreign "ca_init" (ca_t @-> ca_ctx_t @-> returning void)
   let ca_clear = foreign "ca_clear" (ca_t @-> ca_ctx_t @-> returning void)
 
@@ -21,12 +109,10 @@ module Functions (F : Ctypes.FOREIGN) = struct
     foreign "ca_set_si" (ca_t @-> long @-> ca_ctx_t @-> returning void)
 
   let ca_set_fmpz =
-    foreign "ca_set_fmpz"
-      (ca_t @-> Flint.FMPZ.C.fmpz_t @-> ca_ctx_t @-> returning void)
+    foreign "ca_set_fmpz" (ca_t @-> fmpz_t @-> ca_ctx_t @-> returning void)
 
   let ca_set_fmpq =
-    foreign "ca_set_fmpq"
-      (ca_t @-> Flint.FMPQ.C.fmpq_t @-> ca_ctx_t @-> returning void)
+    foreign "ca_set_fmpq" (ca_t @-> fmpq_t @-> ca_ctx_t @-> returning void)
 
   let ca_ctx_init = foreign "ca_ctx_init" (ca_ctx_t @-> returning void)
   let ca_ctx_clear = foreign "ca_ctx_clear" (ca_ctx_t @-> returning void)
@@ -68,7 +154,7 @@ module Functions (F : Ctypes.FOREIGN) = struct
 
   let ca_get_acb_accurate_parts =
     foreign "ca_get_acb_accurate_parts"
-      (Arb.ACB.C.acb_t @-> ca_t @-> long @-> ca_ctx_t @-> returning void)
+      (ACB.t @-> ca_t @-> long @-> ca_ctx_t @-> returning void)
 
   let ca_sqrt = foreign "ca_sqrt" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
 
@@ -89,19 +175,17 @@ module Functions (F : Ctypes.FOREIGN) = struct
 
   let ca_pow_fmpq =
     foreign "ca_pow_fmpq"
-      (ca_t @-> ca_t @-> Flint.FMPQ.C.fmpq_t @-> ca_ctx_t @-> returning void)
+      (ca_t @-> ca_t @-> fmpq_t @-> ca_ctx_t @-> returning void)
 
   let ca_neg = foreign "ca_neg" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
   let ca_inv = foreign "ca_inv" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
   let ca_abs = foreign "ca_abs" (ca_t @-> ca_t @-> ca_ctx_t @-> returning void)
 
   let ca_get_fmpq =
-    foreign "ca_get_fmpq"
-      (Flint.FMPQ.C.fmpq_t @-> ca_t @-> ca_ctx_t @-> returning bool)
+    foreign "ca_get_fmpq" (fmpq_t @-> ca_t @-> ca_ctx_t @-> returning bool)
 
   let ca_get_fmpz =
-    foreign "ca_get_fmpz"
-      (Flint.FMPZ.C.fmpz_t @-> ca_t @-> ca_ctx_t @-> returning bool)
+    foreign "ca_get_fmpz" (fmpz_t @-> ca_t @-> ca_ctx_t @-> returning bool)
 
   let ca_check_is_negative_real =
     foreign "ca_check_is_negative_real" (ca_t @-> ca_ctx_t @-> returning truth_t)
@@ -131,13 +215,11 @@ module Functions (F : Ctypes.FOREIGN) = struct
 
   let qqbar_roots_fmpz_poly =
     foreign "qqbar_roots_fmpz_poly"
-      (qqbar_t @-> Flint.FMPZ_poly.C.fmpz_poly_t @-> flag_qqbar_roots
-     @-> returning void)
+      (qqbar_t @-> fmpz_poly_t @-> flag_qqbar_roots @-> returning void)
 
   let qqbar_validate_existence_uniqueness =
     foreign "_qqbar_validate_existence_uniqueness"
-      (Arb.ACB.C.acb_t @-> Flint.FMPZ_poly.C.fmpz_poly_t @-> Arb.ACB.C.acb_t
-     @-> long @-> returning bool)
+      (ACB.t @-> fmpz_poly_t @-> ACB.t @-> long @-> returning bool)
 
   let qqbar_set = foreign "qqbar_set" (qqbar_t @-> qqbar_t @-> returning void)
   let qqbar_swap = foreign "qqbar_swap" (qqbar_t @-> qqbar_t @-> returning void)
