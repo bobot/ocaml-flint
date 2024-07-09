@@ -17,16 +17,16 @@
 )
 
 (package (name calcium)
-  (synopsis "deprecated use flint")
+  (synopsis "Deprecated use flint")
   (depends (flint (= :version)) (antic (= :version)) (arb (= :version)))
 )
 
 (package (name antic)
-  (synopsis "deprecated use flint")
+  (synopsis "Deprecated use flint")
   (depends (flint (= :version)))
 )
 
 (package (name arb)
-  (synopsis "deprecated use flint")
+  (synopsis "Deprecated use flint")
   (depends (flint (= :version)))
 )
