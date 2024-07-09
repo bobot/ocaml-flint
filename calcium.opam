@@ -9,6 +9,8 @@ bug-reports: "https://github.com/bobot/ocaml-flint/issues"
 depends: [
   "dune" {>= "3.7"}
   "flint" {= version}
+  "antic" {= version}
+  "arb" {= version}
   "odoc" {with-doc}
 ]
 build: [

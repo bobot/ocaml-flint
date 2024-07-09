@@ -18,7 +18,7 @@
 
 (package (name calcium)
   (synopsis "deprecated use flint")
-  (depends (flint (= :version)))
+  (depends (flint (= :version)) (antic (= :version)) (arb (= :version)))
 )
 
 (package (name antic)
