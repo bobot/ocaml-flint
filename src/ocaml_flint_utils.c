@@ -1,9 +1,12 @@
+// gmp must be included before flint for some functions, such as
+// _fmpz_promote_val, to be available; see e.g.
+// https://flintlib.org/doc/fmpz.html#c._fmpz_promote
+#include "gmp.h"
 #include "flint/fmpz.h"
 #include "flint/fmpz_poly.h"
 #include "flint/acb.h"
 #include "flint/ca.h"
 #include "ctypes_cstubs_internals.h"
-#include "gmp.h"
 #include "zarith.h"
 #include <stdio.h>
 
