@@ -1,3 +1,6 @@
+## Release 0.4.1 ##
+  - Fix compilation (@bclement-ocp)
+
 ## Release 0.4.0 ##
   - As in the C library regroup all package into flint  
   - Bump to flint version 3.0.0
