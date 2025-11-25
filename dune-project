@@ -15,18 +15,3 @@
  (synopsis "Stub of the C library Flint3")
  (depends (conf-flint (>= 3.0)) (zarith (>= 1.12)) (ctypes (>= 0.20.1)) (conf-mpfr (>= 3)) (dune-site :with-test) (ocaml (>= 4.10)) (conf-pkg-config (>= 2)) dune-configurator)
 )
-
-(package (name calcium)
-  (synopsis "Deprecated use flint")
-  (depends (flint (= :version)) (antic (= :version)) (arb (= :version)))
-)
-
-(package (name antic)
-  (synopsis "Deprecated use flint")
-  (depends (flint (= :version)))
-)
-
-(package (name arb)
-  (synopsis "Deprecated use flint")
-  (depends (flint (= :version)))
-)
