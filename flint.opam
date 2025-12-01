@@ -10,7 +10,7 @@ depends: [
   "dune" {>= "3.7"}
   "conf-flint" {>= "3.0"}
   "zarith" {>= "1.12"}
-  "ctypes" {>= "0.20.1"}
+  "camlid"
   "conf-mpfr" {>= "3"}
   "dune-site" {with-test}
   "ocaml" {>= "4.10"}

@@ -1,39 +1,23 @@
+(rule
+   (targets ocaml_flint_core.ml ocaml_flint_core_stub.c)
+   (action (run %{exe:generator/generator.exe}))
+   (mode (promote (until-clean))))
+
 (library
  (name flint)
  (public_name flint)
  (c_library_flags (:include ../configure/libs.sexp) "-lflint")
  (foreign_stubs
   (language c)
-  (names ocaml_flint_utils)
+  (names ocaml_flint_utils ocaml_flint_core_stub)
   (flags
    (:include ../configure/c_flags.sexp)
    "-Werror=implicit-function-declaration"
+   -Wall -Werror -Wconversion --pedantic-errors -std=gnu17
    :standard)
   (include_dirs
-   (lib zarith)))
- (libraries zarith ctypes threads)
+   (lib zarith))
+   (extra_deps "ocaml_flint_utils.h"))
+ (libraries zarith threads)
  (flags -w -9-27)
- (ctypes
-  (external_library_name flint)
-  (build_flags_resolver
-   (vendored
-    (c_flags
-     "-Werror=implicit-function-declaration"
-     (:include ../configure/c_flags.sexp)
-     :standard)
-    (c_library_flags
-     (:include ../configure/libs.sexp)
-     "-lgmp -lmpfr -lflint")))
-  (headers
-   (include "flint/fmpz.h" "flint/fmpq.h" "flint/fmpz_poly.h" "flint/acb.h"
-      "flint/ca.h" "string.h"
-   ))
-  (type_description
-   (instance Type)
-   (functor Type_description))
-  (function_description
-   (concurrency sequential)
-   (instance Function)
-   (functor Function_description))
-  (generated_types Types_generated)
-  (generated_entry_point C)))
+)
