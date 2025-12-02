@@ -48,8 +48,8 @@ let ca =
   let icty = Camlid.Expr.expr "ca_with_ctx" in
   let cty = Camlid.Expr.expr "ca_struct *" in
   let set =
-    Camlid.Expert.mk_set ~icty ~cty "ca_with_ctx_set"
-      ~vars:(fun ~c_to ~c_from -> [ c_to; c_from; ca_ctx_var ])
+    Camlid.Expert.mk_set ~icty ~cty "ca_with_ctx_set" ~vars:(fun ~dst ~src ->
+        [ dst; src; ca_ctx_var ])
   in
   let initialize =
     Camlid.Expert.mk_initialize ~cty "ca_with_ctx_init" ~vars:(fun v ->
@@ -66,29 +66,29 @@ let copy_arf =
   Camlid.Expert.(
     copy arf
       ~copy:
-        (mk_copy ~cty:arf.cty.cty "arf_set" ~exprs:(fun ~c_to ~c_from ->
-             [ Camlid.Expr.e_deref c_to; Camlid.Expr.e_deref c_from ])))
+        (mk_copy ~cty:arf.cty.cty "arf_set" ~exprs:(fun ~dst ~src ->
+             [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
 
 let copy_mag =
   Camlid.Expert.(
     copy mag
       ~copy:
-        (mk_copy ~cty:mag.cty.cty "mag_set" ~exprs:(fun ~c_to ~c_from ->
-             [ Camlid.Expr.e_deref c_to; Camlid.Expr.e_deref c_from ])))
+        (mk_copy ~cty:mag.cty.cty "mag_set" ~exprs:(fun ~dst ~src ->
+             [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
 
 let copy_arb =
   Camlid.Expert.(
     copy arb
       ~copy:
-        (mk_copy ~cty:arb.cty.cty "arb_set" ~exprs:(fun ~c_to ~c_from ->
-             [ Camlid.Expr.e_deref c_to; Camlid.Expr.e_deref c_from ])))
+        (mk_copy ~cty:arb.cty.cty "arb_set" ~exprs:(fun ~dst ~src ->
+             [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
 
 let copy_gen (ty : Camlid.Type.typedef) name =
   Camlid.Expert.(
     copy ty
       ~copy:
-        (mk_copy ~cty:ty.cty.cty name ~exprs:(fun ~c_to ~c_from ->
-             [ Camlid.Expr.e_deref c_to; Camlid.Expr.e_deref c_from ])))
+        (mk_copy ~cty:ty.cty.cty name ~exprs:(fun ~dst ~src ->
+             [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
 
 let copy_fmpz_poly = copy_gen fmpz_poly "fmpz_poly_set"
 let copy_acb = copy_gen acb "acb_set"
@@ -230,11 +230,7 @@ let () =
                }
              in
              let qqbar_struct =
-               Camlid.Expert.convert ~a:qqbar ~b:qqbar_struct
-                 ~b_to_a:
-                   (Camlid.Expert.mk_converter ~src:qqbar_struct ~dst:qqbar.cty
-                      "qqbar_alloc_set" (fun ~src ~dst -> [ dst; src ]))
-                 ()
+               convert ~mlc:qqbar ~c:qqbar_struct ~c_to_mlc:"qqbar_alloc_set" ()
              in
              fixed_length_array qqbar_struct
            in

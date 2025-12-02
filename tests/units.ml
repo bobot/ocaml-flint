@@ -75,3 +75,21 @@ let () =
   match a with
   | None -> Format.printf "no roots@."
   | Some a -> pp "a" (Flint.CA.from_qqbar ~ctx a)
+
+let run i =
+  Random.init i;
+  let r = ref (Some (Flint.CA.CTX.mk ())) in
+  let a =
+    Array.init 10 (fun i -> Some (Flint.CA.of_int ~ctx:(Option.get !r) i))
+  in
+  for _ = 0 to 100 do
+    match Random.int 20 with
+    | 10 | 11 | 12 -> r := None
+    | j when 13 <= j -> Gc.full_major ()
+    | j -> a.(j) <- None
+  done
+
+let () =
+  for i = 0 to 10 do
+    run i
+  done
