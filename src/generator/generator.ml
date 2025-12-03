@@ -214,16 +214,14 @@ let () =
           (let array, length =
              let qqbar_struct =
                let c =
-                 Camlid.Expr.Var.mk "c" (Camlid.Expr.expr "qqbar_struct *")
+                 Camlid.Expr.Var.mk "c" (Camlid.Expr.expr "qqbar_struct")
                in
                {
                  Camlid.Type.cty = Camlid.Expr.expr "qqbar_struct";
                  init =
-                   Camlid.Expr.codeo "init" "qqbar_init(%a);" Camlid.Expr.pp_var
-                     c;
+                   Camlid.Expr.expro "qqbar_init(&%a);" Camlid.Expr.pp_var c;
                  free =
-                   Camlid.Expr.codeo "free" "qqbar_clear(%a);"
-                     Camlid.Expr.pp_var c;
+                   Camlid.Expr.expro "qqbar_clear(&%a);" Camlid.Expr.pp_var c;
                  init_expr = Camlid.Expr.expr "(qqbar_struct) {0}";
                  in_call = None;
                  c;
