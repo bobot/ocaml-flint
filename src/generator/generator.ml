@@ -1,37 +1,20 @@
 open Camlid.Helper
 
-let fmpz =
-  custom_ptr ~initialize:"fmpz_init" ~finalize:"fmpz_clear" ~ml:"fmpz" ~c:"fmpz"
-    ~malloc:true ()
+let flint_custom_ptr ?(c_suffix = "_struct") ml =
+  custom_ptr ~initialize:(ml ^ "_init") ~finalize:(ml ^ "_clear") ~ml
+    ~c:(ml ^ c_suffix) ~malloc:true ()
 
-let fmpq =
-  custom_ptr ~initialize:"fmpq_init" ~finalize:"fmpq_clear" ~ml:"fmpq" ~c:"fmpq"
-    ~malloc:true ()
+let fmpz = flint_custom_ptr ~c_suffix:"" "fmpz"
+let fmpq = flint_custom_ptr ~c_suffix:"" "fmpq"
+let fmpz_poly = flint_custom_ptr "fmpz_poly"
+let arf = flint_custom_ptr "arf"
+let mag = flint_custom_ptr "mag"
+let arb = flint_custom_ptr "arb"
+let acb = flint_custom_ptr "acb"
+let qqbar = flint_custom_ptr "qqbar"
 
-let fmpz_poly =
-  custom_ptr ~initialize:"fmpz_poly_init" ~finalize:"fmpz_poly_clear"
-    ~ml:"fmpz_poly" ~c:"fmpz_poly_struct" ~malloc:true ()
-
-let arf =
-  custom_ptr ~initialize:"arf_init" ~finalize:"arf_clear" ~ml:"arf"
-    ~c:"arf_struct" ~malloc:true ()
-
-let mag =
-  custom_ptr ~initialize:"mag_init" ~finalize:"mag_clear" ~ml:"mag"
-    ~c:"mag_struct" ~malloc:true ()
-
-let arb =
-  custom_ptr ~initialize:"arb_init" ~finalize:"arb_clear" ~ml:"arb"
-    ~c:"arb_struct" ~malloc:true ()
-
-let acb =
-  custom_ptr ~initialize:"acb_init" ~finalize:"acb_clear" ~ml:"acb"
-    ~c:"acb_struct" ~malloc:true ()
-
-let qqbar =
-  custom_ptr ~initialize:"qqbar_init" ~finalize:"qqbar_clear" ~ml:"qqbar"
-    ~c:"qqbar_struct" ~malloc:true ()
-
+(** The ca context need to be reference counted since it appears in the custom
+    block of a ca *)
 let ca_ctx, ca_ctx_var, ty_ca_ctx =
   let ty =
     custom_ptr ~initialize:"ca_ctx_ref_count_init"
@@ -44,6 +27,8 @@ let ca_ctx, ca_ctx_var, ty_ca_ctx =
   let ca_ctx = map_param_in_call ~ty:"ca_ctx *" ca_ctx "&(%a->ctx)" in
   (ca_ctx, ca_ctx_var, ty)
 
+(** The custom block of a ca contains a pointer to its context for the
+    finalization *)
 let ca =
   let icty = Camlid.Expr.expr "ca_with_ctx" in
   let cty = Camlid.Expr.expr "ca_struct *" in
@@ -62,27 +47,6 @@ let ca =
       ~get:(mk_get ~icty ~cty "ca_with_ctx_get")
       ~set ())
 
-let copy_arf =
-  Camlid.Expert.(
-    copy arf
-      ~copy:
-        (mk_copy ~cty:arf.cty.cty "arf_set" ~exprs:(fun ~dst ~src ->
-             [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
-
-let copy_mag =
-  Camlid.Expert.(
-    copy mag
-      ~copy:
-        (mk_copy ~cty:mag.cty.cty "mag_set" ~exprs:(fun ~dst ~src ->
-             [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
-
-let copy_arb =
-  Camlid.Expert.(
-    copy arb
-      ~copy:
-        (mk_copy ~cty:arb.cty.cty "arb_set" ~exprs:(fun ~dst ~src ->
-             [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
-
 let copy_gen (ty : Camlid.Type.mlc) name =
   Camlid.Expert.(
     copy ty
@@ -90,6 +54,9 @@ let copy_gen (ty : Camlid.Type.mlc) name =
         (mk_copy ~cty:ty.cty.cty name ~exprs:(fun ~dst ~src ->
              [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
 
+let copy_arf = copy_gen arf "arf_set"
+let copy_mag = copy_gen mag "mag_set"
+let copy_arb = copy_gen arb "arb_set"
 let copy_fmpz_poly = copy_gen fmpz_poly "fmpz_poly_set"
 let copy_acb = copy_gen acb "acb_set"
 

@@ -12,12 +12,12 @@
   (names ocaml_flint_utils ocaml_flint_core_stub)
   (flags
    (:include ../configure/c_flags.sexp)
-   "-Werror=implicit-function-declaration"
-   -Wall -Werror -Wconversion --pedantic-errors -std=gnu17
-   :standard)
+   "-Werror=implicit-function-declaration" -std=gnu11 :standard)
   (include_dirs
    (lib zarith))
    (extra_deps "ocaml_flint_utils.h"))
  (libraries zarith threads)
  (flags -w -9-27)
 )
+
+(env (dev (c_flags -Wall -Werror -Wconversion --pedantic-errors :standard )))
