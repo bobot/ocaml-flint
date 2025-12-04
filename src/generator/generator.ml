@@ -83,7 +83,7 @@ let copy_arb =
         (mk_copy ~cty:arb.cty.cty "arb_set" ~exprs:(fun ~dst ~src ->
              [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
 
-let copy_gen (ty : Camlid.Type.typedef) name =
+let copy_gen (ty : Camlid.Type.mlc) name =
   Camlid.Expert.(
     copy ty
       ~copy:
@@ -119,9 +119,9 @@ let () =
       module_ "FMPZ_poly"
         [
           ml_alias "t" fmpz_poly;
-          (let arr, len = input_array fmpz in
+          (let arr = input_array fmpz in
            func ~ml:"create_fmpz" "create_fmpz_poly_from_fmpz"
-             [ output fmpz_poly; arr; len ]);
+             [ output fmpz_poly; arr.t; arr.len ]);
           func ~ml:"create" "create_fmpz_poly_from_z"
             [ output fmpz_poly; input_value "(Z.t array)" ];
           func ~ml:"to_string" "fmpz_poly_fprint_pretty"
@@ -211,7 +211,7 @@ let () =
             "QQBAR_ROOTS_IRREDUCIBLE";
           get_expression ~name:"get_roots_unsorted" int_trunc
             "QQBAR_ROOTS_UNSORTED";
-          (let array, length =
+          (let array =
              let qqbar_struct =
                let c =
                  Camlid.Expr.Var.mk "c" (Camlid.Expr.expr "qqbar_struct")
@@ -233,7 +233,7 @@ let () =
              fixed_length_array qqbar_struct
            in
            func ~ml:"from_roots" "qqbar_roots_fmpz_poly"
-             [ array; input fmpz_poly; input int_trunc; length ]);
+             [ array.t; input fmpz_poly; input int_trunc; array.len ]);
         ];
       module_ "CA"
         [
