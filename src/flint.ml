@@ -77,11 +77,11 @@ module CA = struct
   include Ocaml_flint_core.CA
 
   let pp ~ctx fmt f = Format.pp_print_string fmt (to_string ~ctx f)
-  let of_z z ~ctx = of_fmpz ~ctx (FMPZ.of_z z)
-  let of_q z ~ctx = of_fmpq ~ctx (FMPQ.of_q z)
-  let get_acb_accurate_parts ~prec t ~ctx = get_acb_accurate_parts ~ctx t prec
+  let of_z ~ctx z = of_fmpz ~ctx (FMPZ.of_z z)
+  let of_q ~ctx z = of_fmpq ~ctx (FMPQ.of_q z)
+  let get_acb_accurate_parts ~ctx ~prec t = get_acb_accurate_parts ~ctx t prec
 
-  let hash t ~ctx =
+  let hash ~ctx t =
     let arb = get_acb_accurate_parts ~ctx ~prec:24 t in
     let z = ARF.get_fmpz_fixed_si (ARB.mid (ACB.real arb)) (-16) in
     Z.hash z
@@ -95,14 +95,14 @@ module CA = struct
     let _, z = get_z ~ctx x in
     FMPZ.to_z z
 
-  let to_q t ~ctx =
+  let to_q ~ctx t =
     let b, q = get_q t ~ctx in
     if b then Some (FMPQ.to_q q) else None
 
-  let floor t ~ctx = get_z (floor t ~ctx) ~ctx
-  let ceil t ~ctx = get_z (ceil t ~ctx) ~ctx
-  let zero () ~ctx = of_int ~ctx 0
-  let one () ~ctx = of_int ~ctx 1
+  let floor ~ctx t = get_z (floor t ~ctx) ~ctx
+  let ceil ~ctx t = get_z (ceil t ~ctx) ~ctx
+  let zero ~ctx () = of_int ~ctx 0
+  let one ~ctx () = of_int ~ctx 1
 
   exception Incomplete
 
@@ -114,34 +114,34 @@ module CA = struct
       else if t_false = x then false
       else raise Incomplete
 
-  let equal x y ~ctx = of_truth_exn (equal ~ctx x y)
-  let le x y ~ctx = of_truth_exn (le ~ctx x y)
-  let ge x y ~ctx = of_truth_exn (ge ~ctx x y)
-  let gt x y ~ctx = of_truth_exn (gt ~ctx x y)
-  let lt x y ~ctx = of_truth_exn (lt ~ctx x y)
+  let equal ~ctx x y = of_truth_exn (equal ~ctx x y)
+  let le ~ctx x y = of_truth_exn (le ~ctx x y)
+  let ge ~ctx x y = of_truth_exn (ge ~ctx x y)
+  let gt ~ctx x y = of_truth_exn (gt ~ctx x y)
+  let lt ~ctx x y = of_truth_exn (lt ~ctx x y)
   let is_negative_real ~ctx x = of_truth_exn (is_negative_real ~ctx x)
 
-  let compare x y ~ctx =
+  let compare ~ctx x y =
     if lt ~ctx x y then -1 else if equal ~ctx x y then 0 else 1
 
-  let compare_z x y ~ctx = compare ~ctx x (of_z ~ctx y)
-  let compare_q x y ~ctx = compare ~ctx x (of_q ~ctx y)
-  let sign x ~ctx = compare ~ctx x (zero ~ctx ())
+  let compare_z ~ctx x y = compare ~ctx x (of_z ~ctx y)
+  let compare_q ~ctx x y = compare ~ctx x (of_q ~ctx y)
+  let sign ~ctx x = compare ~ctx x (zero ~ctx ())
 
-  let truncate a ~ctx =
+  let truncate ~ctx a =
     if is_negative_real ~ctx a then ceil ~ctx a else floor ~ctx a
 
-  let div_e a b ~ctx =
+  let div_e ~ctx a b =
     let d = div a b ~ctx in
     if is_negative_real ~ctx b then ceil ~ctx d else floor ~ctx d
 
-  let div_t a b ~ctx = truncate ~ctx (div ~ctx a b)
-  let div_f a b ~ctx = floor ~ctx (div ~ctx a b)
-  let mod_e a b ~ctx = sub ~ctx a (mul ~ctx (of_z ~ctx (div_e ~ctx a b)) b)
-  let mod_t a b ~ctx = sub ~ctx a (mul ~ctx (of_z ~ctx (div_t ~ctx a b)) b)
-  let mod_f a b ~ctx = sub ~ctx a (mul ~ctx (of_z ~ctx (div_f ~ctx a b)) b)
+  let div_t ~ctx a b = truncate ~ctx (div ~ctx a b)
+  let div_f ~ctx a b = floor ~ctx (div ~ctx a b)
+  let mod_e ~ctx a b = sub ~ctx a (mul ~ctx (of_z ~ctx (div_e ~ctx a b)) b)
+  let mod_t ~ctx a b = sub ~ctx a (mul ~ctx (of_z ~ctx (div_t ~ctx a b)) b)
+  let mod_f ~ctx a b = sub ~ctx a (mul ~ctx (of_z ~ctx (div_f ~ctx a b)) b)
 
-  let pow t q ~ctx =
+  let pow ~ctx t q =
     let q = FMPQ.of_q q in
     pow t q ~ctx
 end

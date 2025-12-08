@@ -202,71 +202,71 @@ let () =
            func ~ml:"from_roots" "qqbar_roots_fmpz_poly"
              [ array.t; input fmpz_poly; input int_trunc; array.len ]);
         ];
-      module_ "CA"
-        [
-          module_ "CTX"
-            [ ml_alias "t" ty_ca_ctx; do_nothing "mk" [ output ty_ca_ctx ] ];
-          func ~ml:"of_int" "ca_set_si" [ output ca; input int; ca_ctx ];
-          module_ "Repr"
-            [
-              func ~ml:"compare" "ca_cmp_repr"
-                [ input ca; input ca; ca_ctx ]
-                ~result:int_trunc;
-              func ~ml:"equal" "ca_equal_repr"
-                [ input ca; input ca; ca_ctx ]
-                ~result:bool;
-              func ~ml:"hash" "ca_hash_repr" [ input ca; ca_ctx ] ~result:size_t;
-            ];
-          ml_alias "t" ca;
-          func ~ml:"to_string" "ca_fprint"
-            [ output string_as_FILE_ptr; input ca; ca_ctx ];
-          func ~ml:"of_fmpz" "ca_set_fmpz" [ output ca; input fmpz; ca_ctx ];
-          func ~ml:"of_fmpq" "ca_set_fmpq" [ output ca; input fmpq; ca_ctx ];
-          func ~ml:"floor" "ca_floor" [ output ca; input ca; ca_ctx ];
-          func ~ml:"ceil" "ca_ceil" [ output ca; input ca; ca_ctx ];
-          func ~ml:"sqrt" "ca_sqrt" [ output ca; input ca; ca_ctx ];
-          func ~ml:"neg" "ca_neg" [ output ca; input ca; ca_ctx ];
-          func ~ml:"inv" "ca_inv" [ output ca; input ca; ca_ctx ];
-          func ~ml:"abs" "ca_abs" [ output ca; input ca; ca_ctx ];
-          func ~ml:"add" "ca_add" [ output ca; input ca; input ca; ca_ctx ];
-          func ~ml:"sub" "ca_sub" [ output ca; input ca; input ca; ca_ctx ];
-          func ~ml:"mul" "ca_mul" [ output ca; input ca; input ca; ca_ctx ];
-          func ~ml:"div" "ca_div" [ output ca; input ca; input ca; ca_ctx ];
-          func ~ml:"from_qqbar" "ca_set_qqbar"
-            [ output ca; input qqbar; ca_ctx ];
-          func ~ml:"to_qqbar" "ca_get_qqbar" [ output qqbar; input ca; ca_ctx ];
-          func ~ml:"pow_int" "ca_pow_si"
-            [ output ca; input ca; input int; ca_ctx ];
-          func ~ml:"pow" "ca_pow_fmpq"
-            [ output ca; input ca; input fmpq; ca_ctx ];
-          func ~ml:"equal" "ca_check_equal"
-            [ input ca; input ca; ca_ctx ]
-            ~result:int_trunc;
-          func ~ml:"le" "ca_check_le"
-            [ input ca; input ca; ca_ctx ]
-            ~result:int_trunc;
-          func ~ml:"ge" "ca_check_ge"
-            [ input ca; input ca; ca_ctx ]
-            ~result:int_trunc;
-          func ~ml:"gt" "ca_check_gt"
-            [ input ca; input ca; ca_ctx ]
-            ~result:int_trunc;
-          func ~ml:"lt" "ca_check_lt"
-            [ input ca; input ca; ca_ctx ]
-            ~result:int_trunc;
-          func ~ml:"is_negative_real" "ca_check_is_negative_real"
-            [ input ca; ca_ctx ]
-            ~result:int_trunc;
-          get_expression ~name:"t_true" int_trunc "T_TRUE";
-          get_expression ~name:"t_false" int_trunc "T_FALSE";
-          get_expression ~name:"t_unknown" int_trunc "T_UNKNOWN";
-          func ~ml:"get_z" "ca_get_fmpz"
-            [ output fmpz; input ca; ca_ctx ]
-            ~result:bool;
-          func ~ml:"get_q" "ca_get_fmpq"
-            [ output fmpq; input ca; ca_ctx ]
-            ~result:bool;
-          func ~ml:"get_acb_accurate_parts" "ca_get_acb_accurate_parts"
-            [ output acb; input ca; input int; ca_ctx ];
-        ];
+      (let func_ctx ?result ~ml c params =
+         func ?result ~ml c (ca_ctx :: params) ~call_params:(params @ [ ca_ctx ])
+       in
+       module_ "CA"
+         [
+           module_ "CTX"
+             [ ml_alias "t" ty_ca_ctx; do_nothing "mk" [ output ty_ca_ctx ] ];
+           func_ctx ~ml:"of_int" "ca_set_si" [ output ca; input int ];
+           module_ "Repr"
+             [
+               func_ctx ~ml:"compare" "ca_cmp_repr"
+                 [ input ca; input ca ]
+                 ~result:int_trunc;
+               func_ctx ~ml:"equal" "ca_equal_repr"
+                 [ input ca; input ca ]
+                 ~result:bool;
+               func_ctx ~ml:"hash" "ca_hash_repr" [ input ca ] ~result:size_t;
+             ];
+           ml_alias "t" ca;
+           func_ctx ~ml:"to_string" "ca_fprint"
+             [ output string_as_FILE_ptr; input ca ];
+           func_ctx ~ml:"of_fmpz" "ca_set_fmpz" [ output ca; input fmpz ];
+           func_ctx ~ml:"of_fmpq" "ca_set_fmpq" [ output ca; input fmpq ];
+           func_ctx ~ml:"floor" "ca_floor" [ output ca; input ca ];
+           func_ctx ~ml:"ceil" "ca_ceil" [ output ca; input ca ];
+           func_ctx ~ml:"sqrt" "ca_sqrt" [ output ca; input ca ];
+           func_ctx ~ml:"neg" "ca_neg" [ output ca; input ca ];
+           func_ctx ~ml:"inv" "ca_inv" [ output ca; input ca ];
+           func_ctx ~ml:"abs" "ca_abs" [ output ca; input ca ];
+           func_ctx ~ml:"add" "ca_add" [ output ca; input ca; input ca ];
+           func_ctx ~ml:"sub" "ca_sub" [ output ca; input ca; input ca ];
+           func_ctx ~ml:"mul" "ca_mul" [ output ca; input ca; input ca ];
+           func_ctx ~ml:"div" "ca_div" [ output ca; input ca; input ca ];
+           func_ctx ~ml:"from_qqbar" "ca_set_qqbar" [ output ca; input qqbar ];
+           func_ctx ~ml:"to_qqbar" "ca_get_qqbar" [ output qqbar; input ca ];
+           func_ctx ~ml:"pow_int" "ca_pow_si" [ output ca; input ca; input int ];
+           func_ctx ~ml:"pow" "ca_pow_fmpq" [ output ca; input ca; input fmpq ];
+           func_ctx ~ml:"equal" "ca_check_equal"
+             [ input ca; input ca ]
+             ~result:int_trunc;
+           func_ctx ~ml:"le" "ca_check_le"
+             [ input ca; input ca ]
+             ~result:int_trunc;
+           func_ctx ~ml:"ge" "ca_check_ge"
+             [ input ca; input ca ]
+             ~result:int_trunc;
+           func_ctx ~ml:"gt" "ca_check_gt"
+             [ input ca; input ca ]
+             ~result:int_trunc;
+           func_ctx ~ml:"lt" "ca_check_lt"
+             [ input ca; input ca ]
+             ~result:int_trunc;
+           func_ctx ~ml:"is_negative_real" "ca_check_is_negative_real"
+             [ input ca ]
+             ~result:int_trunc;
+           get_expression ~name:"t_true" int_trunc "T_TRUE";
+           get_expression ~name:"t_false" int_trunc "T_FALSE";
+           get_expression ~name:"t_unknown" int_trunc "T_UNKNOWN";
+           func_ctx ~ml:"get_z" "ca_get_fmpz"
+             [ output fmpz; input ca ]
+             ~result:bool;
+           func_ctx ~ml:"get_q" "ca_get_fmpq"
+             [ output fmpq; input ca ]
+             ~result:bool;
+           func_ctx ~ml:"get_acb_accurate_parts" "ca_get_acb_accurate_parts"
+             [ output acb; input ca; input int ];
+         ]);
     ]
