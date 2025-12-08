@@ -17,9 +17,8 @@ let qqbar = flint_custom_ptr "qqbar"
     block of a ca *)
 let ca_ctx, ca_ctx_var, ty_ca_ctx =
   let ty =
-    custom_ptr ~initialize:"ca_ctx_ref_count_init"
-      ~finalize:"ca_ctx_ref_count_free" ~ml:"ca_ctx" ~c:"ca_ctx_ref_count"
-      ~malloc:true ()
+    custom ~initialize:"ca_ctx_ref_count_init" ~finalize:"ca_ctx_ref_count_free"
+      ~ml:"ca_ctx" ~c:"ca_ctx_ref_count*" ()
   in
   let ca_ctx, ca_ctx_var =
     Camlid.Expert.simple_param ~input_label:"ctx" ~input:true ty

@@ -47,14 +47,18 @@ static inline void qqbar_from_fmpz_poly(qqbar_t qqbar, fmpz_poly_t poly, acb_t e
 
 typedef struct { long int count; ca_ctx_struct ctx; } ca_ctx_ref_count;
 
-static inline void ca_ctx_ref_count_init(ca_ctx_ref_count * ctx){
-    ctx->count=1;
-    ca_ctx_init(&ctx->ctx);
+static inline void ca_ctx_ref_count_init(ca_ctx_ref_count ** ctx){
+    *ctx=malloc(sizeof(ca_ctx_ref_count));
+    (*ctx)->count=1;
+    ca_ctx_init(&(*ctx)->ctx);
 }
 
-static inline void ca_ctx_ref_count_free(ca_ctx_ref_count * ctx){
-    ctx->count-=1;
-    if(ctx->count==0) ca_ctx_clear(&ctx->ctx);
+static inline void ca_ctx_ref_count_free(ca_ctx_ref_count ** ctx){
+    (*ctx)->count-=1;
+    if((*ctx)->count==0) {
+        ca_ctx_clear(&(*ctx)->ctx);
+        free(*ctx);
+    }
 }
 
 static inline void ca_ctx_ref_count_incr(ca_ctx_ref_count * ctx){
@@ -70,17 +74,19 @@ static inline void ca_with_ctx_get(ca_struct ** ca, ca_with_ctx *ca_with_ctx ){
 static inline void ca_with_ctx_init(ca_struct ** ca,ca_ctx_ref_count *ctx){
     *ca=malloc(sizeof(ca_struct));
     ca_init(*ca,&(ctx->ctx));
+    ca_ctx_ref_count_incr(ctx);
 }
 
 static inline void ca_with_ctx_set(ca_with_ctx *ca_with_ctx, ca_struct ** ca, ca_ctx_ref_count *ctx ){
     (ca_with_ctx->ca)=*ca;
     (ca_with_ctx->ctx)=ctx;
-    ca_ctx_ref_count_incr(ctx);
 }
 
 static inline void ca_with_ctx_free(ca_with_ctx *ca_with_ctx){
+    fflush(stdout);
     ca_clear(ca_with_ctx->ca,&(ca_with_ctx->ctx->ctx));
-    ca_ctx_ref_count_free(ca_with_ctx->ctx);
+    free(ca_with_ctx->ca);
+    ca_ctx_ref_count_free(&ca_with_ctx->ctx);
 }
 
 static inline void qqbar_alloc_set(qqbar_struct **dst, qqbar_struct* src){
