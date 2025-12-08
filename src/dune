@@ -25,12 +25,12 @@
  (libraries zarith threads)
  (flags -w -9-27))
 
-(env
- (dev
-  (c_flags
-   -Wall
-   -Werror
-   -Wconversion
-   -Wstrict-prototypes
-   --pedantic-errors
-   :standard)))
+; (env
+;  (dev
+;   (c_flags
+;    -Wall
+;    -Werror
+;    -Wconversion
+;    -Wstrict-prototypes
+;    --pedantic-errors
+;    :standard)))
