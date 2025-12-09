@@ -48,7 +48,7 @@ module ARB = struct
   let of_round_2exp ?prec ~exp base =
     of_round_fmpz_2exp (FMPZ.of_z base) ~exp:(FMPZ.of_z exp) ?prec
 
-  let of_interval ?(prec = 0) a b = of_interval a b prec
+  let of_interval ?(prec = 10) a b = of_interval a b prec
 end
 
 module ACB = struct
