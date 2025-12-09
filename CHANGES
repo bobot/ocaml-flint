@@ -1,3 +1,7 @@
+## Release 0.4.2 ##
+  - Fix unit test for arm32
+  - Remove deprecated libraries
+
 ## Release 0.4.1 ##
   - Fix compilation (@bclement-ocp)
 
