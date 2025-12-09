@@ -20,7 +20,7 @@ static inline void fmpq_to_q(fmpq *f,value* num,value* den){
 static inline void create_fmpz_poly_from_fmpz(fmpz_poly_struct *poly,fmpz** coef, size_t len){
     fmpz_poly_realloc(poly,(mp_limb_signed_t)len);
     for(size_t i=0; i<len;i++){
-        poly->coeffs[i] = *coef[i];
+        fmpz_set(&(poly->coeffs[i]),coef[i]);
     };
     poly->length=(mp_limb_signed_t)len;
 }
