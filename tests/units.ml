@@ -67,7 +67,7 @@ let () =
 let () =
   let min = Flint.ARF.of_2exp (Z.of_int 1) ~exp:Z.zero in
   let max = Flint.ARF.of_2exp (Z.of_int 3) ~exp:Z.minus_one in
-  let arb = Flint.ARB.of_interval min max in
+  let arb = Flint.ARB.of_interval ~prec:10 min max in
   let acb = Flint.ACB.make ~real:arb ~imag:(Flint.ARB.zero ()) in
   Format.printf "acb:%a@." Flint.ACB.pp acb;
   let p = Flint.FMPZ_poly.create [| Z.of_int (-2); Z.of_int 0; Z.of_int 1 |] in
