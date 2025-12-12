@@ -2,8 +2,17 @@
  (names units)
  (modules units)
  (libraries flint)
- (modes byte)
+ (modes byte exe)
  (package flint))
+
+(rule
+ (alias runtest)
+ (action
+  (progn
+   (with-stdout-to
+    byte.result
+    (run %{exe:units.bc}))
+   (run diff -u %{dep:units.expected} byte.result))))
 
 (tests
  (names dynamic)

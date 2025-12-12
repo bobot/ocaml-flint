@@ -1,1 +1,3 @@
 /_build/
+src/ocaml_flint_core.ml
+src/ocaml_flint_core_stub.c

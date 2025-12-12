@@ -1,28 +1,15 @@
 module FMPZ : sig
   type t
 
-  module C : sig
-    open Ctypes
-
-    val fmpz_t : t typ
-    val mk_fmpz : unit -> t
-  end
-
   val of_int : int -> t
   val to_z : t -> Z.t
   val of_z : Z.t -> t
+  val to_string : t -> string
   val pp : Format.formatter -> t -> unit
 end
 
 module FMPQ : sig
   type t
-
-  module C : sig
-    open Ctypes
-
-    val fmpq_t : t typ
-    val mk_fmpq : unit -> t
-  end
 
   val mk : FMPZ.t -> FMPZ.t -> t
   val of_q : Q.t -> t
@@ -31,18 +18,6 @@ end
 
 module FMPZ_poly : sig
   type t
-
-  module C : sig
-    open Ctypes
-
-    type fmpz_poly
-
-    val fmpz_poly_struct : fmpz_poly structure typ
-    val convert : fmpz_poly structure ptr -> t
-    val fmpz_poly_t : t typ
-    val set : dst:t -> src:t -> unit
-    val mk_fmpz_poly : unit -> t
-  end
 
   val to_string : t -> string
   val pp : Format.formatter -> t -> unit
@@ -61,11 +36,6 @@ end
 module ARF : sig
   type t
 
-  module C : sig
-    val arf_t : t Ctypes.typ
-    val mk_arf : unit -> t
-  end
-
   val pp : Format.formatter -> t -> unit
   val get_fmpz_fixed_si : t -> int -> Z.t
   val of_fmpz_2exp : exp:FMPZ.t -> FMPZ.t -> t
@@ -75,21 +45,11 @@ end
 module MAG : sig
   type t
 
-  module C : sig
-    val mag_t : t Ctypes.typ
-    val mk_mag : unit -> t
-  end
-
   val pp : Format.formatter -> t -> unit
 end
 
 module ARB : sig
   type t
-
-  module C : sig
-    val arb_t : t Ctypes.typ
-    val mk_arb : unit -> t
-  end
 
   val pp : Format.formatter -> t -> unit
   val mid : t -> ARF.t
@@ -103,22 +63,12 @@ end
 module ACB : sig
   type t
 
-  module C : sig
-    type acb
-
-    val acb_struct : acb Ctypes.structure Ctypes.typ
-    val convert : acb Ctypes.structure Ctypes.ptr -> t
-    val acb_t : t Ctypes.typ
-    val mk_acb : unit -> t
-  end
-
   val pp : Format.formatter -> t -> unit
   val rel_accuracy_bits : t -> int
   val real : t -> ARB.t
   val imag : t -> ARB.t
   val make : real:ARB.t -> imag:ARB.t -> t
 end
-
 
 module QQBAR : sig
   type t
@@ -136,18 +86,17 @@ module QQBAR : sig
   val enclosure : t -> ACB.t
   val from_enclosure : FMPZ_poly.t -> ACB.t -> t option
 
-  val from_roots :
-    ?unsorted:bool -> ?irreducible:bool -> FMPZ_poly.t -> t array
+  val from_roots : ?unsorted:bool -> ?irreducible:bool -> FMPZ_poly.t -> t array
   (** default optional value is false *)
 end
 
 module CA : sig
   module CTX : sig
     type t
-  
+
     val mk : unit -> t
   end
-  
+
   type t
 
   val pp : ctx:CTX.t -> Format.formatter -> t -> unit
