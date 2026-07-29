@@ -25,8 +25,16 @@
      (:include ../configure/libs.sexp)
      "-lgmp -lmpfr -lflint")))
   (headers
-   (include "flint/fmpz.h" "flint/fmpq.h" "flint/fmpz_poly.h" "flint/acb.h"
-      "flint/ca.h" "string.h"
+   (include
+   "flint/fmpz.h"
+   "flint/fmpq.h"
+   "flint/fmpz_poly.h"
+   "flint/fmpz_mat.h"
+   "flint/fmpz_poly_factor.h"
+   "flint/acb.h"
+   "flint/ca.h"
+   "flint/arb_fmpz_poly.h"
+   "string.h"
    ))
   (type_description
    (instance Type)

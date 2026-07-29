@@ -75,3 +75,77 @@ let () =
   match a with
   | None -> Format.printf "no roots@."
   | Some a -> pp "a" (Flint.CA.from_qqbar ~ctx a)
+
+let expect_invalid_arg f =
+  match f () with
+  | () -> failwith "expected Invalid_argument"
+  | exception Invalid_argument _ -> ()
+
+let () =
+  let open Flint in
+  let p = FMPZ_poly.init 3 (fun i -> Z.of_int (i + 1)) in
+  assert (FMPZ_poly.degree p = 2);
+  assert (Z.equal (FMPZ_poly.get_coef p 4) Z.zero);
+  assert (Z.equal (FMPZ.to_z (FMPZ_poly.get_coef_fmpz p 4)) Z.zero);
+  let coefficient =
+    FMPZ_poly.get_coef_fmpz (FMPZ_poly.create [| Z.of_int 42 |]) 0
+  in
+  Gc.full_major ();
+  assert (Z.equal (FMPZ.to_z coefficient) (Z.of_int 42));
+  expect_invalid_arg (fun () -> ignore (FMPZ_poly.get_coef p (-1)));
+  assert (FMPZ_poly.degree (FMPZ_poly.create [||]) = -1);
+  let trailing_zero = [| Z.one; Z.zero |] in
+  let created = FMPZ_poly.create trailing_zero in
+  let initialized = FMPZ_poly.init 2 (Array.get trailing_zero) in
+  assert (FMPZ_poly.length created = 1 && FMPZ_poly.degree created = 0);
+  assert (FMPZ_poly.length initialized = 1 && FMPZ_poly.degree initialized = 0);
+  let zero = FMPZ_poly.init 3 (fun _ -> Z.zero) in
+  assert (FMPZ_poly.length zero = 0 && FMPZ_poly.degree zero = -1);
+  Format.printf "poly-init:%a@." FMPZ_poly.pp p;
+
+  let m = FMPZ_mat.init ~rows:2 ~columns:2 (fun i j -> Z.of_int ((2 * i) + j + 1)) in
+  assert (Z.equal (FMPZ_mat.entry m 1 0) (Z.of_int 3));
+  expect_invalid_arg (fun () -> ignore (FMPZ_mat.entry m 2 0));
+  expect_invalid_arg (fun () -> FMPZ_mat.set_entry m (-1) 0 Z.zero);
+  assert (Z.equal (FMPZ_mat.det m) (Z.of_int (-2)));
+  assert (Z.equal (FMPZ_mat.trace m) (Z.of_int 5));
+  assert (FMPZ_mat.rank m = 2);
+  let w = FMPZ_mat.window m ~top:0 ~left:1 ~bottom:2 ~right:2 in
+  assert (FMPZ_mat.rows w = 2 && FMPZ_mat.columns w = 1);
+  assert (Z.equal (FMPZ_mat.entry w 1 0) (Z.of_int 4));
+  Format.printf "matrix-charpoly:%a@." FMPZ_poly.pp (FMPZ_mat.charpoly m);
+
+  let factors =
+    FMPZ_poly_factor.factor
+      (FMPZ_poly.create [| Z.of_int (-1); Z.zero; Z.one |])
+  in
+  let degree_sum =
+    FMPZ_poly_factor.fold
+      (fun sum factor exponent -> sum + (FMPZ_poly.degree factor * exponent))
+      0 factors
+  in
+  assert (degree_sum = 2);
+  Format.printf "factor-count:%d@." (FMPZ_poly_factor.length factors);
+
+  let arf = ARF.of_2exp ~exp:(Z.of_int (-3)) (Z.of_int 5) in
+  let mantissa, exponent = ARF.to_2exp arf in
+  assert (Z.equal mantissa (Z.of_int 5) && Z.equal exponent (Z.of_int (-3)));
+  assert (Z.equal (MAG.get_z (ARB.get_mag (ARB.zero ()))) Z.zero);
+
+  let two = ACB.of_int 2 in
+  let four = ACB.mul two two 32 in
+  assert (ACB.equal four (ACB.of_int 4));
+  let roots =
+    ARB_FMPZ_poly.fold_complex_roots
+      (fun count _ -> count + 1)
+      0
+      (FMPZ_poly.create [| Z.of_int (-1); Z.zero; Z.one |])
+      32
+  in
+  assert (roots = 2);
+  assert
+    (ARB_FMPZ_poly.fold_complex_roots
+       (fun count _ -> count + 1)
+       0 (FMPZ_poly.create [||]) 32
+     = 0);
+  Format.printf "complex-root-count:%d@." roots
