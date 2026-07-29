@@ -45,6 +45,44 @@ module Types (F : Ctypes.TYPE) = struct
 
   let fmpz_poly_t : fmpz_poly_t typ = ptr FMPZ_poly.t
 
+  module FMPZ_poly_factor = struct
+    type s
+    type t = s structure
+
+    let t : t typ =
+      let s = structure "fmpz_poly_factor_struct_struct" in
+      typedef s "fmpz_poly_factor_struct"
+
+    let c = field t "c" fmpz
+    let p = field t "p" fmpz_poly_t
+    let exp = field t "exp" (ptr long)
+    let num = field t "num" long
+    let alloc = field t "alloc" long
+    let () = seal t
+  end
+
+  type fmpz_poly_factor_t = FMPZ_poly_factor.t ptr
+
+  let fmpz_poly_factor_t : fmpz_poly_factor_t typ = ptr FMPZ_poly_factor.t
+
+  module FMPZ_mat = struct
+    type s
+    type t = s structure
+
+    let t : t typ =
+      let s = structure "fmpz_mat_struct_struct" in
+      typedef s "fmpz_mat_struct"
+
+    let entries = field t "entries" (ptr fmpz)
+    let r = field t "r" long
+    let c = field t "c" long
+    let () = seal t
+  end
+
+  type fmpz_mat_t = FMPZ_mat.t ptr
+
+  let fmpz_mat_t : fmpz_mat_t typ = ptr FMPZ_mat.t
+
   module Make (X : sig
     val name : string
   end) =
