@@ -10,7 +10,7 @@ depends: [
   "dune" {>= "3.7"}
   "conf-flint" {>= "3.0"}
   "zarith" {>= "1.12"}
-  "ctypes" {>= "0.20.1"}
+  "camlid"
   "conf-mpfr" {>= "3"}
   "dune-site" {with-test}
   "ocaml" {>= "4.10"}
@@ -33,7 +33,6 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/bobot/ocaml-flint.git"
-conflicts: [ "ocaml-option-bytecode-only" ]
 messages: [ "Problem with the installation of the external
              libraries can be fixed using version 0.3 which
              compile them locally" { failure } ]
