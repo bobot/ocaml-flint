@@ -198,7 +198,23 @@ module CA : sig
   val get_acb_accurate_parts : ctx:CTX.t -> prec:int -> t -> ACB.t
   val equal : ctx:CTX.t -> t -> t -> bool
   val compare : ctx:CTX.t -> t -> t -> int
+
   val hash : ctx:CTX.t -> t -> int
+  (** Edge cases break the hash property (1 every 256 cases). Use
+      {!bucket_probe} for avoiding edge cases. *)
+
+  type bucket_probe =
+    | Single of Z.t
+    | Probe_with_pred of Z.t
+    | Probe_with_succ of Z.t
+
+  val bucket_probe :
+    ?prec:int ->
+    ?bucket_bits:int ->
+    ctx:Ocaml_flint_core.ca_ctx ->
+    t ->
+    bucket_probe
+
   val sign : ctx:CTX.t -> t -> int
   val le : ctx:CTX.t -> t -> t -> bool
   val lt : ctx:CTX.t -> t -> t -> bool

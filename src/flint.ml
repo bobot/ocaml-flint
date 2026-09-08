@@ -271,6 +271,31 @@ module CA = struct
     let z = ARF.get_fmpz_fixed_si (ARB.mid (ACB.real arb)) (-16) in
     Z.hash z
 
+  type bucket_probe =
+    | Single of Z.t
+    | Probe_with_pred of Z.t
+    | Probe_with_succ of Z.t
+
+  let bucket_probe ?(prec = 24) ?(bucket_bits = 8) ~ctx t =
+    if bucket_bits <= 0 || prec <= bucket_bits then
+      invalid_arg "CA.bucket_probe: invalid precision or bucket_bits";
+
+    let acb = get_acb_accurate_parts ~ctx ~prec t in
+    let mid_arf = ARB.mid (ACB.real acb) in
+    (* Extract integer position at `prec` bits precision (micro-bucket) *)
+    let micro_idx = ARF.get_fmpz_fixed_si mid_arf (-prec) in
+
+    (* Super-bucket index k is micro_idx shifted right by bucket_bits *)
+    let super_k = Z.shift_right micro_idx bucket_bits in
+
+    (* Position within the super-bucket (0 to (2^bucket_bits - 1)) *)
+    let pos = Z.to_int (Z.extract micro_idx 0 bucket_bits) in
+    let max_pos = (1 lsl bucket_bits) - 1 in
+
+    if pos = 0 then Probe_with_pred super_k
+    else if pos = max_pos then Probe_with_succ super_k
+    else Single super_k
+
   let get_z_exn ~ctx x =
     let b, z = get_z ~ctx x in
     assert b;

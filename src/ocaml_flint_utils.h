@@ -130,6 +130,8 @@ static inline int fmpz_poly_factor_length(fmpz_poly_factor_struct *fac) {
  *
  * If `v` is a custom block (Tag_custom), it directly returns the value.
  * If `v` is a pair (Tag_tuple / Is_block), it extracts the first element (Field(v, 0))
+ *
+ * The result is alive if v stays alive
  */
 static inline value extract_mat_in_value(value v) {
     if (Tag_val(v) == Custom_tag) {
