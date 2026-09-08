@@ -88,7 +88,6 @@ static inline void ca_with_ctx_set(ca_with_ctx *ca_with_ctx, ca_struct ** ca, ca
 }
 
 static inline void ca_with_ctx_free(ca_with_ctx *ca_with_ctx){
-    fflush(stdout);
     ca_clear(ca_with_ctx->ca,&(ca_with_ctx->ctx->ctx));
     free(ca_with_ctx->ca);
     ca_ctx_ref_count_free(&ca_with_ctx->ctx);

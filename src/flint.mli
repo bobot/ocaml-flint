@@ -46,7 +46,6 @@ module FMPZ_mat : sig
   val entry_fmpz : t -> int -> int -> FMPZ.t
   val set_entry : t -> int -> int -> Z.t -> unit
   val set_entry_fmpz : t -> int -> int -> FMPZ.t -> unit
-
   val zero : rows:int -> columns:int -> t
   val one : rows:int -> columns:int -> t
   val equal : t -> t -> bool
@@ -70,7 +69,7 @@ module FMPZ_mat : sig
   val rank : t -> int
   val charpoly : t -> FMPZ_poly.t
   val hnf : t -> t
-  val hnf_transform : t -> (t * t)
+  val hnf_transform : t -> t * t
   val lll : t -> Q.t -> Q.t -> unit
 end
 
@@ -79,7 +78,6 @@ module FMPZ_poly_factor : sig
 
   val factor : FMPZ_poly.t -> t
   val factor_squarefree : FMPZ_poly.t -> t
-
   val get_factor : t -> int -> FMPZ_poly.t
   val get_exp : t -> int -> int
   val content_fmpz : t -> FMPZ.t
@@ -95,7 +93,7 @@ module ARF : sig
   val get_fmpz_fixed_si : t -> int -> Z.t
   val of_fmpz_2exp : exp:FMPZ.t -> FMPZ.t -> t
   val of_2exp : exp:Z.t -> Z.t -> t
-  val to_2exp : t -> (Z.t * Z.t)
+  val to_2exp : t -> Z.t * Z.t
 end
 
 module MAG : sig
@@ -211,7 +209,6 @@ module CA : sig
   val floor : ctx:CTX.t -> t -> Z.t
   val ceil : ctx:CTX.t -> t -> Z.t
   val truncate : ctx:CTX.t -> t -> Z.t
-
   val to_string : ctx:CTX.t -> t -> string
   val of_int : ctx:CTX.t -> int -> t
   val of_z : ctx:CTX.t -> Z.t -> t
@@ -237,4 +234,9 @@ module CA : sig
   val pow : ctx:CTX.t -> t -> Q.t -> t
   val from_qqbar : ctx:CTX.t -> QQBAR.t -> t
   val to_qqbar : ctx:CTX.t -> t -> QQBAR.t
+end
+
+module Debug : sig
+  val cleanup : unit -> unit
+  val cleanup_master : unit -> unit
 end

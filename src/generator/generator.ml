@@ -503,4 +503,9 @@ let () =
            func_ctx ~ml:"get_acb_accurate_parts" "ca_get_acb_accurate_parts"
              [ output acb; input ca; input int ];
          ]);
+      module_ "Debug"
+        [
+          func ~ml:"cleanup" "flint_cleanup" [];
+          func ~ml:"cleanup_master" "flint_cleanup_master" [];
+        ];
     ]

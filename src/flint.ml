@@ -340,3 +340,5 @@ module CA = struct
     let q = FMPQ.of_q q in
     pow t q ~ctx
 end
+
+module Debug = Ocaml_flint_core.Debug

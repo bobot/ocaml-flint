@@ -1,5 +1,7 @@
 (tests
  (names units)
+ (flags :standard -g)
+ (ocamlopt_flags :standard -g)
  (modules units)
  (libraries flint)
  (modes byte exe)
