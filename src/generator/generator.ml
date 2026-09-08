@@ -339,7 +339,7 @@ let () =
             [ output fmpz_poly; input fmpz_mat ];
           func ~ml:"hnf" "fmpz_mat_hnf"
             [ output fmpz_mat; out_rows; out_cols; input fmpz_mat ];
-          func ~ml:"hnf_transform" "fmpz_mat_hnf_transform_wrapper"
+          func ~ml:"hnf_transform" "fmpz_mat_hnf_transform"
             [
               output fmpz_mat;
               out_rows;
