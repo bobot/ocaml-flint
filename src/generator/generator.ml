@@ -234,9 +234,9 @@ let () =
           func ~ml:"length" "fmpz_poly_length" [ input fmpz_poly ] ~result:int;
           func ~ml:"add" "fmpz_poly_add"
             [ output fmpz_poly; input fmpz_poly; input fmpz_poly ];
-          func ~ml:"sub" "fmpz_poly_add"
+          func ~ml:"sub" "fmpz_poly_sub"
             [ output fmpz_poly; input fmpz_poly; input fmpz_poly ];
-          func ~ml:"mul" "fmpz_poly_add"
+          func ~ml:"mul" "fmpz_poly_mul"
             [ output fmpz_poly; input fmpz_poly; input fmpz_poly ];
           func ~ml:"mul_scalar" "fmpz_poly_scalar_mul_fmpz"
             [ output fmpz_poly; input fmpz_poly; input fmpz ];
