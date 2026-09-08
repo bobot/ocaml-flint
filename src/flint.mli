@@ -14,6 +14,7 @@ module FMPQ : sig
   val mk : FMPZ.t -> FMPZ.t -> t
   val of_q : Q.t -> t
   val to_q : t -> Q.t
+  val pp : Format.formatter -> t -> unit
 end
 
 module FMPZ_poly : sig
@@ -23,14 +24,68 @@ module FMPZ_poly : sig
   val pp : Format.formatter -> t -> unit
   val create : Z.t array -> t
   val create_fmpz : FMPZ.t array -> t
+  val init : int -> (int -> Z.t) -> t
   val get_coef_fmpz : t -> int -> FMPZ.t
   val get_coef : t -> int -> Z.t
   val of_int : int -> t
   val length : t -> int
+  val degree : t -> int
   val add : t -> t -> t
   val sub : t -> t -> t
   val mul : t -> t -> t
   val mul_scalar : t -> FMPZ.t -> t
+end
+
+module FMPZ_mat : sig
+  type t
+
+  val init : rows:int -> columns:int -> (int -> int -> Z.t) -> t
+  val rows : t -> int
+  val columns : t -> int
+  val entry : t -> int -> int -> Z.t
+  val entry_fmpz : t -> int -> int -> FMPZ.t
+  val set_entry : t -> int -> int -> Z.t -> unit
+  val set_entry_fmpz : t -> int -> int -> FMPZ.t -> unit
+
+  val zero : rows:int -> columns:int -> t
+  val one : rows:int -> columns:int -> t
+  val equal : t -> t -> bool
+  val is_zero : t -> bool
+  val is_one : t -> bool
+  val concat_vertical : t -> t -> t
+  val concat_horizontal : t -> t -> t
+  val transpose : t -> t
+  val add : t -> t -> t
+  val sub : t -> t -> t
+  val neg : t -> t
+  val scalar_mul : t -> Z.t -> t
+  val scalar_divexact : t -> Z.t -> t
+  val mul : t -> t -> t
+  val window : t -> top:int -> left:int -> bottom:int -> right:int -> t
+  val kronecker_product : t -> t -> t
+  val inv : t -> (t * Z.t) option
+  val content : t -> Z.t
+  val trace : t -> Z.t
+  val det : t -> Z.t
+  val rank : t -> int
+  val charpoly : t -> FMPZ_poly.t
+  val hnf : t -> t
+  val hnf_transform : t -> (t * t)
+  val lll : t -> Q.t -> Q.t -> unit
+end
+
+module FMPZ_poly_factor : sig
+  type t
+
+  val factor : FMPZ_poly.t -> t
+  val factor_squarefree : FMPZ_poly.t -> t
+
+  val get_factor : t -> int -> FMPZ_poly.t
+  val get_exp : t -> int -> int
+  val content_fmpz : t -> FMPZ.t
+  val content : t -> Z.t
+  val length : t -> int
+  val fold : ('a -> FMPZ_poly.t -> int -> 'a) -> 'a -> t -> 'a
 end
 
 module ARF : sig
@@ -40,11 +95,13 @@ module ARF : sig
   val get_fmpz_fixed_si : t -> int -> Z.t
   val of_fmpz_2exp : exp:FMPZ.t -> FMPZ.t -> t
   val of_2exp : exp:Z.t -> Z.t -> t
+  val to_2exp : t -> (Z.t * Z.t)
 end
 
 module MAG : sig
   type t
 
+  val get_z : t -> Z.t
   val pp : Format.formatter -> t -> unit
 end
 
@@ -58,6 +115,7 @@ module ARB : sig
   val of_round_2exp : ?prec:int -> exp:Z.t -> Z.t -> t
   val of_interval : ?prec:int -> ARF.t -> ARF.t -> t
   val zero : unit -> t
+  val get_mag : t -> MAG.t
 end
 
 module ACB : sig
@@ -68,6 +126,28 @@ module ACB : sig
   val real : t -> ARB.t
   val imag : t -> ARB.t
   val make : real:ARB.t -> imag:ARB.t -> t
+  val zero : t
+  val one : t
+  val of_int : int -> t
+  val of_z : Z.t -> t
+  val of_q : Q.t -> int -> t
+  val equal : t -> t -> bool
+  val overlaps : t -> t -> bool
+  val contains : t -> t -> bool
+  val trim : t -> t
+  val neg : t -> t
+  val conj : t -> t
+  val add : t -> t -> int -> t
+  val mul : t -> t -> int -> t
+  val inv : t -> int -> t
+  val div : t -> t -> int -> t
+  val pi : int -> t
+  val pow_si : t -> int -> int -> t
+  val log : t -> int -> t
+end
+
+module ARB_FMPZ_poly : sig
+  val fold_complex_roots : ('a -> ACB.t -> 'a) -> 'a -> FMPZ_poly.t -> int -> 'a
 end
 
 module QQBAR : sig
@@ -132,16 +212,6 @@ module CA : sig
   val ceil : ctx:CTX.t -> t -> Z.t
   val truncate : ctx:CTX.t -> t -> Z.t
 
-  (*
-  val is_integer : t -> bool
-  (** complete *)
-
-  val is_rational : t -> bool
-  (** not complete *)
-
-  val to_rational_approx : t -> Q.t
-  val to_double : t -> float
-*)
   val to_string : ctx:CTX.t -> t -> string
   val of_int : ctx:CTX.t -> int -> t
   val of_z : ctx:CTX.t -> Z.t -> t

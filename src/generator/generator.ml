@@ -1,17 +1,95 @@
 open Camlid.Helper
 
+(** Return two definitions:
+    - a definition for custom pointer which in C is a pointer to the structure
+      in C
+    - a definition for custom pointer which in C is a structure in C. But data
+      is copied, when going to/from OCaml *)
 let flint_custom_ptr ?(c_suffix = "_struct") ml =
-  custom_ptr ~initialize:(ml ^ "_init") ~finalize:(ml ^ "_clear") ~ml
-    ~c:(ml ^ c_suffix) ~malloc:true ()
+  let custom =
+    custom_ptr ~initialize:(ml ^ "_init") ~finalize:(ml ^ "_clear") ~ml
+      ~c:(ml ^ c_suffix) ~malloc:true ()
+  in
+  let struct_ =
+    let c = Camlid.Expr.Var.mk "c" (Camlid.Expr.expr "%s_struct" ml) in
+    {
+      Camlid.Type.cty = Camlid.Expr.expr "%s_struct" ml;
+      init = Camlid.Expr.expro "%s_init(&%a);" ml Camlid.Expr.pp_var c;
+      free = Camlid.Expr.expro "%s_clear(&%a);" ml Camlid.Expr.pp_var c;
+      init_expr = Camlid.Expr.expr "(%s_struct) {0}" ml;
+      in_call = None;
+      c;
+    }
+  in
+  let open Camlid.Expr in
+  let v_mlc = Var.mk "dst" (expr "%a *" pp_expr custom.cty.cty) in
+  let v_c = Var.mk "src" (expr "%a *" pp_expr struct_.cty) in
+  let c_to_mlc : Camlid.Expert.convert =
+    {
+      dst = v_mlc;
+      src = v_c;
+      convert = expr "%s_set(*%a,%a)" ml pp_var v_mlc pp_var v_c;
+    }
+  in
+  let mlc_to_c : Camlid.Expert.convert =
+    {
+      dst = v_mlc;
+      src = v_c;
+      convert = expr "%s_set(%a,*%a)" ml pp_var v_c pp_var v_mlc;
+    }
+  in
+  let struct_to_custom =
+    Camlid.Expert.convert ~mlc:custom ~c:struct_ ~c_to_mlc ~mlc_to_c ()
+  in
+  (custom, struct_to_custom)
 
-let fmpz = flint_custom_ptr ~c_suffix:"" "fmpz"
-let fmpq = flint_custom_ptr ~c_suffix:"" "fmpq"
-let fmpz_poly = flint_custom_ptr "fmpz_poly"
-let arf = flint_custom_ptr "arf"
-let mag = flint_custom_ptr "mag"
-let arb = flint_custom_ptr "arb"
-let acb = flint_custom_ptr "acb"
-let qqbar = flint_custom_ptr "qqbar"
+let fmpz, _ = flint_custom_ptr ~c_suffix:"" "fmpz"
+let fmpq, _ = flint_custom_ptr ~c_suffix:"" "fmpq"
+let fmpz_poly, _ = flint_custom_ptr "fmpz_poly"
+let arf, _ = flint_custom_ptr "arf"
+let mag, _ = flint_custom_ptr "mag"
+let arb, _ = flint_custom_ptr "arb"
+let acb, acb_struct = flint_custom_ptr "acb"
+let qqbar, qqbar_struct = flint_custom_ptr "qqbar"
+let fmpz_poly_factor, _ = flint_custom_ptr "fmpz_poly_factor"
+
+(** Reusable dimension parameters for output matrices *)
+let out_rows, var_out_rows =
+  Camlid.Expert.simple_param ~input_label:"rows" ~input:true ~used_in_call:false
+    int
+
+let out_cols, var_out_cols =
+  Camlid.Expert.simple_param ~input_label:"cols" ~input:true ~used_in_call:false
+    int
+
+let fmpz_mat =
+  let icty = Camlid.Expr.expr "fmpz_mat_struct" in
+  let cty = Camlid.Expr.expr "fmpz_mat_struct" in
+  let initialize =
+    Camlid.Expert.mk_initialize ~cty "fmpz_mat_init_wrapper" ~vars:(fun v ->
+        [ v; var_out_rows; var_out_cols ])
+  in
+  Camlid.Expert.custom_ptr ~initialize
+    ~finalize:(Camlid.Expert.mk_finalize ~icty "fmpz_mat_clear")
+    ~ml:"fmpz_mat" ~cty ~malloc:true ()
+
+let out_rows2, var_out_rows2 =
+  Camlid.Expert.simple_param ~input_label:"rows2" ~input:true
+    ~used_in_call:false int
+
+let out_cols2, var_out_cols2 =
+  Camlid.Expert.simple_param ~input_label:"cols2" ~input:true
+    ~used_in_call:false int
+
+(** For second output *)
+let fmpz_mat_out2, _ =
+  Camlid.Expert.simple_param
+    ~binds:
+      [
+        (var_out_rows, Camlid.Expr.e_var var_out_rows2);
+        (var_out_cols, Camlid.Expr.e_var var_out_cols2);
+      ]
+    ~output:true fmpz_mat
 
 (** The ca context need to be reference counted since it appears in the custom
     block of a ca *)
@@ -81,6 +159,8 @@ let () =
             [ output fmpq; input fmpz; input fmpz ];
           func "fmpq_to_q"
             [ input fmpq; output_value "Z.t"; output_value "Z.t" ];
+          func ~ml:"to_string" "fmpq_fprint"
+            [ output string_as_FILE_ptr; input fmpq ];
         ];
       module_ "FMPZ_poly"
         [
@@ -111,6 +191,139 @@ let () =
           func ~ml:"mul_scalar" "fmpz_poly_scalar_mul_fmpz"
             [ output fmpz_poly; input fmpz_poly; input fmpz ];
         ];
+      module_ "FMPZ_mat"
+        [
+          ml_alias "t" fmpz_mat;
+          func ~ml:"r_raw" "fmpz_mat_nrows" [ input fmpz_mat ] ~result:int;
+          func ~ml:"c_raw" "fmpz_mat_ncols" [ input fmpz_mat ] ~result:int;
+          func ~ml:"entry_fmpz" "fmpz_mat_get_entry_wrapper"
+            [ output fmpz; input fmpz_mat; input int; input int ];
+          func ~ml:"set_entry" "fmpz_mat_set_entry_wrapper"
+            [ input fmpz_mat; input int; input int; input fmpz ];
+          func ~ml:"zero" "fmpz_mat_zero"
+            [ output fmpz_mat; out_rows; out_cols ];
+          func ~ml:"one" "fmpz_mat_one" [ output fmpz_mat; out_rows; out_cols ];
+          func ~ml:"equal" "fmpz_mat_equal"
+            [ input fmpz_mat; input fmpz_mat ]
+            ~result:bool;
+          func ~ml:"is_zero" "fmpz_mat_is_zero" [ input fmpz_mat ] ~result:bool;
+          func ~ml:"is_one" "fmpz_mat_is_one" [ input fmpz_mat ] ~result:bool;
+          func ~ml:"window_raw" "fmpz_mat_window_init_wrapper"
+            [
+              (* initialize an empty matrix, the wrapper clear it *)
+              fst
+                (Camlid.Expert.simple_param ~output:true
+                   ~binds:
+                     [
+                       (var_out_rows, Camlid.Expr.expr "0");
+                       (var_out_cols, Camlid.Expr.expr "0");
+                     ]
+                   fmpz_mat);
+              input fmpz_mat;
+              input int;
+              input int;
+              input int;
+              input int;
+            ];
+          func ~ml:"transpose" "fmpz_mat_transpose"
+            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat ];
+          func ~ml:"concat_vertical" "fmpz_mat_concat_vertical"
+            [
+              output fmpz_mat;
+              out_rows;
+              out_cols;
+              input fmpz_mat;
+              input fmpz_mat;
+            ];
+          func ~ml:"concat_horizontal" "fmpz_mat_concat_horizontal"
+            [
+              output fmpz_mat;
+              out_rows;
+              out_cols;
+              input fmpz_mat;
+              input fmpz_mat;
+            ];
+          func ~ml:"add" "fmpz_mat_add"
+            [
+              output fmpz_mat;
+              out_rows;
+              out_cols;
+              input fmpz_mat;
+              input fmpz_mat;
+            ];
+          func ~ml:"sub" "fmpz_mat_sub"
+            [
+              output fmpz_mat;
+              out_rows;
+              out_cols;
+              input fmpz_mat;
+              input fmpz_mat;
+            ];
+          func ~ml:"neg" "fmpz_mat_neg"
+            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat ];
+          func ~ml:"scalar_mul" "fmpz_mat_scalar_mul_fmpz"
+            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat; input fmpz ];
+          func ~ml:"scalar_divexact" "fmpz_mat_scalar_divexact_fmpz"
+            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat; input fmpz ];
+          func ~ml:"mul" "fmpz_mat_mul"
+            [
+              output fmpz_mat;
+              out_rows;
+              out_cols;
+              input fmpz_mat;
+              input fmpz_mat;
+            ];
+          func ~ml:"inv" "fmpz_mat_inv"
+            [ output fmpz_mat; out_rows; out_cols; output fmpz; input fmpz_mat ]
+            ~result:bool;
+          func ~ml:"kronecker_product" "fmpz_mat_kronecker_product"
+            [
+              output fmpz_mat;
+              out_rows;
+              out_cols;
+              input fmpz_mat;
+              input fmpz_mat;
+            ];
+          func ~ml:"content" "fmpz_mat_content" [ output fmpz; input fmpz_mat ];
+          func ~ml:"trace" "fmpz_mat_trace" [ output fmpz; input fmpz_mat ];
+          func ~ml:"det" "fmpz_mat_det" [ output fmpz; input fmpz_mat ];
+          func ~ml:"rank" "fmpz_mat_rank" [ input fmpz_mat ] ~result:int;
+          func ~ml:"charpoly" "fmpz_mat_charpoly"
+            [ output fmpz_poly; input fmpz_mat ];
+          func ~ml:"hnf" "fmpz_mat_hnf"
+            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat ];
+          func ~ml:"hnf_transform" "fmpz_mat_hnf_transform_wrapper"
+            [
+              output fmpz_mat;
+              out_rows;
+              out_cols;
+              fmpz_mat_out2;
+              out_rows2;
+              out_cols2;
+              input fmpz_mat;
+            ];
+          func ~ml:"lll" "fmpz_mat_lll_original"
+            [ input fmpz_mat; input fmpq; input fmpq ];
+        ];
+      module_ "FMPZ_poly_factor"
+        [
+          ml_alias "t" fmpz_poly_factor;
+          func ~ml:"factor" "fmpz_poly_factor"
+            [ output fmpz_poly_factor; input fmpz_poly ];
+          func ~ml:"factor_squarefree" "fmpz_poly_factor_squarefree"
+            [ output fmpz_poly_factor; input fmpz_poly ];
+          func ~ml:"get_factor" "fmpz_poly_factor_get_factor"
+            [ input fmpz_poly_factor; input int ]
+            ~result:copy_fmpz_poly;
+          func ~ml:"get_exp" "fmpz_poly_factor_get_exp"
+            [ input fmpz_poly_factor; input int ]
+            ~result:int;
+          func ~ml:"content_fmpz" "fmpz_poly_factor_content"
+            [ output fmpz; input fmpz_poly_factor ];
+          func ~ml:"length" "fmpz_poly_factor_length"
+            [ input fmpz_poly_factor ]
+            ~result:int;
+        ];
       module_ "ARF"
         [
           ml_alias "t" arf;
@@ -120,12 +333,15 @@ let () =
             [ output arf; input fmpz; input fmpz ];
           func ~ml:"get_fmpz_fixed_si" "arf_get_fmpz_fixed_si"
             [ output fmpz; input arf; input int ];
+          func ~ml:"to_2exp" "arf_get_fmpz_2exp"
+            [ output fmpz; output fmpz; input arf ];
         ];
       module_ "MAG"
         [
           ml_alias "t" mag;
           func ~ml:"to_string" "mag_fprint"
             [ output string_as_FILE_ptr; input mag ];
+          func ~ml:"get_z" "mag_get_fmpz" [ output fmpz; input mag ];
         ];
       module_ "ARB"
         [
@@ -139,6 +355,7 @@ let () =
           func ~ml:"zero" "arb_zero" [ output arb ];
           func ~ml:"mid" "arb_midref" [ input arb ] ~result:copy_arf;
           func ~ml:"rad" "arb_radref" [ input arb ] ~result:copy_mag;
+          func ~ml:"get_mag" "arb_get_mag" [ output mag; input arb ];
         ];
       module_ "ACB"
         [
@@ -151,6 +368,44 @@ let () =
           func ~ml:"make" "acb_set_arb_arb" [ output acb; input arb; input arb ];
           func ~ml:"real" "acb_realref" [ input acb ] ~result:copy_arb;
           func ~ml:"imag" "acb_imagref" [ input acb ] ~result:copy_arb;
+          func ~ml:"zero" "acb_zero" [ output acb ];
+          func ~ml:"one" "acb_one" [ output acb ];
+          func ~ml:"of_fmpz" "acb_set_fmpz" [ output acb; input fmpz ];
+          func ~ml:"of_fmpq" "acb_set_fmpq"
+            [ output acb; input fmpq; input int ];
+          func ~ml:"equal" "acb_equal" [ input acb; input acb ] ~result:bool;
+          func ~ml:"overlaps" "acb_overlaps"
+            [ input acb; input acb ]
+            ~result:bool;
+          func ~ml:"contains" "acb_contains"
+            [ input acb; input acb ]
+            ~result:bool;
+          func ~ml:"trim" "acb_trim" [ output acb; input acb ];
+          func ~ml:"neg" "acb_neg" [ output acb; input acb ];
+          func ~ml:"conj" "acb_conj" [ output acb; input acb ];
+          func ~ml:"add" "acb_add"
+            [ output acb; input acb; input acb; input int ];
+          func ~ml:"mul" "acb_mul"
+            [ output acb; input acb; input acb; input int ];
+          func ~ml:"inv" "acb_inv" [ output acb; input acb; input int ];
+          func ~ml:"div" "acb_div"
+            [ output acb; input acb; input acb; input int ];
+          func ~ml:"const_pi" "acb_const_pi" [ output acb; input int ];
+          func ~ml:"pow_si" "acb_pow_si"
+            [ output acb; input acb; input int; input int ];
+          func ~ml:"log" "acb_log" [ output acb; input acb; input int ];
+        ];
+      module_ "ARB_FMPZ_poly"
+        [
+          (let array = fixed_length_array acb_struct in
+           func ~ml:"complex_roots" "arb_fmpz_poly_complex_roots"
+             [
+               array.t;
+               input fmpz_poly;
+               input int_trunc;
+               input int_trunc;
+               array.len;
+             ]);
         ];
       module_ "QQBAR"
         [
@@ -177,27 +432,7 @@ let () =
             "QQBAR_ROOTS_IRREDUCIBLE";
           get_expression ~name:"get_roots_unsorted" int_trunc
             "QQBAR_ROOTS_UNSORTED";
-          (let array =
-             let qqbar_struct =
-               let c =
-                 Camlid.Expr.Var.mk "c" (Camlid.Expr.expr "qqbar_struct")
-               in
-               {
-                 Camlid.Type.cty = Camlid.Expr.expr "qqbar_struct";
-                 init =
-                   Camlid.Expr.expro "qqbar_init(&%a);" Camlid.Expr.pp_var c;
-                 free =
-                   Camlid.Expr.expro "qqbar_clear(&%a);" Camlid.Expr.pp_var c;
-                 init_expr = Camlid.Expr.expr "(qqbar_struct) {0}";
-                 in_call = None;
-                 c;
-               }
-             in
-             let qqbar_struct =
-               convert ~mlc:qqbar ~c:qqbar_struct ~c_to_mlc:"qqbar_alloc_set" ()
-             in
-             fixed_length_array qqbar_struct
-           in
+          (let array = fixed_length_array qqbar_struct in
            func ~ml:"from_roots" "qqbar_roots_fmpz_poly"
              [ array.t; input fmpz_poly; input int_trunc; array.len ]);
         ];

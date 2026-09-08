@@ -13,6 +13,8 @@ module FMPQ = struct
   let to_q t =
     let num, den = Ocaml_flint_core.FMPQ.fmpq_to_q t in
     Q.make num den
+
+  let pp fmt q = Format.pp_print_string fmt (to_string q)
 end
 
 module FMPZ_poly = struct
@@ -20,6 +22,175 @@ module FMPZ_poly = struct
 
   let to_string f = to_string f "x"
   let pp fmt f = Format.pp_print_string fmt (to_string f)
+  let degree t = length t - 1
+
+  let get_coef_fmpz t i =
+    if i < 0 then invalid_arg "FMPZ_poly.get_coef_fmpz: negative index"
+    else get_coef_fmpz t i
+
+  let get_coef t i = FMPZ.to_z @@ get_coef_fmpz t i
+
+  let init len f =
+    if len < 0 then invalid_arg "FMPZ_poly.init: negative length";
+    let a = Array.init len (fun i -> FMPZ.of_z (f i)) in
+    create_fmpz a
+end
+
+module FMPZ_mat = struct
+  include Ocaml_flint_core.FMPZ_mat
+
+  type raw = Ocaml_flint_core.FMPZ_mat.t
+
+  type parent_ref = Root of raw | Node of t
+  and t = { raw : raw; _parent : parent_ref option }
+
+  let of_raw ?parent raw = { raw; _parent = parent }
+  let raw t = t.raw
+  let rows m = r_raw (raw m)
+  let columns m = c_raw (raw m)
+
+  let init ~rows ~columns f =
+    if rows < 0 || columns < 0 then invalid_arg "FMPZ_mat: negative dimension";
+    let m = zero ~rows ~cols:columns in
+    for i = 0 to rows - 1 do
+      for j = 0 to columns - 1 do
+        set_entry m i j (FMPZ.of_z (f i j))
+      done
+    done;
+    of_raw m
+
+  let entry_fmpz m i j =
+    let r = raw m in
+    if i < 0 || j < 0 || i >= r_raw r || j >= c_raw r then
+      invalid_arg "FMPZ_mat.entry: index out of bounds"
+    else entry_fmpz r i j
+
+  let entry m i j = FMPZ.to_z (entry_fmpz m i j)
+
+  let set_entry_fmpz m i j value =
+    let r = raw m in
+    if i < 0 || j < 0 || i >= r_raw r || j >= c_raw r then
+      invalid_arg "FMPZ_mat.set_entry: index out of bounds";
+    set_entry r i j value
+
+  let set_entry m i j value = set_entry_fmpz m i j (FMPZ.of_z value)
+  let zero ~rows ~columns = of_raw (zero ~rows ~cols:columns)
+  let one ~rows ~columns = of_raw (one ~rows ~cols:columns)
+  let equal a b = equal (raw a) (raw b)
+  let is_zero m = is_zero (raw m)
+  let is_one m = is_one (raw m)
+
+  let window mat ~top ~left ~bottom ~right =
+    let m, n = (rows mat, columns mat) in
+    if left < 0 || top < 0 || right < 0 || bottom < 0 then
+      invalid_arg "FMPZ_mat.window: negative index"
+    else if left > right || top > bottom then
+      invalid_arg "FMPZ_mat.window: negative size"
+    else if bottom > m || right > n then
+      invalid_arg "FMPZ_mat.window: exceeds matrix dimension"
+    else
+      let win_raw = window_raw (raw mat) top left bottom right in
+      of_raw ~parent:(Node mat) win_raw
+
+  let concat_vertical a b =
+    if columns a <> columns b then
+      invalid_arg "FMPZ_mat.concat_vertical: incompatible dimensions"
+    else
+      let r = rows a + rows b in
+      let c = columns a in
+      of_raw (concat_vertical ~rows:r ~cols:c (raw a) (raw b))
+
+  let concat_horizontal a b =
+    if rows a <> rows b then
+      invalid_arg "FMPZ_mat.concat_horizontal: incompatible dimensions"
+    else
+      let r = rows a in
+      let c = columns a + columns b in
+      of_raw (concat_horizontal ~rows:r ~cols:c (raw a) (raw b))
+
+  let add m n =
+    if rows m <> rows n || columns m <> columns n then
+      invalid_arg "FMPZ_mat.add: incompatible dimensions"
+    else
+      let r, c = (rows m, columns m) in
+      of_raw (add ~rows:r ~cols:c (raw m) (raw n))
+
+  let sub m n =
+    if rows m <> rows n || columns m <> columns n then
+      invalid_arg "FMPZ_mat.sub: incompatible dimensions"
+    else
+      let r, c = (rows m, columns m) in
+      of_raw (sub ~rows:r ~cols:c (raw m) (raw n))
+
+  let neg m =
+    let r, c = (rows m, columns m) in
+    of_raw (neg ~rows:r ~cols:c (raw m))
+
+  let transpose m =
+    let r, c = (columns m, rows m) in
+    of_raw (transpose ~rows:r ~cols:c (raw m))
+
+  let kronecker_product a b =
+    let r = rows a * rows b in
+    let c = columns a * columns b in
+    of_raw (kronecker_product ~rows:r ~cols:c (raw a) (raw b))
+
+  let scalar_mul m d =
+    let r, c = (rows m, columns m) in
+    of_raw (scalar_mul ~rows:r ~cols:c (raw m) (FMPZ.of_z d))
+
+  let scalar_divexact m d =
+    if Z.equal Z.zero d then
+      invalid_arg "FMPZ_mat.scalar_divexact: division by zero"
+    else
+      let r, c = (rows m, columns m) in
+      of_raw (scalar_divexact ~rows:r ~cols:c (raw m) (FMPZ.of_z d))
+
+  let mul m n =
+    if columns m <> rows n then
+      invalid_arg "FMPZ_mat.mul: incompatible dimensions"
+    else
+      let r, c = (rows m, columns n) in
+      of_raw (mul ~rows:r ~cols:c (raw m) (raw n))
+
+  let inv m =
+    if rows m <> columns m then invalid_arg "FMPZ_mat.inv: Non-square matrix"
+    else
+      let r, c = (rows m, columns m) in
+      let b, res, den = inv ~rows:r ~cols:c (raw m) in
+      if b then Some (of_raw res, FMPZ.to_z den) else None
+
+  let content m = FMPZ.to_z (content (raw m))
+  let trace m = FMPZ.to_z (trace (raw m))
+  let det m = FMPZ.to_z (det (raw m))
+  let rank m = rank (raw m)
+  let charpoly m = charpoly (raw m)
+
+  let hnf m =
+    let r, c = (rows m, columns m) in
+    of_raw (hnf ~rows:r ~cols:c (raw m))
+
+  let hnf_transform m =
+    let r, c = (rows m, columns m) in
+    let h, u = hnf_transform ~rows:r ~cols:c ~rows2:r ~cols2:r (raw m) in
+    (of_raw h, of_raw u)
+
+  let lll m delta epsilon = lll (raw m) (FMPQ.of_q delta) (FMPQ.of_q epsilon)
+end
+
+module FMPZ_poly_factor = struct
+  include Ocaml_flint_core.FMPZ_poly_factor
+
+  let content factors = FMPZ.to_z (content_fmpz factors)
+
+  let fold f acc factors =
+    let len = length factors in
+    let rec loop i acc =
+      if i < len then
+        loop (i + 1) (f acc (get_factor factors i) (get_exp factors i))
+      else acc
+    in
+    loop 0 acc
 end
 
 module ARF = struct
@@ -29,12 +200,17 @@ module ARF = struct
   let of_fmpz_2exp ~exp z = of_fmpz_2exp z exp
   let of_2exp ~exp z = of_fmpz_2exp ~exp:(FMPZ.of_z exp) (FMPZ.of_z z)
   let get_fmpz_fixed_si t i = FMPZ.to_z @@ get_fmpz_fixed_si t i
+
+  let to_2exp x =
+    let m, e = to_2exp x in
+    (FMPZ.to_z m, FMPZ.to_z e)
 end
 
 module MAG = struct
   include Ocaml_flint_core.MAG
 
   let pp fmt f = Format.pp_print_string fmt (to_string f)
+  let get_z x = FMPZ.to_z (get_z x)
 end
 
 module ARB = struct
@@ -56,6 +232,25 @@ module ACB = struct
 
   let pp fmt f = Format.pp_print_string fmt (to_string f)
   let make ~real ~imag = make real imag
+  let zero = zero ()
+  let one = one ()
+  let of_int z = of_fmpz (FMPZ.of_int z)
+  let of_z z = of_fmpz (FMPZ.of_z z)
+  let of_q q prec = of_fmpq (FMPQ.of_q q) prec
+  let pi prec = const_pi prec
+  let pow_si b e prec = pow_si b e prec
+end
+
+module ARB_FMPZ_poly = struct
+  include Ocaml_flint_core.ARB_FMPZ_poly
+
+  let fold_complex_roots f acc p prec =
+    let d = FMPZ_poly.degree p in
+    if d <= 0 then acc
+    else
+      let roots = complex_roots p d (*flag*) 0 prec in
+      let rec go i acc = if i < d then go (i + 1) (f acc roots.(i)) else acc in
+      go 0 acc
 end
 
 module QQBAR = struct

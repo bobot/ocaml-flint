@@ -4,6 +4,9 @@
 #include <gmp.h>
 #include <flint/fmpz.h>
 #include <flint/fmpz_poly.h>
+#include <flint/fmpz_mat.h>
+#include <flint/fmpz_poly_factor.h>
+#include <flint/arb_fmpz_poly.h>
 #include <flint/acb.h>
 #include <flint/ca.h>
 #include <caml/mlvalues.h>
@@ -23,6 +26,7 @@ static inline void create_fmpz_poly_from_fmpz(fmpz_poly_struct *poly,fmpz** coef
         fmpz_set(&(poly->coeffs[i]),coef[i]);
     };
     poly->length=(mp_limb_signed_t)len;
+    _fmpz_poly_normalise(poly);
 }
 
 static inline void create_fmpz_poly_from_z(fmpz_poly_struct *poly,value arr){
@@ -33,6 +37,7 @@ static inline void create_fmpz_poly_from_z(fmpz_poly_struct *poly,value arr){
         flint_stubs_utils_fmpz_of_z(&(poly->coeffs[i]),Field(arr,i));
     };
     poly->length=(mp_limb_signed_t)len;
+    _fmpz_poly_normalise(poly);
     CAMLreturn0;
 }
 
@@ -89,8 +94,41 @@ static inline void ca_with_ctx_free(ca_with_ctx *ca_with_ctx){
     ca_ctx_ref_count_free(&ca_with_ctx->ctx);
 }
 
-static inline void qqbar_alloc_set(qqbar_struct **dst, qqbar_struct* src){
-    *dst=malloc(sizeof(qqbar_struct));
-    qqbar_init(*dst);
-    qqbar_set(*dst,src);
+static inline void fmpz_mat_init_wrapper(fmpz_mat_struct *res, int r, int c) {
+    fmpz_mat_init(res, r, c);
 }
+
+static inline void fmpz_mat_get_entry_wrapper(fmpz *res, fmpz_mat_struct *m, slong i, slong j) {
+    fmpz_set(res, fmpz_mat_entry(m, i, j));
+}
+
+static inline void fmpz_mat_set_entry_wrapper(fmpz_mat_struct *m, slong i, slong j, fmpz *v) {
+    fmpz_set(fmpz_mat_entry(m, i, j), v);
+}
+
+static inline void fmpz_mat_window_init_wrapper(fmpz_mat_struct *res, fmpz_mat_struct *m, slong r1, slong c1, slong r2, slong c2) {
+    fmpz_mat_clear(res);
+    fmpz_mat_window_init(res, m, r1, c1, r2, c2);
+}
+
+static inline void fmpz_mat_hnf_transform_wrapper(fmpz_mat_struct *h, fmpz_mat_struct *u, fmpz_mat_struct *a) {
+    fmpz_mat_init(u, fmpz_mat_nrows(a), fmpz_mat_nrows(a));
+    fmpz_mat_hnf_transform(h, u, a);
+}
+
+static inline fmpz_poly_struct* fmpz_poly_factor_get_factor(fmpz_poly_factor_struct *fac, slong i) {
+    return &(fac->p[i]);
+}
+
+static inline int fmpz_poly_factor_get_exp(fmpz_poly_factor_struct *fac, slong i) {
+    return fac->exp[i];
+}
+
+static inline void fmpz_poly_factor_content(fmpz *c, fmpz_poly_factor_struct *fac) {
+    fmpz_set(c, &(fac->c));
+}
+
+static inline int fmpz_poly_factor_length(fmpz_poly_factor_struct *fac) {
+    return fac->num;
+}
+
