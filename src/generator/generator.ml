@@ -66,12 +66,62 @@ let fmpz_mat =
   let icty = Camlid.Expr.expr "fmpz_mat_struct" in
   let cty = Camlid.Expr.expr "fmpz_mat_struct" in
   let initialize =
-    Camlid.Expert.mk_initialize ~cty "fmpz_mat_init_wrapper" ~vars:(fun v ->
+    Camlid.Expert.mk_initialize ~cty "fmpz_mat_init" ~vars:(fun v ->
         [ v; var_out_rows; var_out_cols ])
   in
-  Camlid.Expert.custom_ptr ~initialize
-    ~finalize:(Camlid.Expert.mk_finalize ~icty "fmpz_mat_clear")
-    ~ml:"fmpz_mat" ~cty ~malloc:true ()
+  let pre =
+    Camlid.Expert.custom_ptr ~initialize
+      ~finalize:(Camlid.Expert.mk_finalize ~icty "fmpz_mat_clear")
+      ~ml:"fmpz_mat" ~cty ~malloc:true ()
+  in
+  let conv : Camlid.Type.conv =
+    let open Camlid.Expr in
+    match pre.conv with
+    | Boxed { c2ml; ml2c } ->
+        Boxed
+          {
+            c2ml;
+            ml2c =
+              binds
+                [ (pre.v, expr "extract_mat_in_value(%a)" pp_var pre.v) ]
+                ml2c;
+          }
+    | Unboxable _ -> assert false
+  in
+  { pre with conv }
+
+let fmpz_mat_window vmat =
+  let icty = Camlid.Expr.expr "fmpz_mat_struct" in
+  let cty = Camlid.Expr.expr "fmpz_mat_struct" in
+  let pre =
+    Camlid.Expert.custom_ptr
+      ~finalize:(Camlid.Expert.mk_finalize ~icty "fmpz_mat_window_clear")
+      ~ml:"fmpz_mat" ~cty ~malloc:true ()
+  in
+  let conv : Camlid.Type.conv =
+    let open Camlid.Expr in
+    match pre.conv with
+    | Boxed { c2ml; ml2c = _ } ->
+        let v' = Var.mk "v" (expr "value *") in
+        Boxed
+          {
+            c2ml =
+              call_codef "pack_window"
+                [ (v', e_addr pre.v) ]
+                (fun { fmt } ->
+                  fmt "CAMLparam0();@ ";
+                  fmt "CAMLlocal1(tmp);@ ";
+                  fmt "*%a = caml_alloc_tuple(2);@ " pp_var v';
+                  fmt "%a;@ " Camlid.Expr.pp_expr_binds
+                    (c2ml, [ (pre.v, expr "tmp") ]);
+                  fmt "Store_field(%a, 0, tmp);@ " pp_var v';
+                  fmt "Store_field(%a, 1, %a);@ " pp_var v' pp_var vmat;
+                  fmt "CAMLreturn0;@ ");
+            ml2c = expr "#error(\"should not be used\")";
+          }
+    | Unboxable _ -> assert false
+  in
+  { pre with conv; mlty = fmpz_mat.mlty }
 
 let out_rows2, var_out_rows2 =
   Camlid.Expert.simple_param ~input_label:"rows2" ~input:true
@@ -208,23 +258,20 @@ let () =
             ~result:bool;
           func ~ml:"is_zero" "fmpz_mat_is_zero" [ input fmpz_mat ] ~result:bool;
           func ~ml:"is_one" "fmpz_mat_is_one" [ input fmpz_mat ] ~result:bool;
-          func ~ml:"window_raw" "fmpz_mat_window_init_wrapper"
-            [
-              (* initialize an empty matrix, the wrapper clear it *)
-              fst
-                (Camlid.Expert.simple_param ~output:true
-                   ~binds:
-                     [
-                       (var_out_rows, Camlid.Expr.expr "0");
-                       (var_out_cols, Camlid.Expr.expr "0");
-                     ]
-                   fmpz_mat);
-              input fmpz_mat;
-              input int;
-              input int;
-              input int;
-              input int;
-            ];
+          func ~ml:"window" "fmpz_mat_window_init"
+            (let input_mat, _, mat_var =
+               Camlid.Expert.param ~input:true fmpz_mat
+             in
+
+             [
+               (* initialize an empty matrix, the wrapper clear it *)
+               output (fmpz_mat_window mat_var);
+               input_mat;
+               input int;
+               input int;
+               input int;
+               input int;
+             ]);
           func ~ml:"transpose" "fmpz_mat_transpose"
             [ output fmpz_mat; out_rows; out_cols; input fmpz_mat ];
           func ~ml:"concat_vertical" "fmpz_mat_concat_vertical"
