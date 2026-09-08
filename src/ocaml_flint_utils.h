@@ -11,6 +11,7 @@
 #include <flint/ca.h>
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
+#include <stdatomic.h>
 
 void flint_stubs_utils_z_of_fmpz(fmpz *f, value* z);
 void flint_stubs_utils_fmpz_of_z(fmpz *f, value z);
@@ -58,24 +59,23 @@ static inline void qqbar_from_fmpz_poly(qqbar_t qqbar, fmpz_poly_t poly, acb_t e
     fmpz_poly_set(&(qqbar->poly),poly);
 }
 
-typedef struct { long int count; ca_ctx_struct ctx; } ca_ctx_ref_count;
+typedef struct { _Atomic long int count; ca_ctx_struct ctx; } ca_ctx_ref_count;
 
 static inline void ca_ctx_ref_count_init(ca_ctx_ref_count ** ctx){
     *ctx=malloc(sizeof(ca_ctx_ref_count));
-    (*ctx)->count=1;
+    atomic_init(&(*ctx)->count, 1);
     ca_ctx_init(&(*ctx)->ctx);
 }
 
 static inline void ca_ctx_ref_count_free(ca_ctx_ref_count ** ctx){
-    (*ctx)->count-=1;
-    if((*ctx)->count==0) {
+    if (atomic_fetch_sub_explicit(&(*ctx)->count, 1, memory_order_acq_rel) == 1) {
         ca_ctx_clear(&(*ctx)->ctx);
         free(*ctx);
     }
 }
 
 static inline void ca_ctx_ref_count_incr(ca_ctx_ref_count * ctx){
-    ctx->count+=1;
+    atomic_fetch_add_explicit(&ctx->count, 1, memory_order_relaxed);
 }
 
 typedef struct { ca_ctx_ref_count *ctx; ca_struct *ca; } ca_with_ctx;
