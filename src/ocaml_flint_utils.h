@@ -42,7 +42,15 @@ static inline void create_fmpz_poly_from_z(fmpz_poly_struct *poly,value arr){
 }
 
 static inline void get_coef_fmpz_poly_from_z(value * z, fmpz_poly_struct *poly, slong coef){
-    flint_stubs_utils_z_of_fmpz(&(poly->coeffs[coef]),z);
+    if (coef < 0 || coef >= poly->length) {
+        /** todo direct */
+        fmpz_t zero;
+        fmpz_init(zero);
+        flint_stubs_utils_z_of_fmpz(zero, z);
+        fmpz_clear(zero);
+    } else {
+        flint_stubs_utils_z_of_fmpz(&(poly->coeffs[coef]), z);
+    }
 }
 
 static inline void qqbar_from_fmpz_poly(qqbar_t qqbar, fmpz_poly_t poly, acb_t enclosure, int*status){
