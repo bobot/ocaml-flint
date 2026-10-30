@@ -3,6 +3,8 @@
  (modules units)
  (libraries flint)
  (modes byte)
+ (deps
+  (package flint))
  (package flint))
 
 (tests
