@@ -166,6 +166,9 @@ module ARF = struct
 
   let pp fmt x = Format.pp_print_string fmt (External.to_string x)
 
+  let is_finite x = arf_is_finite x
+  let cmpabs_2exp x n = arf_cmpabs_2exp_si x (Signed.Long.of_int n)
+
   let get_fmpz_fixed_si x n =
     let z = FMPZ.C.mk_fmpz () in
     ignore (arf_get_fmpz_fixed_si z x (Signed.Long.of_int n));
@@ -410,6 +413,13 @@ module CA = struct
   let compare_q ~ctx x y = compare ~ctx x (of_q ~ctx y)
   let sign ~ctx x = compare ~ctx x (zero ~ctx ())
   let is_negative_real ~ctx x = of_truth_exn (ca_check_is_negative_real x ctx)
+
+  let is_rational ~ctx x =
+    match ca_check_is_rational x ctx with
+    | TRUE -> Some true
+    | FALSE -> Some false
+    | UNKNOWN -> None
+
   let to_string ~ctx f = External.to_string f ctx
   let pp ~ctx fmt f = Format.pp_print_string fmt (to_string ~ctx f)
 
@@ -420,13 +430,17 @@ module CA = struct
 
   let hash ~ctx t =
     let arb = get_acb_accurate_parts ~ctx ~prec:24 t in
-    let z = ARF.get_fmpz_fixed_si (ARB.mid (ACB.real arb)) (-16) in
-    Z.hash z
+    let mid = ARB.mid (ACB.real arb) in
+    (* get_fmpz_fixed_si aborts on infinity and nan (the result of [1/x] for a
+       zero FLINT doesn't recognize), and needs memory for all the bits of a
+       huge number. *)
+    if not (ARF.is_finite mid) then 0
+    else if ARF.cmpabs_2exp mid 4096 >= 0 then 1
+    else Z.hash (ARF.get_fmpz_fixed_si mid (-16))
 
   let get_z_exn ~ctx t =
     let fmpz = FMPZ.C.mk_fmpz () in
-    let b = ca_get_fmpz fmpz t ctx in
-    assert b;
+    if not (ca_get_fmpz fmpz t ctx) then raise Incomplete;
     FMPZ.to_z fmpz
 
   let to_q ~ctx t =
@@ -475,8 +489,7 @@ module CA = struct
 
   let to_qqbar ~ctx ca =
     let qqbar = QQBAR.C.mk_qqbar () in
-    let b = ca_get_qqbar qqbar ca ctx in
-    assert b;
     (* only algebraic currently *)
+    if not (ca_get_qqbar qqbar ca ctx) then raise Incomplete;
     qqbar
 end

@@ -67,6 +67,12 @@ module ARF : sig
   end
 
   val pp : Format.formatter -> t -> unit
+  val is_finite : t -> bool
+  (** false on infinity and nan *)
+
+  val cmpabs_2exp : t -> int -> int
+  (** [cmpabs_2exp x n] compares |x| and [2^n] *)
+
   val get_fmpz_fixed_si : t -> int -> Z.t
   val of_fmpz_2exp : exp:FMPZ.t -> FMPZ.t -> t
   val of_2exp : exp:Z.t -> Z.t -> t
@@ -168,10 +174,23 @@ module CA : sig
     val hash : ctx:CTX.t -> t -> int
   end
 
+  exception Incomplete
+  (** FLINT could not decide. Raised by the comparisons, {!floor}, {!ceil},
+      {!truncate}, the divisions and modulos built on them, and {!to_qqbar}. A
+      failure tells nothing about the number. *)
+
   val get_acb_accurate_parts : ctx:CTX.t -> prec:int -> t -> ACB.t
   val equal : ctx:CTX.t -> t -> t -> bool
   val compare : ctx:CTX.t -> t -> t -> int
   val hash : ctx:CTX.t -> t -> int
+  (** Not compatible with {!equal}: two equal numbers built differently can get
+      different hashes, because it is computed from a rounded enclosure and
+      numbers close to a rounding boundary (integers, for example) can fall on
+      either side. For instance [k] and [k * sqrt(5+2*sqrt 6) / (sqrt 2 + sqrt 3)]
+      differ for [k = 25]. Don't use it as the hash of a table keyed by
+      {!equal}. Numbers with a non finite enclosure, and those above [2^4096],
+      get a constant. *)
+
   val sign : ctx:CTX.t -> t -> int
   val le : ctx:CTX.t -> t -> t -> bool
   val lt : ctx:CTX.t -> t -> t -> bool
@@ -183,12 +202,13 @@ module CA : sig
   val ceil : ctx:CTX.t -> t -> Z.t
   val truncate : ctx:CTX.t -> t -> Z.t
 
+  val is_rational : ctx:CTX.t -> t -> bool option
+  (** Whether the number is rational, [None] when FLINT can't decide.
+      [ca_check_is_rational]. Unlike {!to_q}, whose failure proves nothing. *)
+
   (*
   val is_integer : t -> bool
   (** complete *)
-
-  val is_rational : t -> bool
-  (** not complete *)
 
   val to_rational_approx : t -> Q.t
   val to_double : t -> float

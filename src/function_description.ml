@@ -83,6 +83,11 @@ module Functions (F : Ctypes.FOREIGN) = struct
   let acb_rel_accuracy_bits =
     foreign "acb_rel_accuracy_bits" (ACB.t @-> returning long)
 
+  let arf_is_finite = foreign "arf_is_finite" (arf_t @-> returning bool)
+
+  let arf_cmpabs_2exp_si =
+    foreign "arf_cmpabs_2exp_si" (arf_t @-> long @-> returning int)
+
   let arf_get_fmpz_fixed_si =
     foreign "arf_get_fmpz_fixed_si"
       (fmpz_t @-> arf_t @-> long @-> returning bool)
@@ -189,6 +194,9 @@ module Functions (F : Ctypes.FOREIGN) = struct
 
   let ca_check_is_negative_real =
     foreign "ca_check_is_negative_real" (ca_t @-> ca_ctx_t @-> returning truth_t)
+
+  let ca_check_is_rational =
+    foreign "ca_check_is_rational" (ca_t @-> ca_ctx_t @-> returning truth_t)
 
   let qqbar_init = foreign "qqbar_init" (qqbar_t @-> returning void)
   let qqbar_clear = foreign "qqbar_clear" (qqbar_t @-> returning void)
