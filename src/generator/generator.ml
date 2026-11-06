@@ -1,80 +1,44 @@
 open Camlid.Helper
 
-(** Return two definitions:
-    - a definition for custom pointer which in C is a pointer to the structure
-      in C
-    - a definition for custom pointer which in C is a structure in C. But data
-      is copied, when going to/from OCaml *)
-let flint_custom_ptr ?(c_suffix = "_struct") ml =
-  let custom =
-    custom_ptr ~initialize:(ml ^ "_init") ~finalize:(ml ^ "_clear") ~ml
-      ~c:(ml ^ c_suffix) ~malloc:true ()
-  in
-  let struct_ =
-    let c = Camlid.Expr.Var.mk "c" (Camlid.Expr.expr "%s_struct" ml) in
-    {
-      Camlid.Type.cty = Camlid.Expr.expr "%s_struct" ml;
-      init = Camlid.Expr.expro "%s_init(&%a);" ml Camlid.Expr.pp_var c;
-      free = Camlid.Expr.expro "%s_clear(&%a);" ml Camlid.Expr.pp_var c;
-      init_expr = Camlid.Expr.expr "(%s_struct) {0}" ml;
-      in_call = None;
-      c;
-    }
-  in
-  let open Camlid.Expr in
-  let v_mlc = Var.mk "dst" (expr "%a *" pp_expr custom.cty.cty) in
-  let v_c = Var.mk "src" (expr "%a *" pp_expr struct_.cty) in
-  let c_to_mlc : Camlid.Expert.convert =
-    {
-      dst = v_mlc;
-      src = v_c;
-      convert = expr "%s_set(*%a,%a)" ml pp_var v_mlc pp_var v_c;
-    }
-  in
-  let mlc_to_c : Camlid.Expert.convert =
-    {
-      dst = v_mlc;
-      src = v_c;
-      convert = expr "%s_set(%a,*%a)" ml pp_var v_c pp_var v_mlc;
-    }
-  in
-  let struct_to_custom =
-    Camlid.Expert.convert ~mlc:custom ~c:struct_ ~c_to_mlc ~mlc_to_c ()
-  in
-  (custom, struct_to_custom)
+let flint_type ?(c_suffix = "_struct") ml =
+  value_type ~init:(ml ^ "_init") ~clear:(ml ^ "_clear") ~copy:(ml ^ "_set")
+    ~ml ~c:(ml ^ c_suffix) ()
 
-let fmpz, _ = flint_custom_ptr ~c_suffix:"" "fmpz"
-let fmpq, _ = flint_custom_ptr ~c_suffix:"" "fmpq"
-let fmpz_poly, _ = flint_custom_ptr "fmpz_poly"
-let arf, _ = flint_custom_ptr "arf"
-let mag, _ = flint_custom_ptr "mag"
-let arb, _ = flint_custom_ptr "arb"
-let acb, acb_struct = flint_custom_ptr "acb"
-let qqbar, qqbar_struct = flint_custom_ptr "qqbar"
-let fmpz_poly_factor, _ = flint_custom_ptr "fmpz_poly_factor"
+let fmpz_t = flint_type ~c_suffix:"" "fmpz"
+let fmpq_t = flint_type ~c_suffix:"" "fmpq"
+let fmpz_poly_t = flint_type "fmpz_poly"
+let arf_t = flint_type "arf"
+let mag_t = flint_type "mag"
+let arb_t = flint_type "arb"
+let acb_t = flint_type "acb"
+let qqbar_t = flint_type "qqbar"
+let fmpz_poly_factor_t = flint_type "fmpz_poly_factor"
+let fmpz = fmpz_t.t
+let fmpq = fmpq_t.t
+let fmpz_poly = fmpz_poly_t.t
+let arf = arf_t.t
+let mag = mag_t.t
+let arb = arb_t.t
+let acb = acb_t.t
+let acb_struct = acb_t.value
+let qqbar = qqbar_t.t
+let qqbar_struct = qqbar_t.value
+let fmpz_poly_factor = fmpz_poly_factor_t.t
 
 (** Reusable dimension parameters for output matrices *)
-let out_rows, var_out_rows =
-  Camlid.Expert.simple_param ~input_label:"rows" ~input:true ~used_in_call:false
-    int
+let out_rows, var_out_rows = extra_input ~label:"rows" int
 
-let out_cols, var_out_cols =
-  Camlid.Expert.simple_param ~input_label:"cols" ~input:true ~used_in_call:false
-    int
+let out_cols, var_out_cols = extra_input ~label:"cols" int
 
 let fmpz_mat =
-  let icty = Camlid.Expr.expr "fmpz_mat_struct" in
-  let cty = Camlid.Expr.expr "fmpz_mat_struct" in
-  let initialize =
-    Camlid.Expert.mk_initialize ~cty "fmpz_mat_init" ~vars:(fun v ->
-        [ v; var_out_rows; var_out_cols ])
-  in
   let pre =
-    Camlid.Expert.custom_ptr ~initialize
-      ~finalize:(Camlid.Expert.mk_finalize ~icty "fmpz_mat_clear")
-      ~ml:"fmpz_mat" ~cty ~malloc:true ()
+    (value_type ~init:"fmpz_mat_init"
+       ~init_args:[ var_out_rows; var_out_cols ]
+       ~clear:"fmpz_mat_clear" ~copy:"fmpz_mat_set" ~ml:"fmpz_mat"
+       ~c:"fmpz_mat_struct" ())
+      .t
   in
-  let conv : Camlid.Type.conv =
+  let conv : Camlid.Ty.conv =
     let open Camlid.Expr in
     match pre.conv with
     | Boxed { c2ml; ml2c } ->
@@ -95,10 +59,10 @@ let fmpz_mat_window vmat =
   let cty = Camlid.Expr.expr "fmpz_mat_struct" in
   let pre =
     Camlid.Expert.custom_ptr
-      ~finalize:(Camlid.Expert.mk_finalize ~icty "fmpz_mat_window_clear")
+      ~clear:(Camlid.Expert.mk_clear ~icty "fmpz_mat_window_clear")
       ~ml:"fmpz_mat" ~cty ~malloc:true ()
   in
-  let conv : Camlid.Type.conv =
+  let conv : Camlid.Ty.conv =
     let open Camlid.Expr in
     match pre.conv with
     | Boxed { c2ml; ml2c = _ } ->
@@ -145,7 +109,7 @@ let fmpz_mat_out2, _ =
     block of a ca *)
 let ca_ctx, ca_ctx_var, ty_ca_ctx =
   let ty =
-    custom ~initialize:"ca_ctx_ref_count_init" ~finalize:"ca_ctx_ref_count_free"
+    custom ~init:"ca_ctx_ref_count_init" ~clear:"ca_ctx_ref_count_free"
       ~ml:"ca_ctx" ~c:"ca_ctx_ref_count*" ()
   in
   let ca_ctx, ca_ctx_var =
@@ -163,29 +127,22 @@ let ca =
     Camlid.Expert.mk_set ~icty ~cty "ca_with_ctx_set" ~vars:(fun ~dst ~src ->
         [ dst; src; ca_ctx_var ])
   in
-  let initialize =
-    Camlid.Expert.mk_initialize ~cty "ca_with_ctx_init" ~vars:(fun v ->
+  let init =
+    Camlid.Expert.mk_init ~cty "ca_with_ctx_init" ~vars:(fun v ->
         [ v; ca_ctx_var ])
   in
   Camlid.Expert.(
-    custom ~initialize
-      ~finalize:(mk_finalize ~icty "ca_with_ctx_free")
+    custom ~init
+      ~clear:(mk_clear ~icty "ca_with_ctx_free")
       ~ml:"ca" ~icty ~cty
       ~get:(mk_get ~icty ~cty "ca_with_ctx_get")
       ~set ())
 
-let copy_gen (ty : Camlid.Type.mlc) name =
-  Camlid.Expert.(
-    copy ty
-      ~copy:
-        (mk_copy ~cty:ty.cty.cty name ~exprs:(fun ~dst ~src ->
-             [ Camlid.Expr.e_deref dst; Camlid.Expr.e_deref src ])))
-
-let copy_arf = copy_gen arf "arf_set"
-let copy_mag = copy_gen mag "mag_set"
-let copy_arb = copy_gen arb "arb_set"
-let copy_fmpz_poly = copy_gen fmpz_poly "fmpz_poly_set"
-let copy_acb = copy_gen acb "acb_set"
+let copy_arf = arf_t.copy_of_ptr
+let copy_mag = mag_t.copy_of_ptr
+let copy_arb = arb_t.copy_of_ptr
+let copy_fmpz_poly = fmpz_poly_t.copy_of_ptr
+let copy_acb = acb_t.copy_of_ptr
 
 let () =
   Camlid.Generate.to_file "ocaml_flint_core" ~prefix:"ocaml_flint_"
@@ -215,7 +172,7 @@ let () =
       module_ "FMPZ_poly"
         [
           ml_alias "t" fmpz_poly;
-          (let arr = input_array fmpz in
+          (let arr = array_len fmpz in
            func ~ml:"create_fmpz" "create_fmpz_poly_from_fmpz"
              [ output fmpz_poly; arr.t; arr.len ]);
           func ~ml:"create" "create_fmpz_poly_from_z"
@@ -449,8 +406,8 @@ let () =
              [
                array.t;
                input fmpz_poly;
-               input int_trunc;
-               input int_trunc;
+               input c_int;
+               input c_int;
                array.len;
              ]);
         ];
@@ -463,7 +420,7 @@ let () =
             ~result:bool;
           func ~ml:"compare" "qqbar_cmp_root_order"
             [ input qqbar; input qqbar ]
-            ~result:int_trunc;
+            ~result:c_int;
           func ~ml:"hash" "qqbar_hash" [ input qqbar ] ~result:size_t;
           func ~ml:"is_real" "qqbar_is_real" [ input qqbar ] ~result:bool;
           func ~ml:"is_zero" "qqbar_is_zero" [ input qqbar ] ~result:bool;
@@ -475,13 +432,13 @@ let () =
           (let status, opt_qqbar = ret_option_if qqbar in
            func ~ml:"from_enclosure" "qqbar_from_fmpz_poly"
              [ output opt_qqbar; input fmpz_poly; input acb; status ]);
-          get_expression ~name:"get_roots_irreducible" int_trunc
+          get_expression ~name:"get_roots_irreducible" c_int
             "QQBAR_ROOTS_IRREDUCIBLE";
-          get_expression ~name:"get_roots_unsorted" int_trunc
+          get_expression ~name:"get_roots_unsorted" c_int
             "QQBAR_ROOTS_UNSORTED";
           (let array = fixed_length_array qqbar_struct in
            func ~ml:"from_roots" "qqbar_roots_fmpz_poly"
-             [ array.t; input fmpz_poly; input int_trunc; array.len ]);
+             [ array.t; input fmpz_poly; input c_int; array.len ]);
         ];
       (let func_ctx ?result ~ml c params =
          func ?result ~ml c (ca_ctx :: params) ~call_params:(params @ [ ca_ctx ])
@@ -495,7 +452,7 @@ let () =
              [
                func_ctx ~ml:"compare" "ca_cmp_repr"
                  [ input ca; input ca ]
-                 ~result:int_trunc;
+                 ~result:c_int;
                func_ctx ~ml:"equal" "ca_equal_repr"
                  [ input ca; input ca ]
                  ~result:bool;
@@ -522,25 +479,25 @@ let () =
            func_ctx ~ml:"pow" "ca_pow_fmpq" [ output ca; input ca; input fmpq ];
            func_ctx ~ml:"equal" "ca_check_equal"
              [ input ca; input ca ]
-             ~result:int_trunc;
+             ~result:c_int;
            func_ctx ~ml:"le" "ca_check_le"
              [ input ca; input ca ]
-             ~result:int_trunc;
+             ~result:c_int;
            func_ctx ~ml:"ge" "ca_check_ge"
              [ input ca; input ca ]
-             ~result:int_trunc;
+             ~result:c_int;
            func_ctx ~ml:"gt" "ca_check_gt"
              [ input ca; input ca ]
-             ~result:int_trunc;
+             ~result:c_int;
            func_ctx ~ml:"lt" "ca_check_lt"
              [ input ca; input ca ]
-             ~result:int_trunc;
+             ~result:c_int;
            func_ctx ~ml:"is_negative_real" "ca_check_is_negative_real"
              [ input ca ]
-             ~result:int_trunc;
-           get_expression ~name:"t_true" int_trunc "T_TRUE";
-           get_expression ~name:"t_false" int_trunc "T_FALSE";
-           get_expression ~name:"t_unknown" int_trunc "T_UNKNOWN";
+             ~result:c_int;
+           get_expression ~name:"t_true" c_int "T_TRUE";
+           get_expression ~name:"t_false" c_int "T_FALSE";
+           get_expression ~name:"t_unknown" c_int "T_UNKNOWN";
            func_ctx ~ml:"get_z" "ca_get_fmpz"
              [ output fmpz; input ca ]
              ~result:bool;
