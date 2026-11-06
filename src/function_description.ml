@@ -85,8 +85,10 @@ module Functions (F : Ctypes.FOREIGN) = struct
 
   let arf_is_finite = foreign "arf_is_finite" (arf_t @-> returning bool)
 
-  let arf_cmpabs_2exp_si =
-    foreign "arf_cmpabs_2exp_si" (arf_t @-> long @-> returning int)
+  let arf_set_mag = foreign "arf_set_mag" (arf_t @-> mag_t @-> returning void)
+
+  let arf_get_fmpz_2exp =
+    foreign "arf_get_fmpz_2exp" (fmpz_t @-> fmpz_t @-> arf_t @-> returning void)
 
   let arf_get_fmpz_fixed_si =
     foreign "arf_get_fmpz_fixed_si"
@@ -194,6 +196,9 @@ module Functions (F : Ctypes.FOREIGN) = struct
 
   let ca_check_is_negative_real =
     foreign "ca_check_is_negative_real" (ca_t @-> ca_ctx_t @-> returning truth_t)
+
+  let ca_check_is_real =
+    foreign "ca_check_is_real" (ca_t @-> ca_ctx_t @-> returning truth_t)
 
   let ca_check_is_rational =
     foreign "ca_check_is_rational" (ca_t @-> ca_ctx_t @-> returning truth_t)

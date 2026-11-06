@@ -70,9 +70,6 @@ module ARF : sig
   val is_finite : t -> bool
   (** false on infinity and nan *)
 
-  val cmpabs_2exp : t -> int -> int
-  (** [cmpabs_2exp x n] compares |x| and [2^n] *)
-
   val get_fmpz_fixed_si : t -> int -> Z.t
   val of_fmpz_2exp : exp:FMPZ.t -> FMPZ.t -> t
   val of_2exp : exp:Z.t -> Z.t -> t
@@ -182,14 +179,15 @@ module CA : sig
   val get_acb_accurate_parts : ctx:CTX.t -> prec:int -> t -> ACB.t
   val equal : ctx:CTX.t -> t -> t -> bool
   val compare : ctx:CTX.t -> t -> t -> int
-  val hash : ctx:CTX.t -> t -> int
-  (** Not compatible with {!equal}: two equal numbers built differently can get
-      different hashes, because it is computed from a rounded enclosure and
-      numbers close to a rounding boundary (integers, for example) can fall on
-      either side. For instance [k] and [k * sqrt(5+2*sqrt 6) / (sqrt 2 + sqrt 3)]
-      differ for [k = 25]. Don't use it as the hash of a table keyed by
-      {!equal}. Numbers with a non finite enclosure, and those above [2^4096],
-      get a constant. *)
+  val hash : ctx:CTX.t -> t -> int option
+  (** If both give [Some], equal numbers have equal hashes, however they were
+      built: the hash depends only on the rounding of the number to 20
+      significant bits.
+
+      [None] says nothing: special values, numbers not known to be real, or
+      FLINT can't decide the rounding. One form of a number can give [None] and
+      another form [Some h], so on [None] the caller must not continue with a
+      default hash, which would break the property above. *)
 
   val sign : ctx:CTX.t -> t -> int
   val le : ctx:CTX.t -> t -> t -> bool

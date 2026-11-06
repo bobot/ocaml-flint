@@ -167,7 +167,16 @@ module ARF = struct
   let pp fmt x = Format.pp_print_string fmt (External.to_string x)
 
   let is_finite x = arf_is_finite x
-  let cmpabs_2exp x n = arf_cmpabs_2exp_si x (Signed.Long.of_int n)
+
+  let of_mag m =
+    let arf = C.mk_arf () in
+    arf_set_mag arf m;
+    arf
+
+  let to_2exp x =
+    let m = FMPZ.C.mk_fmpz () and e = FMPZ.C.mk_fmpz () in
+    arf_get_fmpz_2exp m e x;
+    (FMPZ.to_z m, FMPZ.to_z e)
 
   let get_fmpz_fixed_si x n =
     let z = FMPZ.C.mk_fmpz () in
@@ -413,6 +422,7 @@ module CA = struct
   let compare_q ~ctx x y = compare ~ctx x (of_q ~ctx y)
   let sign ~ctx x = compare ~ctx x (zero ~ctx ())
   let is_negative_real ~ctx x = of_truth_exn (ca_check_is_negative_real x ctx)
+  let is_real ~ctx x = of_truth_exn (ca_check_is_real x ctx)
 
   let is_rational ~ctx x =
     match ca_check_is_rational x ctx with
@@ -428,15 +438,65 @@ module CA = struct
     ca_get_acb_accurate_parts acb t (Signed.Long.of_int prec) ctx;
     acb
 
-  let hash ~ctx t =
-    let arb = get_acb_accurate_parts ~ctx ~prec:24 t in
-    let mid = ARB.mid (ACB.real arb) in
-    (* get_fmpz_fixed_si aborts on infinity and nan (the result of [1/x] for a
-       zero FLINT doesn't recognize), and needs memory for all the bits of a
-       huge number. *)
-    if not (ARF.is_finite mid) then 0
-    else if ARF.cmpabs_2exp mid 4096 >= 0 then 1
-    else Z.hash (ARF.get_fmpz_fixed_si mid (-16))
+  (* Hash of the real number: the rounding down of |x| to 20 significant bits,
+     which depends only on the number. Port of [Hash] in
+     common/colibrilib/real_hash.mlw of colibrics, where it is proved. *)
+  let hash_bits = 20
+  let hash_max_exp = 4_000_000
+
+  (* [(m, r, e)] with [(m-r)*2^e <= real part of x <= (m+r)*2^e] *)
+  let hash_enclose ~ctx x =
+    let re = ACB.real (get_acb_accurate_parts ~ctx ~prec:64 x) in
+    let mid = ARB.mid re and rad = ARF.of_mag (ARB.rad re) in
+    if not (ARF.is_finite mid && ARF.is_finite rad) then raise Incomplete;
+    let m, me = ARF.to_2exp mid and r, re = ARF.to_2exp rad in
+    if not (Z.fits_int me && Z.fits_int re) then raise Incomplete;
+    let me = Z.to_int me and re = Z.to_int re in
+    if Z.equal m Z.zero then (m, r, re)
+    else if Z.equal r Z.zero then (m, r, me)
+    else if Stdlib.abs (me - re) > hash_max_exp then raise Incomplete
+    else
+      let e = min me re in
+      (Z.shift_left m (me - e), Z.shift_left r (re - e), e)
+
+  let hash_round n e =
+    let b = Z.numbits n in
+    if b >= hash_bits then (Z.shift_right n (b - hash_bits), e + b - hash_bits)
+    else (Z.shift_left n (hash_bits - b), e - (hash_bits - b))
+
+  (* [s * x] compared with [m * 2^f] *)
+  let hash_side ~ctx x s m f =
+    if Stdlib.abs f > hash_max_exp then raise Incomplete;
+    let q = Q.of_bigint (if s > 0 then m else Z.neg m) in
+    let q = if f >= 0 then Q.mul_2exp q f else Q.div_2exp q (-f) in
+    let c = compare_q ~ctx x q in
+    if s > 0 then c else -c
+
+  let hash_positive ~ctx x s lo hi e =
+    let ((m1, f1) as r1) = hash_round lo e in
+    let ((m2, f2) as r2) = hash_round hi e in
+    let m, f =
+      if Z.equal m1 m2 && f1 = f2 then r1
+      else if hash_side ~ctx x s m2 f2 >= 0 then r2
+      else if hash_side ~ctx x s (Z.succ m1) f1 < 0 then r1
+      else raise Incomplete
+    in
+    Hashtbl.hash (s, Z.to_int m, f)
+
+  let hash ~ctx x =
+    match
+      if not (is_real ~ctx x) then None
+      else
+        let m, r, e = hash_enclose ~ctx x in
+        let lo = Z.sub m r and hi = Z.add m r in
+        if Z.sign lo > 0 then Some (hash_positive ~ctx x 1 lo hi e)
+        else if Z.sign hi < 0 then
+          Some (hash_positive ~ctx x (-1) (Z.neg hi) (Z.neg lo) e)
+        else if sign ~ctx x = 0 then Some (Hashtbl.hash (0, 0, 0))
+        else None
+    with
+    | h -> h
+    | exception Incomplete -> None
 
   let get_z_exn ~ctx t =
     let fmpz = FMPZ.C.mk_fmpz () in
