@@ -199,9 +199,15 @@ module CA : sig
   val equal : ctx:CTX.t -> t -> t -> bool
   val compare : ctx:CTX.t -> t -> t -> int
 
-  val hash : ctx:CTX.t -> t -> int
-  (** Edge cases break the hash property (1 every 256 cases). Use
-      {!bucket_probe} for avoiding edge cases. *)
+  val hash : ctx:CTX.t -> t -> int option
+  (** If both give [Some], equal numbers have equal hashes, however they were
+      built: the hash depends only on the rounding of the number to 20
+      significant bits.
+
+      [None] says nothing: special values, numbers not known to be real, or
+      FLINT can't decide the rounding. One form of a number can give [None] and
+      another form [Some h], so on [None] the caller must not continue with a
+      default hash, which would break the property above. *)
 
   type bucket_probe =
     | Single of Z.t
@@ -214,6 +220,13 @@ module CA : sig
     ctx:Ocaml_flint_core.ca_ctx ->
     t ->
     bucket_probe
+
+  exception Incomplete
+  (** FLINT can't decide: raised by the comparisons, {!floor}, {!ceil} and
+      {!to_qqbar}. *)
+
+  val is_rational : ctx:CTX.t -> t -> bool option
+  (** [None] when FLINT can't decide. *)
 
   val sign : ctx:CTX.t -> t -> int
   val le : ctx:CTX.t -> t -> t -> bool

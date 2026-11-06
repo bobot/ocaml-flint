@@ -186,6 +186,38 @@ let[@inline never] [@local never] run () =
       = 0);
     Format.printf "complex-root-count:%d@." roots
   in
+  let () =
+    let open Flint in
+    (* CA.hash depends only on the number, not on how it was built *)
+    let ctx = CA.CTX.mk () in
+    let ci = CA.of_int ~ctx in
+    let sum = CA.add ~ctx (CA.sqrt ~ctx (ci 2)) (CA.sqrt ~ctx (ci 3)) in
+    let nested =
+      CA.sqrt ~ctx
+        (CA.add ~ctx (ci 5) (CA.mul ~ctx (ci 2) (CA.sqrt ~ctx (ci 6))))
+    in
+    let same a b =
+      assert (CA.equal ~ctx a b);
+      match (CA.hash ~ctx a, CA.hash ~ctx b) with
+      | Some x, Some y -> assert (x = y)
+      | _ -> assert false
+    in
+    for k = -60 to 60 do
+      let k = ci k in
+      same (CA.mul ~ctx k sum) (CA.mul ~ctx k nested);
+      same k (CA.mul ~ctx k (CA.div ~ctx nested sum))
+    done;
+    let two = ci 2 in
+    let pow a b = CA.pow ~ctx two (Q.make (Z.of_int a) (Z.of_int b)) in
+    assert (CA.hash ~ctx two = CA.hash ~ctx (CA.mul ~ctx (pow 128 129) (pow 1 129)));
+    assert (CA.hash ~ctx (CA.sqrt ~ctx (ci (-1))) = None);
+    assert (CA.hash ~ctx (CA.div ~ctx (ci 1) (ci 0)) = None);
+    assert (CA.is_rational ~ctx (pow 1 2) = Some false);
+    assert (CA.is_rational ~ctx (ci 2) = Some true);
+    match CA.to_qqbar ~ctx (pow 1 121) with
+    | _ -> assert false
+    | exception CA.Incomplete -> ()
+  in
   ()
 
 let () =

@@ -339,6 +339,8 @@ let () =
             [ output fmpz; input arf; input int ];
           func ~ml:"to_2exp" "arf_get_fmpz_2exp"
             [ output fmpz; output fmpz; input arf ];
+          func ~ml:"is_finite" "arf_is_finite" [ input arf ] ~result:bool;
+          func ~ml:"of_mag" "arf_set_mag" [ output arf; input mag ];
         ];
       module_ "MAG"
         [
@@ -474,7 +476,9 @@ let () =
            func_ctx ~ml:"mul" "ca_mul" [ output ca; input ca; input ca ];
            func_ctx ~ml:"div" "ca_div" [ output ca; input ca; input ca ];
            func_ctx ~ml:"from_qqbar" "ca_set_qqbar" [ output ca; input qqbar ];
-           func_ctx ~ml:"to_qqbar" "ca_get_qqbar" [ output qqbar; input ca ];
+           func_ctx ~ml:"to_qqbar" "ca_get_qqbar"
+             [ output qqbar; input ca ]
+             ~result:bool;
            func_ctx ~ml:"pow_int" "ca_pow_si" [ output ca; input ca; input int ];
            func_ctx ~ml:"pow" "ca_pow_fmpq" [ output ca; input ca; input fmpq ];
            func_ctx ~ml:"equal" "ca_check_equal"
@@ -493,6 +497,12 @@ let () =
              [ input ca; input ca ]
              ~result:c_int;
            func_ctx ~ml:"is_negative_real" "ca_check_is_negative_real"
+             [ input ca ]
+             ~result:c_int;
+           func_ctx ~ml:"is_real" "ca_check_is_real"
+             [ input ca ]
+             ~result:c_int;
+           func_ctx ~ml:"is_rational" "ca_check_is_rational"
              [ input ca ]
              ~result:c_int;
            get_expression ~name:"t_true" c_int "T_TRUE";

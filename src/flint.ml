@@ -266,11 +266,6 @@ module CA = struct
   let of_q ~ctx z = of_fmpq ~ctx (FMPQ.of_q z)
   let get_acb_accurate_parts ~ctx ~prec t = get_acb_accurate_parts ~ctx t prec
 
-  let hash ~ctx t =
-    let arb = get_acb_accurate_parts ~ctx ~prec:24 t in
-    let z = ARF.get_fmpz_fixed_si (ARB.mid (ACB.real arb)) (-16) in
-    Z.hash z
-
   type bucket_probe =
     | Single of Z.t
     | Probe_with_pred of Z.t
@@ -296,25 +291,27 @@ module CA = struct
     else if pos = max_pos then Probe_with_succ super_k
     else Single super_k
 
+  exception Incomplete
+
   let get_z_exn ~ctx x =
     let b, z = get_z ~ctx x in
-    assert b;
-    FMPZ.to_z z
-
-  let get_z ~ctx x =
-    let _, z = get_z ~ctx x in
+    if not b then raise Incomplete;
     FMPZ.to_z z
 
   let to_q ~ctx t =
     let b, q = get_q t ~ctx in
     if b then Some (FMPQ.to_q q) else None
 
-  let floor ~ctx t = get_z (floor t ~ctx) ~ctx
-  let ceil ~ctx t = get_z (ceil t ~ctx) ~ctx
+  let floor ~ctx t = get_z_exn (floor t ~ctx) ~ctx
+  let ceil ~ctx t = get_z_exn (ceil t ~ctx) ~ctx
+
+  let to_qqbar ~ctx t =
+    let b, q = to_qqbar ~ctx t in
+    if not b then raise Incomplete;
+    q
+
   let zero ~ctx () = of_int ~ctx 0
   let one ~ctx () = of_int ~ctx 1
-
-  exception Incomplete
 
   let of_truth_exn =
     let t_true = t_true () in
@@ -330,6 +327,16 @@ module CA = struct
   let gt ~ctx x y = of_truth_exn (gt ~ctx x y)
   let lt ~ctx x y = of_truth_exn (lt ~ctx x y)
   let is_negative_real ~ctx x = of_truth_exn (is_negative_real ~ctx x)
+  let is_real ~ctx x = of_truth_exn (is_real ~ctx x)
+
+  let is_rational =
+    let t_true = t_true () in
+    let t_false = t_false () in
+    fun ~ctx x ->
+      let r = is_rational ~ctx x in
+      if t_true = r then Some true
+      else if t_false = r then Some false
+      else None
 
   let compare ~ctx x y =
     if lt ~ctx x y then -1 else if equal ~ctx x y then 0 else 1
@@ -337,6 +344,66 @@ module CA = struct
   let compare_z ~ctx x y = compare ~ctx x (of_z ~ctx y)
   let compare_q ~ctx x y = compare ~ctx x (of_q ~ctx y)
   let sign ~ctx x = compare ~ctx x (zero ~ctx ())
+
+  (* Hash of the real number: the rounding down of |x| to 20 significant bits,
+     which depends only on the number. Port of [Hash] in
+     common/colibrilib/real_hash.mlw of colibrics, where it is proved. *)
+  let hash_bits = 20
+  let hash_max_exp = 4_000_000
+
+  (* [(m, r, e)] with [(m-r)*2^e <= real part of x <= (m+r)*2^e] *)
+  let hash_enclose ~ctx x =
+    let re = ACB.real (get_acb_accurate_parts ~ctx ~prec:64 x) in
+    let mid = ARB.mid re and rad = ARF.of_mag (ARB.rad re) in
+    if not (ARF.is_finite mid && ARF.is_finite rad) then raise Incomplete;
+    let m, me = ARF.to_2exp mid and r, re = ARF.to_2exp rad in
+    if not (Z.fits_int me && Z.fits_int re) then raise Incomplete;
+    let me = Z.to_int me and re = Z.to_int re in
+    if Z.equal m Z.zero then (m, r, re)
+    else if Z.equal r Z.zero then (m, r, me)
+    else if Stdlib.abs (me - re) > hash_max_exp then raise Incomplete
+    else
+      let e = min me re in
+      (Z.shift_left m (me - e), Z.shift_left r (re - e), e)
+
+  let hash_round n e =
+    let b = Z.numbits n in
+    if b >= hash_bits then (Z.shift_right n (b - hash_bits), e + b - hash_bits)
+    else (Z.shift_left n (hash_bits - b), e - (hash_bits - b))
+
+  (* [s * x] compared with [m * 2^f] *)
+  let hash_side ~ctx x s m f =
+    if Stdlib.abs f > hash_max_exp then raise Incomplete;
+    let q = Q.of_bigint (if s > 0 then m else Z.neg m) in
+    let q = if f >= 0 then Q.mul_2exp q f else Q.div_2exp q (-f) in
+    let c = compare_q ~ctx x q in
+    if s > 0 then c else -c
+
+  let hash_positive ~ctx x s lo hi e =
+    let ((m1, f1) as r1) = hash_round lo e in
+    let ((m2, f2) as r2) = hash_round hi e in
+    let m, f =
+      if Z.equal m1 m2 && f1 = f2 then r1
+      else if hash_side ~ctx x s m2 f2 >= 0 then r2
+      else if hash_side ~ctx x s (Z.succ m1) f1 < 0 then r1
+      else raise Incomplete
+    in
+    Hashtbl.hash (s, Z.to_int m, f)
+
+  let hash ~ctx x =
+    match
+      if not (is_real ~ctx x) then None
+      else
+        let m, r, e = hash_enclose ~ctx x in
+        let lo = Z.sub m r and hi = Z.add m r in
+        if Z.sign lo > 0 then Some (hash_positive ~ctx x 1 lo hi e)
+        else if Z.sign hi < 0 then
+          Some (hash_positive ~ctx x (-1) (Z.neg hi) (Z.neg lo) e)
+        else if sign ~ctx x = 0 then Some (Hashtbl.hash (0, 0, 0))
+        else None
+    with
+    | h -> h
+    | exception Incomplete -> None
 
   let truncate ~ctx a =
     if is_negative_real ~ctx a then ceil ~ctx a else floor ~ctx a
