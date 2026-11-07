@@ -209,7 +209,8 @@ let[@inline never] [@local never] run () =
     done;
     let two = ci 2 in
     let pow a b = CA.pow ~ctx two (Q.make (Z.of_int a) (Z.of_int b)) in
-    assert (CA.hash ~ctx two = CA.hash ~ctx (CA.mul ~ctx (pow 128 129) (pow 1 129)));
+    assert (
+      CA.hash ~ctx two = CA.hash ~ctx (CA.mul ~ctx (pow 128 129) (pow 1 129)));
     assert (CA.hash ~ctx (CA.sqrt ~ctx (ci (-1))) = None);
     assert (CA.hash ~ctx (CA.div ~ctx (ci 1) (ci 0)) = None);
     assert (CA.is_rational ~ctx (pow 1 2) = Some false);

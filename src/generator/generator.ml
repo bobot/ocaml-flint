@@ -1,8 +1,8 @@
 open Camlid.Helper
 
 let flint_type ?(c_suffix = "_struct") ml =
-  value_type ~init:(ml ^ "_init") ~clear:(ml ^ "_clear") ~copy:(ml ^ "_set")
-    ~ml ~c:(ml ^ c_suffix) ()
+  value_type ~init:(ml ^ "_init") ~clear:(ml ^ "_clear") ~copy:(ml ^ "_set") ~ml
+    ~c:(ml ^ c_suffix) ()
 
 let fmpz_t = flint_type ~c_suffix:"" "fmpz"
 let fmpq_t = flint_type ~c_suffix:"" "fmpq"
@@ -405,13 +405,7 @@ let () =
         [
           (let array = fixed_length_array acb_struct in
            func ~ml:"complex_roots" "arb_fmpz_poly_complex_roots"
-             [
-               array.t;
-               input fmpz_poly;
-               input c_int;
-               input c_int;
-               array.len;
-             ]);
+             [ array.t; input fmpz_poly; input c_int; input c_int; array.len ]);
         ];
       module_ "QQBAR"
         [
@@ -436,8 +430,7 @@ let () =
              [ output opt_qqbar; input fmpz_poly; input acb; status ]);
           get_expression ~name:"get_roots_irreducible" c_int
             "QQBAR_ROOTS_IRREDUCIBLE";
-          get_expression ~name:"get_roots_unsorted" c_int
-            "QQBAR_ROOTS_UNSORTED";
+          get_expression ~name:"get_roots_unsorted" c_int "QQBAR_ROOTS_UNSORTED";
           (let array = fixed_length_array qqbar_struct in
            func ~ml:"from_roots" "qqbar_roots_fmpz_poly"
              [ array.t; input fmpz_poly; input c_int; array.len ]);
@@ -484,24 +477,14 @@ let () =
            func_ctx ~ml:"equal" "ca_check_equal"
              [ input ca; input ca ]
              ~result:c_int;
-           func_ctx ~ml:"le" "ca_check_le"
-             [ input ca; input ca ]
-             ~result:c_int;
-           func_ctx ~ml:"ge" "ca_check_ge"
-             [ input ca; input ca ]
-             ~result:c_int;
-           func_ctx ~ml:"gt" "ca_check_gt"
-             [ input ca; input ca ]
-             ~result:c_int;
-           func_ctx ~ml:"lt" "ca_check_lt"
-             [ input ca; input ca ]
-             ~result:c_int;
+           func_ctx ~ml:"le" "ca_check_le" [ input ca; input ca ] ~result:c_int;
+           func_ctx ~ml:"ge" "ca_check_ge" [ input ca; input ca ] ~result:c_int;
+           func_ctx ~ml:"gt" "ca_check_gt" [ input ca; input ca ] ~result:c_int;
+           func_ctx ~ml:"lt" "ca_check_lt" [ input ca; input ca ] ~result:c_int;
            func_ctx ~ml:"is_negative_real" "ca_check_is_negative_real"
              [ input ca ]
              ~result:c_int;
-           func_ctx ~ml:"is_real" "ca_check_is_real"
-             [ input ca ]
-             ~result:c_int;
+           func_ctx ~ml:"is_real" "ca_check_is_real" [ input ca ] ~result:c_int;
            func_ctx ~ml:"is_rational" "ca_check_is_rational"
              [ input ca ]
              ~result:c_int;

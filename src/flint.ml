@@ -334,9 +334,7 @@ module CA = struct
     let t_false = t_false () in
     fun ~ctx x ->
       let r = is_rational ~ctx x in
-      if t_true = r then Some true
-      else if t_false = r then Some false
-      else None
+      if t_true = r then Some true else if t_false = r then Some false else None
 
   let compare ~ctx x y =
     if lt ~ctx x y then -1 else if equal ~ctx x y then 0 else 1
