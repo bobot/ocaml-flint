@@ -39,15 +39,15 @@ end
 module FMPZ_mat : sig
   type t
 
-  val init : rows:int -> columns:int -> (int -> int -> Z.t) -> t
+  val init : rows:int -> cols:int -> (int -> int -> Z.t) -> t
   val rows : t -> int
-  val columns : t -> int
+  val cols : t -> int
   val entry : t -> int -> int -> Z.t
   val entry_fmpz : t -> int -> int -> FMPZ.t
   val set_entry : t -> int -> int -> Z.t -> unit
   val set_entry_fmpz : t -> int -> int -> FMPZ.t -> unit
-  val zero : rows:int -> columns:int -> t
-  val one : rows:int -> columns:int -> t
+  val zero : rows:int -> cols:int -> t
+  val one : rows:int -> cols:int -> t
   val equal : t -> t -> bool
   val is_zero : t -> bool
   val is_one : t -> bool

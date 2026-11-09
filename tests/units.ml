@@ -138,7 +138,7 @@ let[@inline never] [@local never] run () =
     Format.printf "poly-init:%a@." FMPZ_poly.pp p;
 
     let m =
-      FMPZ_mat.init ~rows:2 ~columns:2 (fun i j -> Z.of_int ((2 * i) + j + 1))
+      FMPZ_mat.init ~rows:2 ~cols:2 (fun i j -> Z.of_int ((2 * i) + j + 1))
     in
     assert (Z.equal (FMPZ_mat.entry m 1 0) (Z.of_int 3));
     expect_invalid_arg (fun () -> ignore (FMPZ_mat.entry m 2 0));
@@ -147,7 +147,7 @@ let[@inline never] [@local never] run () =
     assert (Z.equal (FMPZ_mat.trace m) (Z.of_int 5));
     assert (FMPZ_mat.rank m = 2);
     let w = FMPZ_mat.window m ~top:0 ~left:1 ~bottom:2 ~right:2 in
-    assert (FMPZ_mat.rows w = 2 && FMPZ_mat.columns w = 1);
+    assert (FMPZ_mat.rows w = 2 && FMPZ_mat.cols w = 1);
     assert (Z.equal (FMPZ_mat.entry w 1 0) (Z.of_int 4));
     Format.printf "matrix-charpoly:%a@." FMPZ_poly.pp (FMPZ_mat.charpoly m);
 
