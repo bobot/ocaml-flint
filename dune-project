@@ -11,6 +11,6 @@
 
 (package
  (name flint)
- (synopsis "Stub of the C library Flint3")
+ (synopsis "OCaml bindings to the FLINT 3 C library")
  (depends (conf-flint (>= 3.0)) (zarith (>= 1.12)) (camlid (>= 0.3)) (conf-mpfr (>= 3)) (dune-site :with-test) (ocaml (>= 4.14)) (conf-pkg-config (>= 2)) dune-configurator)
 )

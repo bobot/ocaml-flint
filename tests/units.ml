@@ -222,7 +222,9 @@ let[@inline never] [@local never] run () =
   ()
 
 let () =
-  run ();
+  (* through Sys.opaque_identity, flambda can't inline run: its values would
+     become static symbols, never collected *)
+  (Sys.opaque_identity run) ();
   (* Force major collection and compaction so all custom blocks get finalized *)
   Gc.full_major ();
   Gc.compact ();
