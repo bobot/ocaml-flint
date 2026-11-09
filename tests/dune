@@ -5,10 +5,14 @@
  (modules units)
  (libraries flint)
  (modes byte exe)
+ (deps
+  (package flint))
  (package flint))
 
 (rule
  (alias runtest)
+ (deps
+  (package flint))
  (action
   (progn
    (with-stdout-to
