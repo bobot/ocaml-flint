@@ -84,68 +84,38 @@ module FMPZ_mat = struct
   let concat_vertical a b =
     if cols a <> cols b then
       invalid_arg "FMPZ_mat.concat_vertical: incompatible dimensions"
-    else
-      let r = rows a + rows b in
-      let c = cols a in
-      concat_vertical ~rows:r ~cols:c a b
+    else concat_vertical a b
 
   let concat_horizontal a b =
     if rows a <> rows b then
       invalid_arg "FMPZ_mat.concat_horizontal: incompatible dimensions"
-    else
-      let r = rows a in
-      let c = cols a + cols b in
-      concat_horizontal ~rows:r ~cols:c a b
+    else concat_horizontal a b
 
   let add m n =
     if rows m <> rows n || cols m <> cols n then
       invalid_arg "FMPZ_mat.add: incompatible dimensions"
-    else
-      let r, c = (rows m, cols m) in
-      add ~rows:r ~cols:c m n
+    else add m n
 
   let sub m n =
     if rows m <> rows n || cols m <> cols n then
       invalid_arg "FMPZ_mat.sub: incompatible dimensions"
-    else
-      let r, c = (rows m, cols m) in
-      sub ~rows:r ~cols:c m n
+    else sub m n
 
-  let neg m =
-    let r, c = (rows m, cols m) in
-    neg ~rows:r ~cols:c m
-
-  let transpose m =
-    let r, c = (cols m, rows m) in
-    transpose ~rows:r ~cols:c m
-
-  let kronecker_product a b =
-    let r = rows a * rows b in
-    let c = cols a * cols b in
-    kronecker_product ~rows:r ~cols:c a b
-
-  let scalar_mul m d =
-    let r, c = (rows m, cols m) in
-    scalar_mul ~rows:r ~cols:c m (FMPZ.of_z d)
+  let scalar_mul m d = scalar_mul m (FMPZ.of_z d)
 
   let scalar_divexact m d =
     if Z.equal Z.zero d then
       invalid_arg "FMPZ_mat.scalar_divexact: division by zero"
-    else
-      let r, c = (rows m, cols m) in
-      scalar_divexact ~rows:r ~cols:c m (FMPZ.of_z d)
+    else scalar_divexact m (FMPZ.of_z d)
 
   let mul m n =
     if cols m <> rows n then invalid_arg "FMPZ_mat.mul: incompatible dimensions"
-    else
-      let r, c = (rows m, cols n) in
-      mul ~rows:r ~cols:c m n
+    else mul m n
 
   let inv m =
     if rows m <> cols m then invalid_arg "FMPZ_mat.inv: Non-square matrix"
     else
-      let r, c = (rows m, cols m) in
-      let b, res, den = inv ~rows:r ~cols:c m in
+      let b, res, den = inv m in
       if b then Some (res, FMPZ.to_z den) else None
 
   let content m = FMPZ.to_z (content m)
@@ -153,15 +123,6 @@ module FMPZ_mat = struct
   let det m = FMPZ.to_z (det m)
   let rank m = rank m
   let charpoly m = charpoly m
-
-  let hnf m =
-    let r, c = (rows m, cols m) in
-    hnf ~rows:r ~cols:c m
-
-  let hnf_transform m =
-    let r, c = (rows m, cols m) in
-    hnf_transform ~rows:r ~cols:c ~rows2:r ~cols2:r m
-
   let lll m delta epsilon = lll m (FMPQ.of_q delta) (FMPQ.of_q epsilon)
 end
 

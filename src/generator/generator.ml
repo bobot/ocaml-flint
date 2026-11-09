@@ -87,23 +87,26 @@ let fmpz_mat_window vmat =
   in
   { pre with conv; mlty = fmpz_mat.mlty }
 
-let out_rows2, var_out_rows2 =
-  Camlid.Expert.simple_param ~input_label:"rows2" ~input:true
-    ~used_in_call:false int
+(** An input matrix, with the C expressions of its numbers of rows and columns.
+    They can be used to initialize an output of the same function: the inputs
+    are converted before the outputs are initialized. *)
+let in_mat () =
+  let p, c = Camlid.Expert.simple_param ~input:true fmpz_mat in
+  let open Camlid.Expr in
+  (p, expr "fmpz_mat_nrows(%a)" pp_var c, expr "fmpz_mat_ncols(%a)" pp_var c)
 
-let out_cols2, var_out_cols2 =
-  Camlid.Expert.simple_param ~input_label:"cols2" ~input:true
-    ~used_in_call:false int
+(** An output matrix with [rows] rows and [cols] columns, C expressions *)
+let out_mat ~rows ~cols =
+  fst
+    (Camlid.Expert.simple_param
+       ~binds:[ (var_out_rows, rows); (var_out_cols, cols) ]
+       ~output:true fmpz_mat)
 
-(** For second output *)
-let fmpz_mat_out2, _ =
-  Camlid.Expert.simple_param
-    ~binds:
-      [
-        (var_out_rows, Camlid.Expr.e_var var_out_rows2);
-        (var_out_cols, Camlid.Expr.e_var var_out_cols2);
-      ]
-    ~output:true fmpz_mat
+let ( +: ) a b =
+  Camlid.Expr.expr "%a + %a" Camlid.Expr.pp_expr a Camlid.Expr.pp_expr b
+
+let ( *: ) a b =
+  Camlid.Expr.expr "%a * %a" Camlid.Expr.pp_expr a Camlid.Expr.pp_expr b
 
 (** The ca context need to be reference counted since it appears in the custom
     block of a ca *)
@@ -229,83 +232,47 @@ let () =
                input int;
                input int;
              ]);
-          func ~ml:"transpose" "fmpz_mat_transpose"
-            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat ];
-          func ~ml:"concat_vertical" "fmpz_mat_concat_vertical"
-            [
-              output fmpz_mat;
-              out_rows;
-              out_cols;
-              input fmpz_mat;
-              input fmpz_mat;
-            ];
-          func ~ml:"concat_horizontal" "fmpz_mat_concat_horizontal"
-            [
-              output fmpz_mat;
-              out_rows;
-              out_cols;
-              input fmpz_mat;
-              input fmpz_mat;
-            ];
-          func ~ml:"add" "fmpz_mat_add"
-            [
-              output fmpz_mat;
-              out_rows;
-              out_cols;
-              input fmpz_mat;
-              input fmpz_mat;
-            ];
-          func ~ml:"sub" "fmpz_mat_sub"
-            [
-              output fmpz_mat;
-              out_rows;
-              out_cols;
-              input fmpz_mat;
-              input fmpz_mat;
-            ];
-          func ~ml:"neg" "fmpz_mat_neg"
-            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat ];
-          func ~ml:"scalar_mul" "fmpz_mat_scalar_mul_fmpz"
-            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat; input fmpz ];
-          func ~ml:"scalar_divexact" "fmpz_mat_scalar_divexact_fmpz"
-            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat; input fmpz ];
-          func ~ml:"mul" "fmpz_mat_mul"
-            [
-              output fmpz_mat;
-              out_rows;
-              out_cols;
-              input fmpz_mat;
-              input fmpz_mat;
-            ];
-          func ~ml:"inv" "fmpz_mat_inv"
-            [ output fmpz_mat; out_rows; out_cols; output fmpz; input fmpz_mat ]
-            ~result:bool;
-          func ~ml:"kronecker_product" "fmpz_mat_kronecker_product"
-            [
-              output fmpz_mat;
-              out_rows;
-              out_cols;
-              input fmpz_mat;
-              input fmpz_mat;
-            ];
+          (let a, r, c = in_mat () in
+           func ~ml:"transpose" "fmpz_mat_transpose"
+             [ out_mat ~rows:c ~cols:r; a ]);
+          (let a, ra, ca = in_mat () and b, rb, _cb = in_mat () in
+           func ~ml:"concat_vertical" "fmpz_mat_concat_vertical"
+             [ out_mat ~rows:(ra +: rb) ~cols:ca; a; b ]);
+          (let a, ra, ca = in_mat () and b, _rb, cb = in_mat () in
+           func ~ml:"concat_horizontal" "fmpz_mat_concat_horizontal"
+             [ out_mat ~rows:ra ~cols:(ca +: cb); a; b ]);
+          (let a, ra, ca = in_mat () and b, _rb, _cb = in_mat () in
+           func ~ml:"add" "fmpz_mat_add" [ out_mat ~rows:ra ~cols:ca; a; b ]);
+          (let a, ra, ca = in_mat () and b, _rb, _cb = in_mat () in
+           func ~ml:"sub" "fmpz_mat_sub" [ out_mat ~rows:ra ~cols:ca; a; b ]);
+          (let a, r, c = in_mat () in
+           func ~ml:"neg" "fmpz_mat_neg" [ out_mat ~rows:r ~cols:c; a ]);
+          (let a, r, c = in_mat () in
+           func ~ml:"scalar_mul" "fmpz_mat_scalar_mul_fmpz"
+             [ out_mat ~rows:r ~cols:c; a; input fmpz ]);
+          (let a, r, c = in_mat () in
+           func ~ml:"scalar_divexact" "fmpz_mat_scalar_divexact_fmpz"
+             [ out_mat ~rows:r ~cols:c; a; input fmpz ]);
+          (let a, ra, _ca = in_mat () and b, _rb, cb = in_mat () in
+           func ~ml:"mul" "fmpz_mat_mul" [ out_mat ~rows:ra ~cols:cb; a; b ]);
+          (let a, r, c = in_mat () in
+           func ~ml:"inv" "fmpz_mat_inv"
+             [ out_mat ~rows:r ~cols:c; output fmpz; a ]
+             ~result:bool);
+          (let a, ra, ca = in_mat () and b, rb, cb = in_mat () in
+           func ~ml:"kronecker_product" "fmpz_mat_kronecker_product"
+             [ out_mat ~rows:(ra *: rb) ~cols:(ca *: cb); a; b ]);
           func ~ml:"content" "fmpz_mat_content" [ output fmpz; input fmpz_mat ];
           func ~ml:"trace" "fmpz_mat_trace" [ output fmpz; input fmpz_mat ];
           func ~ml:"det" "fmpz_mat_det" [ output fmpz; input fmpz_mat ];
           func ~ml:"rank" "fmpz_mat_rank" [ input fmpz_mat ] ~result:int;
           func ~ml:"charpoly" "fmpz_mat_charpoly"
             [ output fmpz_poly; input fmpz_mat ];
-          func ~ml:"hnf" "fmpz_mat_hnf"
-            [ output fmpz_mat; out_rows; out_cols; input fmpz_mat ];
-          func ~ml:"hnf_transform" "fmpz_mat_hnf_transform"
-            [
-              output fmpz_mat;
-              out_rows;
-              out_cols;
-              fmpz_mat_out2;
-              out_rows2;
-              out_cols2;
-              input fmpz_mat;
-            ];
+          (let a, r, c = in_mat () in
+           func ~ml:"hnf" "fmpz_mat_hnf" [ out_mat ~rows:r ~cols:c; a ]);
+          (let a, r, c = in_mat () in
+           func ~ml:"hnf_transform" "fmpz_mat_hnf_transform"
+             [ out_mat ~rows:r ~cols:c; out_mat ~rows:r ~cols:r; a ]);
           func ~ml:"lll" "fmpz_mat_lll_original"
             [ input fmpz_mat; input fmpq; input fmpq ];
         ];
