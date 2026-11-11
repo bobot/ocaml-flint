@@ -54,38 +54,16 @@ let fmpz_mat =
   in
   { pre with conv }
 
-let fmpz_mat_window vmat =
-  let icty = Camlid.Expr.expr "fmpz_mat_struct" in
-  let cty = Camlid.Expr.expr "fmpz_mat_struct" in
-  let pre =
-    Camlid.Expert.custom_ptr
-      ~clear:(Camlid.Expert.mk_clear ~icty "fmpz_mat_window_clear")
-      ~ml:"fmpz_mat" ~cty ~malloc:true ()
+(** A window shares the entries of its matrix: the OCaml value of a window is a
+    block containing its custom block and the matrix, kept alive (inputs read it
+    with [extract_mat_in_value]). *)
+let fmpz_mat_window =
+  let ty =
+    custom_ptr ~clear:"fmpz_mat_window_clear" ~ml:"fmpz_mat"
+      ~c:"fmpz_mat_struct" ()
   in
-  let conv : Camlid.Ty.conv =
-    let open Camlid.Expr in
-    match pre.conv with
-    | Boxed { c2ml; ml2c = _ } ->
-        let v' = Var.mk "v" (expr "value *") in
-        Boxed
-          {
-            c2ml =
-              call_codef "pack_window"
-                [ (v', e_addr pre.v) ]
-                (fun { fmt } ->
-                  fmt "CAMLparam0();@ ";
-                  fmt "CAMLlocal1(tmp);@ ";
-                  fmt "*%a = caml_alloc_tuple(2);@ " pp_var v';
-                  fmt "%a;@ " Camlid.Expr.pp_expr_binds
-                    (c2ml, [ (pre.v, expr "tmp") ]);
-                  fmt "Store_field(*%a, 0, tmp);@ " pp_var v';
-                  fmt "Store_field(*%a, 1, %a);@ " pp_var v' pp_var vmat;
-                  fmt "CAMLreturn0;@ ");
-            ml2c = expr "#error(\"should not be used\")";
-          }
-    | Unboxable _ -> assert false
-  in
-  { pre with conv; mlty = fmpz_mat.mlty }
+  let w = keep_alive ty in
+  fun vmat -> { (w.with_parent vmat) with mlty = fmpz_mat.mlty }
 
 (** An input matrix, with the C expressions of its numbers of rows and columns.
     They can be used to initialize an output of the same function: the inputs

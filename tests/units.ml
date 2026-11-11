@@ -149,6 +149,21 @@ let[@inline never] [@local never] run () =
     let w = FMPZ_mat.window m ~top:0 ~left:1 ~bottom:2 ~right:2 in
     assert (FMPZ_mat.rows w = 2 && FMPZ_mat.cols w = 1);
     assert (Z.equal (FMPZ_mat.entry w 1 0) (Z.of_int 4));
+    (* a window shares the entries of its matrix and keeps it alive, also
+       through a window of a window *)
+    let ww =
+      let m =
+        FMPZ_mat.init ~rows:3 ~cols:3 (fun i j -> Z.of_int ((3 * i) + j))
+      in
+      let w = FMPZ_mat.window m ~top:1 ~left:1 ~bottom:3 ~right:3 in
+      FMPZ_mat.set_entry w 0 0 (Z.of_int 40);
+      assert (Z.equal (FMPZ_mat.entry m 1 1) (Z.of_int 40));
+      FMPZ_mat.window w ~top:1 ~left:0 ~bottom:2 ~right:2
+    in
+    Gc.full_major ();
+    assert (Z.equal (FMPZ_mat.entry ww 0 0) (Z.of_int 7));
+    assert (Z.equal (FMPZ_mat.entry ww 0 1) (Z.of_int 8));
+    assert (Z.equal (FMPZ_mat.entry (FMPZ_mat.transpose ww) 1 0) (Z.of_int 8));
     Format.printf "matrix-charpoly:%a@." FMPZ_poly.pp (FMPZ_mat.charpoly m);
 
     let factors =
