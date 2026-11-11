@@ -177,6 +177,10 @@ module CA : sig
 
   type t
 
+  val ctx : t -> CTX.t
+  (** The context of a number. It is equal ([=], [compare], [Hashtbl.hash]) to
+      the context given to create the number, but not physically ([==]). *)
+
   val pp : ctx:CTX.t -> Format.formatter -> t -> unit
 
   val zero : ctx:CTX.t -> unit -> t

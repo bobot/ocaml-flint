@@ -11,7 +11,6 @@
 #include <flint/ca.h>
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
-#include <stdatomic.h>
 
 void flint_stubs_utils_z_of_fmpz(fmpz *f, value* z);
 void flint_stubs_utils_fmpz_of_z(fmpz *f, value z);
@@ -57,48 +56,6 @@ static inline void get_coef_fmpz_poly_from_z(value * z, fmpz_poly_struct *poly, 
 static inline void qqbar_from_fmpz_poly(qqbar_t qqbar, fmpz_poly_t poly, acb_t enclosure, int*status){
     *status = _qqbar_validate_existence_uniqueness(&(qqbar->enclosure),poly,enclosure,QQBAR_DEFAULT_PREC);
     fmpz_poly_set(&(qqbar->poly),poly);
-}
-
-typedef struct { _Atomic long int count; ca_ctx_struct ctx; } ca_ctx_ref_count;
-
-static inline void ca_ctx_ref_count_init(ca_ctx_ref_count ** ctx){
-    *ctx=malloc(sizeof(ca_ctx_ref_count));
-    atomic_init(&(*ctx)->count, 1);
-    ca_ctx_init(&(*ctx)->ctx);
-}
-
-static inline void ca_ctx_ref_count_free(ca_ctx_ref_count ** ctx){
-    if (atomic_fetch_sub_explicit(&(*ctx)->count, 1, memory_order_acq_rel) == 1) {
-        ca_ctx_clear(&(*ctx)->ctx);
-        free(*ctx);
-    }
-}
-
-static inline void ca_ctx_ref_count_incr(ca_ctx_ref_count * ctx){
-    atomic_fetch_add_explicit(&ctx->count, 1, memory_order_relaxed);
-}
-
-typedef struct { ca_ctx_ref_count *ctx; ca_struct *ca; } ca_with_ctx;
-
-static inline void ca_with_ctx_get(ca_struct ** ca, ca_with_ctx *ca_with_ctx ){
-    *ca = (ca_with_ctx->ca);
-}
-
-static inline void ca_with_ctx_init(ca_struct ** ca,ca_ctx_ref_count *ctx){
-    *ca=malloc(sizeof(ca_struct));
-    ca_init(*ca,&(ctx->ctx));
-    ca_ctx_ref_count_incr(ctx);
-}
-
-static inline void ca_with_ctx_set(ca_with_ctx *ca_with_ctx, ca_struct ** ca, ca_ctx_ref_count *ctx ){
-    (ca_with_ctx->ca)=*ca;
-    (ca_with_ctx->ctx)=ctx;
-}
-
-static inline void ca_with_ctx_free(ca_with_ctx *ca_with_ctx){
-    ca_clear(ca_with_ctx->ca,&(ca_with_ctx->ctx->ctx));
-    free(ca_with_ctx->ca);
-    ca_ctx_ref_count_free(&ca_with_ctx->ctx);
 }
 
 static inline void fmpz_mat_get_entry_wrapper(fmpz *res, fmpz_mat_struct *m, slong i, slong j) {
