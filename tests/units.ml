@@ -46,7 +46,11 @@ let[@inline never] [@local never] run () =
         (Flint.CA.of_int ~ctx:ctx' 4)
         (Flint.CA.of_int ~ctx:ctx' 3)
     in
-    Format.printf "ctx:%a@." (Flint.CA.pp ~ctx:(Flint.CA.ctx x)) x
+    Format.printf "ctx:%a same:%b other:%b@."
+      (Flint.CA.pp ~ctx:(Flint.CA.ctx x))
+      x
+      (Flint.CA.ctx x = ctx')
+      (Flint.CA.ctx x = ctx)
   in
 
   let () =
