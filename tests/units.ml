@@ -34,6 +34,22 @@ let[@inline never] [@local never] run () =
   in
 
   let () =
+    (* the context of a number, only reachable from the number *)
+    let ctx' =
+      Sys.opaque_identity
+        (fun () -> Flint.CA.ctx (Flint.CA.of_int ~ctx:(Flint.CA.CTX.mk ()) 3))
+        ()
+    in
+    Gc.full_major ();
+    let x =
+      Flint.CA.add ~ctx:ctx'
+        (Flint.CA.of_int ~ctx:ctx' 4)
+        (Flint.CA.of_int ~ctx:ctx' 3)
+    in
+    Format.printf "ctx:%a@." (Flint.CA.pp ~ctx:(Flint.CA.ctx x)) x
+  in
+
+  let () =
     let z1 = Flint.CA.of_z ~ctx (Z.of_int 2) in
     pp "z1" z1;
     let z2 = Flint.CA.sqrt ~ctx z1 in

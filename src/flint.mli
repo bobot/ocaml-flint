@@ -177,6 +177,9 @@ module CA : sig
 
   type t
 
+  val ctx : t -> CTX.t
+  (** The context of a number *)
+
   val pp : ctx:CTX.t -> Format.formatter -> t -> unit
 
   val zero : ctx:CTX.t -> unit -> t

@@ -373,6 +373,7 @@ let () =
            module_ "CTX"
              [ ml_alias "t" ty_ca_ctx; do_nothing "mk" [ output ty_ca_ctx ] ];
            func_ctx ~ml:"of_int" "ca_set_si" [ output ca_out; input int ];
+           ca_child.get_parent "ctx";
            module_ "Repr"
              [
                func_ctx ~ml:"compare" "ca_cmp_repr"

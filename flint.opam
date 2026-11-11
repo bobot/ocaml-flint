@@ -40,5 +40,5 @@ x-maintenance-intent: ["(latest)"]
 # Until camlid with parent/child ~init (bobot/camlid, bobot/agent/child-init) is released;
 # remove before the release (make release refuses it).
 pin-depends: [
-  ["camlid.0.4~dev" "git+https://github.com/bobot/camlid.git#eab9a3c7872cd0e50bd22b1567af0612de2d4779"]
+  ["camlid.0.4~dev" "git+https://github.com/bobot/camlid.git#f625392bd3210f36e70562b9aa4c8a013268416e"]
 ]

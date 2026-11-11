@@ -8,6 +8,7 @@
   - CA.hash returns `int option` and depends only on the number: two equal
     numbers have the same hash (None when it can't be computed exactly)
     (@bobot)
+  - CA.ctx gives the context of a number (@bobot)
   - CA.Incomplete is raised by the comparisons, floor, ceil and to_qqbar
     when FLINT cannot decide, instead of a silent wrong answer; add
     CA.is_rational and CA.bucket_probe (@bobot)
