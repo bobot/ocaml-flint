@@ -19,3 +19,7 @@ r0:1.41421 {a where a = 1.41421 [a^2-2=0]}
 r1:-1.41421 {-a where a = 1.41421 [a^2-2=0]}
 acb:((5 * 2^-2) +/- (536870913 * 2^-31), (0) +/- (0))
 a:1.41421 {a where a = 1.41421 [a^2-2=0]}
+poly-init:3*x^2+2*x+1
+matrix-charpoly:x^2-5*x-2
+factor-count:2
+complex-root-count:2

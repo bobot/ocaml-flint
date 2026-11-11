@@ -1,9 +1,24 @@
 (tests
  (names units)
+ (flags :standard -g)
+ (ocamlopt_flags :standard -g)
  (modules units)
  (libraries flint)
- (modes byte)
+ (modes byte exe)
+ (deps
+  (package flint))
  (package flint))
+
+(rule
+ (alias runtest)
+ (deps
+  (package flint))
+ (action
+  (progn
+   (with-stdout-to
+    byte.result
+    (run %{exe:units.bc}))
+   (run diff -u %{dep:units.expected} byte.result))))
 
 (tests
  (names dynamic)
