@@ -16,6 +16,8 @@ release:
 	@test "$$(sed -n '1s/^## *\(Release \)\{0,1\}\([^ ]*\).*/\2/p' CHANGES)" = "$(TAG)" \
 	  || { echo "CHANGES does not start with ## Release $(TAG) ##"; exit 1; }
 	@git diff --quiet HEAD || { echo "uncommitted changes"; exit 1; }
+	@! grep -q pin-depends flint.opam \
+	  || { echo "remove pin-depends from opam.template (opam-repository refuses it)"; exit 1; }
 	@git fetch -q origin main
 	@test "$$(git rev-parse HEAD)" = "$$(git rev-parse origin/main)" \
 	  || { echo "HEAD is not origin/main"; exit 1; }
