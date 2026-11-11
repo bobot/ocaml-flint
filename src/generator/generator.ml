@@ -78,8 +78,8 @@ let fmpz_mat_window vmat =
                   fmt "*%a = caml_alloc_tuple(2);@ " pp_var v';
                   fmt "%a;@ " Camlid.Expr.pp_expr_binds
                     (c2ml, [ (pre.v, expr "tmp") ]);
-                  fmt "Store_field(%a, 0, tmp);@ " pp_var v';
-                  fmt "Store_field(%a, 1, %a);@ " pp_var v' pp_var vmat;
+                  fmt "Store_field(*%a, 0, tmp);@ " pp_var v';
+                  fmt "Store_field(*%a, 1, %a);@ " pp_var v' pp_var vmat;
                   fmt "CAMLreturn0;@ ");
             ml2c = expr "#error(\"should not be used\")";
           }
