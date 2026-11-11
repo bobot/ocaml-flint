@@ -86,39 +86,24 @@ let ( +: ) a b =
 let ( *: ) a b =
   Camlid.Expr.expr "%a * %a" Camlid.Expr.pp_expr a Camlid.Expr.pp_expr b
 
-(** The ca context need to be reference counted since it appears in the custom
-    block of a ca *)
-let ca_ctx, ca_ctx_var, ty_ca_ctx =
-  let ty =
-    custom ~init:"ca_ctx_ref_count_init" ~clear:"ca_ctx_ref_count_free"
-      ~ml:"ca_ctx" ~c:"ca_ctx_ref_count*" ()
-  in
-  let ca_ctx, ca_ctx_var =
-    Camlid.Expert.simple_param ~input_label:"ctx" ~input:true ty
-  in
-  let ca_ctx = map_param_in_call ~ty:"ca_ctx *" ca_ctx "&(%a->ctx)" in
-  (ca_ctx, ca_ctx_var, ty)
+(** The ca context is allocated and initialized by camlid; it is cleared after
+    the last ca, whose custom block keeps a reference on it (ca_clear needs it)
+*)
+let ty_ca_ctx, ca_ctx_parent =
+  parent ~malloc:"ca_ctx_struct" ~init:"ca_ctx_init" ~clear:"ca_ctx_clear"
+    ~ml:"ca_ctx" ~c:"ca_ctx_struct *" ()
 
-(** The custom block of a ca contains a pointer to its context for the
-    finalization *)
-let ca =
-  let icty = Camlid.Expr.expr "ca_with_ctx" in
-  let cty = Camlid.Expr.expr "ca_struct *" in
-  let set =
-    Camlid.Expert.mk_set ~icty ~cty "ca_with_ctx_set" ~vars:(fun ~dst ~src ->
-        [ dst; src; ca_ctx_var ])
-  in
-  let init =
-    Camlid.Expert.mk_init ~cty "ca_with_ctx_init" ~vars:(fun v ->
-        [ v; ca_ctx_var ])
-  in
-  Camlid.Expert.(
-    custom ~init
-      ~clear:(mk_clear ~icty "ca_with_ctx_free")
-      ~ml:"ca" ~icty ~cty
-      ~get:(mk_get ~icty ~cty "ca_with_ctx_get")
-      ~set ())
+let ca_ctx, ca_ctx_c, ca_ctx_ml =
+  Camlid.Expert.param ~input_label:"ctx" ~input:true ~name:"ctx" ty_ca_ctx
 
+let ca_child =
+  child ca_ctx_parent ~malloc:"ca_struct" ~init:"ca_init" ~parent_last:true
+    ~clear_with_parent:"ca_clear" ~ml:"ca" ~c:"ca_struct *" ()
+
+(** A ca input, and a ca output initialized in the context [ctx] *)
+let ca_in = ca_child.t
+
+let ca_out = ca_child.with_parent ~c:ca_ctx_c ca_ctx_ml
 let copy_arf = arf_t.copy_of_ptr
 let copy_mag = mag_t.copy_of_ptr
 let copy_arb = arb_t.copy_of_ptr
@@ -387,63 +372,80 @@ let () =
          [
            module_ "CTX"
              [ ml_alias "t" ty_ca_ctx; do_nothing "mk" [ output ty_ca_ctx ] ];
-           func_ctx ~ml:"of_int" "ca_set_si" [ output ca; input int ];
+           func_ctx ~ml:"of_int" "ca_set_si" [ output ca_out; input int ];
            module_ "Repr"
              [
                func_ctx ~ml:"compare" "ca_cmp_repr"
-                 [ input ca; input ca ]
+                 [ input ca_in; input ca_in ]
                  ~result:c_int;
                func_ctx ~ml:"equal" "ca_equal_repr"
-                 [ input ca; input ca ]
+                 [ input ca_in; input ca_in ]
                  ~result:bool;
-               func_ctx ~ml:"hash" "ca_hash_repr" [ input ca ] ~result:size_t;
+               func_ctx ~ml:"hash" "ca_hash_repr" [ input ca_in ] ~result:size_t;
              ];
-           ml_alias "t" ca;
+           ml_alias "t" ca_in;
            func_ctx ~ml:"to_string" "ca_fprint"
-             [ output string_as_FILE_ptr; input ca ];
-           func_ctx ~ml:"of_fmpz" "ca_set_fmpz" [ output ca; input fmpz ];
-           func_ctx ~ml:"of_fmpq" "ca_set_fmpq" [ output ca; input fmpq ];
-           func_ctx ~ml:"floor" "ca_floor" [ output ca; input ca ];
-           func_ctx ~ml:"ceil" "ca_ceil" [ output ca; input ca ];
-           func_ctx ~ml:"sqrt" "ca_sqrt" [ output ca; input ca ];
-           func_ctx ~ml:"neg" "ca_neg" [ output ca; input ca ];
-           func_ctx ~ml:"inv" "ca_inv" [ output ca; input ca ];
-           func_ctx ~ml:"abs" "ca_abs" [ output ca; input ca ];
-           func_ctx ~ml:"add" "ca_add" [ output ca; input ca; input ca ];
-           func_ctx ~ml:"sub" "ca_sub" [ output ca; input ca; input ca ];
-           func_ctx ~ml:"mul" "ca_mul" [ output ca; input ca; input ca ];
-           func_ctx ~ml:"div" "ca_div" [ output ca; input ca; input ca ];
-           func_ctx ~ml:"from_qqbar" "ca_set_qqbar" [ output ca; input qqbar ];
+             [ output string_as_FILE_ptr; input ca_in ];
+           func_ctx ~ml:"of_fmpz" "ca_set_fmpz" [ output ca_out; input fmpz ];
+           func_ctx ~ml:"of_fmpq" "ca_set_fmpq" [ output ca_out; input fmpq ];
+           func_ctx ~ml:"floor" "ca_floor" [ output ca_out; input ca_in ];
+           func_ctx ~ml:"ceil" "ca_ceil" [ output ca_out; input ca_in ];
+           func_ctx ~ml:"sqrt" "ca_sqrt" [ output ca_out; input ca_in ];
+           func_ctx ~ml:"neg" "ca_neg" [ output ca_out; input ca_in ];
+           func_ctx ~ml:"inv" "ca_inv" [ output ca_out; input ca_in ];
+           func_ctx ~ml:"abs" "ca_abs" [ output ca_out; input ca_in ];
+           func_ctx ~ml:"add" "ca_add"
+             [ output ca_out; input ca_in; input ca_in ];
+           func_ctx ~ml:"sub" "ca_sub"
+             [ output ca_out; input ca_in; input ca_in ];
+           func_ctx ~ml:"mul" "ca_mul"
+             [ output ca_out; input ca_in; input ca_in ];
+           func_ctx ~ml:"div" "ca_div"
+             [ output ca_out; input ca_in; input ca_in ];
+           func_ctx ~ml:"from_qqbar" "ca_set_qqbar"
+             [ output ca_out; input qqbar ];
            func_ctx ~ml:"to_qqbar" "ca_get_qqbar"
-             [ output qqbar; input ca ]
+             [ output qqbar; input ca_in ]
              ~result:bool;
-           func_ctx ~ml:"pow_int" "ca_pow_si" [ output ca; input ca; input int ];
-           func_ctx ~ml:"pow" "ca_pow_fmpq" [ output ca; input ca; input fmpq ];
+           func_ctx ~ml:"pow_int" "ca_pow_si"
+             [ output ca_out; input ca_in; input int ];
+           func_ctx ~ml:"pow" "ca_pow_fmpq"
+             [ output ca_out; input ca_in; input fmpq ];
            func_ctx ~ml:"equal" "ca_check_equal"
-             [ input ca; input ca ]
+             [ input ca_in; input ca_in ]
              ~result:c_int;
-           func_ctx ~ml:"le" "ca_check_le" [ input ca; input ca ] ~result:c_int;
-           func_ctx ~ml:"ge" "ca_check_ge" [ input ca; input ca ] ~result:c_int;
-           func_ctx ~ml:"gt" "ca_check_gt" [ input ca; input ca ] ~result:c_int;
-           func_ctx ~ml:"lt" "ca_check_lt" [ input ca; input ca ] ~result:c_int;
+           func_ctx ~ml:"le" "ca_check_le"
+             [ input ca_in; input ca_in ]
+             ~result:c_int;
+           func_ctx ~ml:"ge" "ca_check_ge"
+             [ input ca_in; input ca_in ]
+             ~result:c_int;
+           func_ctx ~ml:"gt" "ca_check_gt"
+             [ input ca_in; input ca_in ]
+             ~result:c_int;
+           func_ctx ~ml:"lt" "ca_check_lt"
+             [ input ca_in; input ca_in ]
+             ~result:c_int;
            func_ctx ~ml:"is_negative_real" "ca_check_is_negative_real"
-             [ input ca ]
+             [ input ca_in ]
              ~result:c_int;
-           func_ctx ~ml:"is_real" "ca_check_is_real" [ input ca ] ~result:c_int;
+           func_ctx ~ml:"is_real" "ca_check_is_real"
+             [ input ca_in ]
+             ~result:c_int;
            func_ctx ~ml:"is_rational" "ca_check_is_rational"
-             [ input ca ]
+             [ input ca_in ]
              ~result:c_int;
            get_expression ~name:"t_true" c_int "T_TRUE";
            get_expression ~name:"t_false" c_int "T_FALSE";
            get_expression ~name:"t_unknown" c_int "T_UNKNOWN";
            func_ctx ~ml:"get_z" "ca_get_fmpz"
-             [ output fmpz; input ca ]
+             [ output fmpz; input ca_in ]
              ~result:bool;
            func_ctx ~ml:"get_q" "ca_get_fmpq"
-             [ output fmpq; input ca ]
+             [ output fmpq; input ca_in ]
              ~result:bool;
            func_ctx ~ml:"get_acb_accurate_parts" "ca_get_acb_accurate_parts"
-             [ output acb; input ca; input int ];
+             [ output acb; input ca_in; input int ];
          ]);
       module_ "Debug"
         [

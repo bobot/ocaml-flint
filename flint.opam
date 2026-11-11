@@ -40,5 +40,5 @@ x-maintenance-intent: ["(latest)"]
 # Until camlid 0.3 is in opam-repository (ocaml/opam-repository#31184);
 # remove before the release (make release refuses it).
 pin-depends: [
-  ["camlid.0.3" "git+https://github.com/bobot/camlid.git#4f5089250264ac73eb75203e66fa1494761db3f2"]
+  ["camlid.0.4~dev" "git+https://github.com/bobot/camlid.git#eab9a3c7872cd0e50bd22b1567af0612de2d4779"]
 ]
