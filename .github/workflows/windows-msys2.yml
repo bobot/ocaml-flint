@@ -54,13 +54,14 @@ jobs:
           CHERE_INVOKING: 1
         run: |
           pacman -S --noconfirm --needed mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-gcc mingw-w64-x86_64-gmp mingw-w64-x86_64-mpfr mingw-w64-x86_64-pkgconf
-          curl -sSL -o flint.tar.gz https://github.com/flintlib/flint/releases/download/v3.6.0/flint-3.6.0.tar.gz
-          tar xzf flint.tar.gz -C "$RUNNER_TEMP"
-          cmake -S "$RUNNER_TEMP/flint-3.6.0" -B "$RUNNER_TEMP/flint-build" -G Ninja \
+          T=$(cygpath -u "$RUNNER_TEMP")
+          curl -sSL -o "$T/flint.tar.gz" https://github.com/flintlib/flint/releases/download/v3.6.0/flint-3.6.0.tar.gz
+          tar xzf "$T/flint.tar.gz" -C "$T"
+          cmake -S "$T/flint-3.6.0" -B "$T/flint-build" -G Ninja \
             -DCMAKE_INSTALL_PREFIX=/mingw64 -DCMAKE_BUILD_TYPE=Release \
             -DENABLE_ARCH=NO -DENABLE_AVX2=OFF -DBUILD_TESTING=OFF
-          cmake --build "$RUNNER_TEMP/flint-build"
-          cmake --install "$RUNNER_TEMP/flint-build"
+          cmake --build "$T/flint-build"
+          cmake --install "$T/flint-build"
           pkg-config --modversion flint
           pkg-config --cflags --libs flint
           grep -n "FLINT_LONG_LONG\|FLINT_BITS" /mingw64/include/flint/flint-config.h || true
