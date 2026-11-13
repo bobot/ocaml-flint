@@ -42,6 +42,12 @@ jobs:
           windows-environment: msys2
           opam-pin: false
 
+      # conf-flint.3.0 in opam-repository names the MSYS2 package
+      # "mingw-w64-flint", which opam reports as unavailable: MSYS2 needs
+      # the full name (as conf-mingw-w64-gmp-x86_64). Pin a fixed copy.
+      - name: Pin conf-flint with the MSYS2 package name fixed
+        run: opam pin add -n -y --kind=path conf-flint .github/conf-flint
+
       - name: Install flint dependencies (depext installs mingw-w64 FLINT)
         run: opam install . --deps-only --with-test --confirm-level=unsafe-yes
 
