@@ -42,10 +42,32 @@ jobs:
           windows-environment: msys2
           opam-pin: false
 
-      # conf-flint.3.0 in opam-repository names the MSYS2 package
-      # "mingw-w64-flint", which opam reports as unavailable: MSYS2 needs
-      # the full name (as conf-mingw-w64-gmp-x86_64). Pin a fixed copy.
-      - name: Pin conf-flint with the MSYS2 package name fixed
+      # opam's mingw OCaml uses the MINGW64 environment of MSYS2
+      # (conf-mingw-w64-gcc-x86_64 depends on msys2-mingw64), but MSYS2
+      # builds FLINT only for ucrt64, clang64 and clangarm64: there is no
+      # mingw-w64-x86_64-flint. Build FLINT for MINGW64 from the release,
+      # without AVX2 so that the result runs on any x86_64.
+      - name: Build FLINT 3.6.0 for MINGW64
+        shell: C:\msys64\usr\bin\bash.exe --login -eo pipefail {0}
+        env:
+          MSYSTEM: MINGW64
+          CHERE_INVOKING: 1
+        run: |
+          pacman -S --noconfirm --needed mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-gcc mingw-w64-x86_64-gmp mingw-w64-x86_64-mpfr mingw-w64-x86_64-pkgconf
+          curl -sSL -o flint.tar.gz https://github.com/flintlib/flint/releases/download/v3.6.0/flint-3.6.0.tar.gz
+          tar xzf flint.tar.gz -C "$RUNNER_TEMP"
+          cmake -S "$RUNNER_TEMP/flint-3.6.0" -B "$RUNNER_TEMP/flint-build" -G Ninja \
+            -DCMAKE_INSTALL_PREFIX=/mingw64 -DCMAKE_BUILD_TYPE=Release \
+            -DENABLE_ARCH=NO -DENABLE_AVX2=OFF -DBUILD_TESTING=OFF
+          cmake --build "$RUNNER_TEMP/flint-build"
+          cmake --install "$RUNNER_TEMP/flint-build"
+          pkg-config --modversion flint
+          pkg-config --cflags --libs flint
+          grep -n "FLINT_LONG_LONG\|FLINT_BITS" /mingw64/include/flint/flint-config.h || true
+
+      # conf-flint.3.0's MSYS2 depext names a package that does not exist
+      # for MINGW64: pin a copy without it (FLINT is installed above).
+      - name: Pin conf-flint without the MSYS2 depext
         run: opam pin add -n -y --kind=path conf-flint .github/conf-flint
 
       - name: Install flint dependencies (depext installs mingw-w64 FLINT)
@@ -56,12 +78,6 @@ jobs:
 
       - name: Test flint
         run: opam exec -- dune runtest
-
-      - name: Which FLINT and word size
-        run: |
-          opam exec -- pkg-config --modversion flint
-          opam exec -- pkg-config --cflags --libs flint
-          opam exec -- sh -c 'grep -n "FLINT_LONG_LONG\|FLINT_BITS" "$(pkg-config --variable=includedir flint)/flint/flint-config.h" || true'
 
       - name: Install mlcuddidl (colibri2 dependency)
         id: cudd

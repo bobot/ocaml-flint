@@ -33,7 +33,6 @@ depexts: [
   ["flint-devel"] {os-family = "opensuse"}
   ["libflint-devel"] {os = "win32" & os-distribution = "cygwinports" }
   ["libflint-devel"] {os = "cygwin" & os-distribution = "cygwin" }
-  ["mingw-w64-x86_64-flint"] {os = "win32" & os-distribution = "msys2" & arch = "x86_64"}
   ["flint"] {os-distribution = "nixos"}
   ["flint"] {os-distribution = "arch"}
   ["flint"] {os = "freebsd"}
