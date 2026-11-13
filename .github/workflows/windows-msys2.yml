@@ -1,0 +1,73 @@
+name: Windows MSYS2 (experiment)
+
+# Experiment: build and test flint on Windows with MSYS2 (mingw-w64,
+# FLINT from pacman), and check whether mlcuddidl (needed by colibri2)
+# and a pure OCaml BDD library (mlbdd) build there.
+
+on:
+  push:
+    branches:
+      - bobot/agent/camlid-flint/msys2
+  workflow_dispatch:
+
+jobs:
+  msys2:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      # As in opam-repository's windows.yml: drop the runner's extra
+      # toolchains (Strawberry Perl's gcc, chocolatey's pkg-config, ...)
+      # so that opam only sees the MSYS2 ones.
+      - name: Prune PATH
+        run: |
+          $exclude = @('Strawberry', 'chocolatey', 'OpenSSL', 'vcpkg',
+                       'mingw64', 'LLVM', 'Git\bin', 'Git\usr', 'CMake')
+          $kept = @()
+          foreach ($dir in $env:PATH -split ';' | Where-Object { $_ }) {
+            if ($exclude | Where-Object { $dir -like "*$_*" }) {
+              Write-Host "Dropping  $dir"
+            } else {
+              $kept += $dir
+            }
+          }
+          "PATH=$($kept -join ';')" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Use OCaml 5 with MSYS2
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: "5"
+          windows-environment: msys2
+          opam-pin: false
+
+      - name: Install flint dependencies (depext installs mingw-w64 FLINT)
+        run: opam install . --deps-only --with-test --confirm-level=unsafe-yes
+
+      - name: Build flint
+        run: opam exec -- dune build
+
+      - name: Test flint
+        run: opam exec -- dune runtest
+
+      - name: Which FLINT and word size
+        run: |
+          opam exec -- pkg-config --modversion flint
+          opam exec -- pkg-config --cflags --libs flint
+          opam exec -- sh -c 'grep -n "FLINT_LONG_LONG\|FLINT_BITS" "$(pkg-config --variable=includedir flint)/flint/flint-config.h" || true'
+
+      - name: Install mlcuddidl (colibri2 dependency)
+        id: cudd
+        continue-on-error: true
+        run: opam install mlcuddidl --confirm-level=unsafe-yes
+
+      - name: Install mlbdd (pure OCaml BDD library)
+        id: mlbdd
+        continue-on-error: true
+        run: opam install mlbdd --confirm-level=unsafe-yes
+
+      - name: Summary
+        run: |
+          Write-Host "mlcuddidl: ${{ steps.cudd.outcome }}"
+          Write-Host "mlbdd: ${{ steps.mlbdd.outcome }}"
